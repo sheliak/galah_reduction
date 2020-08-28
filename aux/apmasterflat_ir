@@ -1,0 +1,12936 @@
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 1 2000. 14.02183
+	image	masterflat_ir
+	aperture	1
+	beam	1
+	center	2000. 14.02183
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.5140823
+		-1.822508
+		-0.9311193
+		0.005075869
+		-0.04889077
+		-0.01595364
+		-0.01094299
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 2 2000. 22.31548
+	image	masterflat_ir
+	aperture	2
+	beam	2
+	center	2000. 22.31548
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		-0.5200118
+		-1.825184
+		-0.9356939
+		0.002008684
+		-0.0586272
+		-0.01716232
+		-0.002396014
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 3 2000. 30.38723
+	image	masterflat_ir
+	aperture	3
+	beam	3
+	center	2000. 30.38723
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.5028635
+		-1.893841
+		-0.9537786
+		-0.003643496
+		-0.05387865
+		-0.01016966
+		-0.006448401
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 4 2000. 38.64157
+	image	masterflat_ir
+	aperture	4
+	beam	4
+	center	2000. 38.64157
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		-0.4957763
+		-1.796772
+		-0.9196716
+		0.005330354
+		-0.05334717
+		-0.01487291
+		-0.01040538
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 5 2000. 46.50219
+	image	masterflat_ir
+	aperture	5
+	beam	5
+	center	2000. 46.50219
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.4889576
+		-1.870677
+		-0.9205047
+		-6.266507E-5
+		-0.05275236
+		-0.01480687
+		-0.004264814
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 6 2000. 54.91738
+	image	masterflat_ir
+	aperture	6
+	beam	6
+	center	2000. 54.91738
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.5217352
+		-1.793421
+		-0.9139587
+		0.009842309
+		-0.06414626
+		-0.01970162
+		-0.003242601
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 7 2000. 62.93457
+	image	masterflat_ir
+	aperture	7
+	beam	7
+	center	2000. 62.93457
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.4831634
+		-1.850689
+		-0.8737363
+		0.0127774
+		-0.04036336
+		-0.009725614
+		-0.01302198
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 8 2000. 70.98775
+	image	masterflat_ir
+	aperture	8
+	beam	8
+	center	2000. 70.98775
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		-0.4449068
+		-1.805566
+		-0.8005402
+		0.03464133
+		-0.02063525
+		-0.009253452
+		-0.01650978
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 9 2000. 77.61581
+	image	masterflat_ir
+	aperture	9
+	beam	9
+	center	2000. 77.61581
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		3110.
+		0.2673194
+		-1.795241
+		-0.5628966
+		-0.144477
+		-0.04531297
+		0.04740307
+		-0.03209964
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 10 2000. 87.09948
+	image	masterflat_ir
+	aperture	10
+	beam	10
+	center	2000. 87.09948
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.4072647
+		-1.747097
+		-0.6678721
+		0.05590801
+		0.0144216
+		-0.01785628
+		-0.02537869
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 11 2000. 109.8468
+	image	masterflat_ir
+	aperture	11
+	beam	11
+	center	2000. 109.8468
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.4767967
+		-1.860391
+		-0.8828183
+		0.0101708
+		-0.04390085
+		-0.007540938
+		0.003516283
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 12 2000. 118.0825
+	image	masterflat_ir
+	aperture	12
+	beam	12
+	center	2000. 118.0825
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		-0.4862632
+		-1.884867
+		-0.8603309
+		0.01438465
+		-0.03689751
+		-0.006303939
+		-0.0105325
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 13 2000. 126.3947
+	image	masterflat_ir
+	aperture	13
+	beam	13
+	center	2000. 126.3947
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		-0.4855835
+		-1.880704
+		-0.8671263
+		-0.001051617
+		-0.05253031
+		-0.01035778
+		-7.783161E-5
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 14 2000. 134.7418
+	image	masterflat_ir
+	aperture	14
+	beam	14
+	center	2000. 134.7418
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4100.
+		-0.4485391
+		-1.833651
+		-0.8570581
+		0.007771804
+		-0.04644737
+		-0.005659229
+		-0.002854429
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 15 2000. 143.0699
+	image	masterflat_ir
+	aperture	15
+	beam	15
+	center	2000. 143.0699
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.489006
+		-1.877516
+		-0.856146
+		0.01051214
+		-0.04408404
+		-0.006963835
+		4.172752E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 16 2000. 151.4171
+	image	masterflat_ir
+	aperture	16
+	beam	16
+	center	2000. 151.4171
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.4659778
+		-1.862757
+		-0.8474053
+		0.009982684
+		-0.05310779
+		-0.01778837
+		-0.00477225
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 17 2000. 159.7458
+	image	masterflat_ir
+	aperture	17
+	beam	17
+	center	2000. 159.7458
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.4664284
+		-1.847243
+		-0.8348691
+		0.005473413
+		-0.05771954
+		-0.01529579
+		0.001201782
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 18 2000. 168.0129
+	image	masterflat_ir
+	aperture	18
+	beam	18
+	center	2000. 168.0129
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.4597214
+		-1.830507
+		-0.81881
+		0.01250088
+		-0.04727421
+		-0.01171975
+		-0.003709957
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 19 2000. 176.3083
+	image	masterflat_ir
+	aperture	19
+	beam	19
+	center	2000. 176.3083
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.4344952
+		-1.818023
+		-0.8006123
+		0.01573044
+		-0.0442113
+		-0.01100766
+		-0.004294849
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 20 2000. 184.6226
+	image	masterflat_ir
+	aperture	20
+	beam	20
+	center	2000. 184.6226
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.4129201
+		-1.839108
+		-0.7293202
+		0.03073525
+		-0.01463953
+		-0.003620364
+		-0.01060056
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 21 2000. 205.9287
+	image	masterflat_ir
+	aperture	21
+	beam	21
+	center	2000. 205.9287
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.4538231
+		-1.8692
+		-0.8016285
+		0.005687107
+		-0.04273449
+		-0.01579238
+		-0.004638575
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 22 2000. 214.3134
+	image	masterflat_ir
+	aperture	22
+	beam	22
+	center	2000. 214.3134
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.4494216
+		-1.880961
+		-0.7993069
+		0.00894458
+		-0.0345995
+		-0.004063519
+		-0.003950335
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 23 2000. 222.8676
+	image	masterflat_ir
+	aperture	23
+	beam	23
+	center	2000. 222.8676
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.4558196
+		-1.873414
+		-0.7909152
+		-0.004099726
+		-0.04395811
+		-0.0114864
+		-0.005090703
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 24 2000. 231.3178
+	image	masterflat_ir
+	aperture	24
+	beam	24
+	center	2000. 231.3178
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.4351891
+		-1.857186
+		-0.7854949
+		-0.001273228
+		-0.04375314
+		-0.0143012
+		-6.555103E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 25 2000. 239.7681
+	image	masterflat_ir
+	aperture	25
+	beam	25
+	center	2000. 239.7681
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.4353111
+		-1.857186
+		-0.7854947
+		-0.00127269
+		-0.0437529
+		-0.01430081
+		-6.554798E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 26 2000. 248.1915
+	image	masterflat_ir
+	aperture	26
+	beam	26
+	center	2000. 248.1915
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.4143771
+		-1.850961
+		-0.7555342
+		0.01612845
+		-0.03452599
+		-0.003171223
+		-0.00926986
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 27 2000. 256.5674
+	image	masterflat_ir
+	aperture	27
+	beam	27
+	center	2000. 256.5674
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.4301019
+		-1.859159
+		-0.7280278
+		0.01721184
+		-0.02712883
+		-0.005499796
+		-0.01121766
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 28 2000. 265.0735
+	image	masterflat_ir
+	aperture	28
+	beam	28
+	center	2000. 265.0735
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4120.
+		-0.3867587
+		-1.797796
+		-0.7236863
+		0.01031634
+		-0.0463824
+		-0.01480782
+		-0.001904672
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 29 2000. 273.5424
+	image	masterflat_ir
+	aperture	29
+	beam	29
+	center	2000. 273.5424
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.4042911
+		-1.845848
+		-0.7296566
+		0.005464766
+		-0.04183364
+		-0.01098656
+		-5.017023E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 30 2000. 282.0199
+	image	masterflat_ir
+	aperture	30
+	beam	30
+	center	2000. 282.0199
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.3944187
+		-1.830786
+		-0.706691
+		0.008342738
+		-0.03676058
+		-0.007419656
+		4.132258E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 31 2000. 303.2541
+	image	masterflat_ir
+	aperture	31
+	beam	31
+	center	2000. 303.2541
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.4452057
+		-1.951753
+		-0.6172048
+		0.05699714
+		0.0914615
+		0.04239085
+		7.780731E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 32 2000. 311.7235
+	image	masterflat_ir
+	aperture	32
+	beam	32
+	center	2000. 311.7235
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.4146268
+		-1.834934
+		-0.6746082
+		0.0168939
+		-0.02286809
+		-0.003536698
+		-0.002829489
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 33 2000. 320.4566
+	image	masterflat_ir
+	aperture	33
+	beam	33
+	center	2000. 320.4566
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.4114066
+		-1.849648
+		-0.6831132
+		0.021561
+		-0.02366515
+		-0.003586838
+		-0.00281545
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 34 2000. 328.9488
+	image	masterflat_ir
+	aperture	34
+	beam	34
+	center	2000. 328.9488
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		-0.3682613
+		-1.840364
+		-0.6709477
+		0.01473084
+		-0.01345309
+		-0.004477359
+		-0.003025631
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 35 2000. 337.6487
+	image	masterflat_ir
+	aperture	35
+	beam	35
+	center	2000. 337.6487
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		-0.3672553
+		-1.825428
+		-0.6667778
+		0.01566757
+		-0.0214796
+		-0.008403458
+		-0.0110379
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 36 2000. 346.1406
+	image	masterflat_ir
+	aperture	36
+	beam	36
+	center	2000. 346.1406
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.3824523
+		-1.831673
+		-0.6608577
+		0.02221267
+		-0.0264041
+		-0.001863175
+		-0.005328115
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 37 2000. 354.6249
+	image	masterflat_ir
+	aperture	37
+	beam	37
+	center	2000. 354.6249
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4100.
+		-0.3609019
+		-1.777247
+		-0.6114051
+		0.03034822
+		-5.883625E-5
+		0.002720125
+		-0.005016385
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 38 2000. 363.3202
+	image	masterflat_ir
+	aperture	38
+	beam	38
+	center	2000. 363.3202
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.3885133
+		-1.790708
+		-0.6356987
+		0.02213962
+		-0.02380954
+		-0.004139958
+		-0.006049546
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 39 2000. 371.8358
+	image	masterflat_ir
+	aperture	39
+	beam	39
+	center	2000. 371.8358
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.3609989
+		-1.783858
+		-0.6142464
+		0.02972739
+		-0.0254179
+		-0.002817554
+		-1.354816E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 40 2000. 380.2279
+	image	masterflat_ir
+	aperture	40
+	beam	40
+	center	2000. 380.2279
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		-0.3361991
+		-1.793617
+		-0.5919057
+		0.03196079
+		-0.02420056
+		-0.002969358
+		-0.002945739
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 41 2000. 409.8798
+	image	masterflat_ir
+	aperture	41
+	beam	41
+	center	2000. 409.8798
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		-0.3500457
+		-1.803311
+		-0.6397825
+		-0.004591387
+		-0.03912237
+		-0.008933757
+		-9.817330E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 42 2000. 418.7928
+	image	masterflat_ir
+	aperture	42
+	beam	42
+	center	2000. 418.7928
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		-0.3853581
+		-1.795405
+		-0.6406328
+		0.001509981
+		-0.03571026
+		-0.01321803
+		-0.004663554
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 43 2000. 427.3695
+	image	masterflat_ir
+	aperture	43
+	beam	43
+	center	2000. 427.3695
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.3842575
+		-1.830317
+		-0.6545174
+		9.968275E-4
+		-0.03807447
+		-0.009557785
+		-0.005149401
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 44 2000. 435.9942
+	image	masterflat_ir
+	aperture	44
+	beam	44
+	center	2000. 435.9942
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.3628801
+		-1.815479
+		-0.6263323
+		0.007316134
+		-0.03704562
+		-0.006378596
+		0.004433178
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 45 2000. 444.5108
+	image	masterflat_ir
+	aperture	45
+	beam	45
+	center	2000. 444.5108
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.3499681
+		-1.796705
+		-0.6083796
+		-0.0126969
+		-0.03337185
+		-0.01603392
+		-7.977110E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 46 2000. 453.4501
+	image	masterflat_ir
+	aperture	46
+	beam	46
+	center	2000. 453.4501
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.3821436
+		-1.805672
+		-0.6258269
+		-0.001845113
+		-0.009141757
+		-0.009138175
+		-0.007232466
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 47 2000. 461.8735
+	image	masterflat_ir
+	aperture	47
+	beam	47
+	center	2000. 461.8735
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.3407717
+		-1.784692
+		-0.5794557
+		-0.004528691
+		-0.03692078
+		-0.01166666
+		-0.006258588
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 48 2000. 470.5765
+	image	masterflat_ir
+	aperture	48
+	beam	48
+	center	2000. 470.5765
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.3148095
+		-1.788448
+		-0.5707078
+		0.00311309
+		-0.03646303
+		-0.0069012
+		0.002339078
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 49 2000. 479.2986
+	image	masterflat_ir
+	aperture	49
+	beam	49
+	center	2000. 479.2986
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.3336828
+		-1.819745
+		-0.5761092
+		0.02470127
+		-0.02223964
+		-7.279858E-4
+		0.004585028
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 50 2000. 500.1923
+	image	masterflat_ir
+	aperture	50
+	beam	50
+	center	2000. 500.1923
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4120.
+		-0.3263807
+		-1.795776
+		-0.5788293
+		9.165647E-5
+		-0.03110619
+		-0.00348995
+		-0.001121616
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 51 2000. 508.8828
+	image	masterflat_ir
+	aperture	51
+	beam	51
+	center	2000. 508.8828
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4100.
+		-0.3180777
+		-1.822727
+		-0.5817495
+		0.003986964
+		-0.01175073
+		-0.001110438
+		-0.008129733
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 52 2000. 517.5461
+	image	masterflat_ir
+	aperture	52
+	beam	52
+	center	2000. 517.5461
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		-0.3591104
+		-1.860228
+		-0.610323
+		-0.005488362
+		-0.02906932
+		0.001518681
+		-0.003516734
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 53 2000. 526.3317
+	image	masterflat_ir
+	aperture	53
+	beam	53
+	center	2000. 526.3317
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.3878839
+		-1.852688
+		-0.6168851
+		0.002042879
+		-0.02712585
+		-0.001951154
+		-6.391841E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 54 2000. 535.2164
+	image	masterflat_ir
+	aperture	54
+	beam	54
+	center	2000. 535.2164
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.3671339
+		-1.864127
+		-0.6113713
+		0.003640515
+		-0.01569742
+		0.008625815
+		-0.008596043
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 55 2000. 543.6637
+	image	masterflat_ir
+	aperture	55
+	beam	55
+	center	2000. 543.6637
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		-0.3957898
+		-2.108897
+		-0.7014899
+		-0.152124
+		0.006235717
+		-0.02277519
+		-0.01798654
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 56 2000. 552.755
+	image	masterflat_ir
+	aperture	56
+	beam	56
+	center	2000. 552.755
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.367727
+		-1.801629
+		-0.5834777
+		0.03375528
+		-0.01868004
+		0.001264396
+		-0.007265138
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 57 2000. 561.2056
+	image	masterflat_ir
+	aperture	57
+	beam	57
+	center	2000. 561.2056
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.3413143
+		-1.840262
+		-0.5559426
+		3.766822E-4
+		-0.03192877
+		-0.01106437
+		6.307311E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 58 2000. 570.1743
+	image	masterflat_ir
+	aperture	58
+	beam	58
+	center	2000. 570.1743
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		-0.3107025
+		-1.766482
+		-0.5443124
+		0.04054508
+		-0.01637589
+		0.006560459
+		-0.001155235
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 59 2000. 578.9048
+	image	masterflat_ir
+	aperture	59
+	beam	59
+	center	2000. 578.9048
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.3178464
+		-1.800435
+		-0.5222805
+		0.01080568
+		-0.02591621
+		-0.003084703
+		-0.00173213
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 60 2000. 601.5696
+	image	masterflat_ir
+	aperture	60
+	beam	60
+	center	2000. 601.5696
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.3044867
+		-1.768003
+		-0.5022198
+		0.01288995
+		-0.02311631
+		5.822257E-4
+		0.001046194
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 61 2000. 610.2159
+	image	masterflat_ir
+	aperture	61
+	beam	61
+	center	2000. 610.2159
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.3499535
+		-1.805046
+		-0.5163289
+		0.007343359
+		-0.01907467
+		0.009501231
+		9.842373E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 62 2000. 619.2465
+	image	masterflat_ir
+	aperture	62
+	beam	62
+	center	2000. 619.2465
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.3238058
+		-1.789279
+		-0.5090555
+		0.00538579
+		-0.02939272
+		-0.003581182
+		0.002569499
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 63 2000. 628.0636
+	image	masterflat_ir
+	aperture	63
+	beam	63
+	center	2000. 628.0636
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.3174012
+		-1.793467
+		-0.5024955
+		0.006617032
+		-0.02247132
+		-0.003726319
+		-0.003777618
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 64 2000. 636.8438
+	image	masterflat_ir
+	aperture	64
+	beam	64
+	center	2000. 636.8438
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.3090684
+		-1.773457
+		-0.4873822
+		-0.003933148
+		-0.03034052
+		-0.007037329
+		-0.003684352
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 65 2000. 645.5181
+	image	masterflat_ir
+	aperture	65
+	beam	65
+	center	2000. 645.5181
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.3060669
+		-1.804296
+		-0.4980218
+		0.009627332
+		-0.01785504
+		-0.003299786
+		-0.004692486
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 66 2000. 654.314
+	image	masterflat_ir
+	aperture	66
+	beam	66
+	center	2000. 654.314
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		-0.2949198
+		-1.757582
+		-0.4711077
+		0.009609369
+		-0.02596164
+		-5.112106E-4
+		0.003230928
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 67 2000. 663.3303
+	image	masterflat_ir
+	aperture	67
+	beam	67
+	center	2000. 663.3303
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.3028308
+		-1.766538
+		-0.4679473
+		0.001308443
+		-0.01945462
+		-0.009239941
+		-0.005290715
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 68 2000. 671.9721
+	image	masterflat_ir
+	aperture	68
+	beam	68
+	center	2000. 671.9721
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.2645936
+		-1.778503
+		-0.4557473
+		0.01676954
+		-0.02259915
+		-0.007579268
+		0.004115874
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 69 2000. 680.7377
+	image	masterflat_ir
+	aperture	69
+	beam	69
+	center	2000. 680.7377
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		-0.2578168
+		-1.751784
+		-0.4314429
+		0.00809129
+		-0.01324191
+		0.004308946
+		-0.001011246
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 70 2000. 702.4545
+	image	masterflat_ir
+	aperture	70
+	beam	70
+	center	2000. 702.4545
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4100.
+		-0.2516419
+		-1.714575
+		-0.4250526
+		0.001703236
+		-0.02298018
+		-0.006229907
+		-0.002881099
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 71 2000. 711.3363
+	image	masterflat_ir
+	aperture	71
+	beam	71
+	center	2000. 711.3363
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		-0.2645148
+		-1.743402
+		-0.4337467
+		-0.005239746
+		-0.02472084
+		-0.009838512
+		-0.006054323
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 72 2000. 720.2304
+	image	masterflat_ir
+	aperture	72
+	beam	72
+	center	2000. 720.2304
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.2788833
+		-1.758701
+		-0.4511155
+		0.003031376
+		-0.02371412
+		0.002942798
+		-0.00159757
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 73 2000. 728.9777
+	image	masterflat_ir
+	aperture	73
+	beam	73
+	center	2000. 728.9777
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.2783095
+		-1.770194
+		-0.4509645
+		0.004070442
+		-0.01677542
+		0.004272181
+		-0.006649868
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 74 2000. 737.8368
+	image	masterflat_ir
+	aperture	74
+	beam	74
+	center	2000. 737.8368
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.2489115
+		-1.730323
+		-0.4042788
+		-0.005201401
+		-0.03016289
+		0.003572131
+		0.002020618
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 75 2000. 746.6559
+	image	masterflat_ir
+	aperture	75
+	beam	75
+	center	2000. 746.6559
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.2226743
+		-1.72344
+		-0.3918158
+		-0.009107461
+		-0.02907469
+		-0.00660817
+		-0.005113332
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 76 2000. 755.6827
+	image	masterflat_ir
+	aperture	76
+	beam	76
+	center	2000. 755.6827
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.2653468
+		-1.723445
+		-0.4270883
+		0.02030053
+		-0.02410892
+		0.002774059
+		-0.00233979
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 77 2000. 764.4096
+	image	masterflat_ir
+	aperture	77
+	beam	77
+	center	2000. 764.4096
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.2221114
+		-1.719654
+		-0.3959022
+		0.003343926
+		-0.02837285
+		-0.001914745
+		-0.005496357
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 78 2000. 773.1353
+	image	masterflat_ir
+	aperture	78
+	beam	78
+	center	2000. 773.1353
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		-0.2270404
+		-1.716394
+		-0.3860205
+		0.01233109
+		-0.01566247
+		0.004684922
+		-0.002183433
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 79 2000. 782.098
+	image	masterflat_ir
+	aperture	79
+	beam	79
+	center	2000. 782.098
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.2642739
+		-1.711876
+		-0.3692577
+		-0.004791567
+		-0.02823973
+		-0.003246372
+		0.001140601
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 80 2000. 803.9053
+	image	masterflat_ir
+	aperture	80
+	beam	80
+	center	2000. 803.9053
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		-0.2474846
+		-1.720044
+		-0.361039
+		0.01926152
+		-0.0192184
+		6.278497E-4
+		-0.002248855
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 81 2000. 812.7507
+	image	masterflat_ir
+	aperture	81
+	beam	81
+	center	2000. 812.7507
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.232515
+		-1.713608
+		-0.3487174
+		0.006620186
+		-0.02723698
+		0.004842491
+		1.960200E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 82 2000. 821.0197
+	image	masterflat_ir
+	aperture	82
+	beam	82
+	center	2000. 821.0197
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.2211092
+		-1.672173
+		-0.2759322
+		0.02440095
+		-0.02765372
+		0.002043245
+		5.966836E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 83 2000. 830.9107
+	image	masterflat_ir
+	aperture	83
+	beam	83
+	center	2000. 830.9107
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.2430025
+		-1.747545
+		-0.3823941
+		0.01138441
+		-0.01358669
+		0.007304272
+		7.381584E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 84 2000. 839.8188
+	image	masterflat_ir
+	aperture	84
+	beam	84
+	center	2000. 839.8188
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.2263488
+		-1.708117
+		-0.3502012
+		0.007790293
+		-0.02201168
+		0.003241605
+		-7.917878E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 85 2000. 848.9006
+	image	masterflat_ir
+	aperture	85
+	beam	85
+	center	2000. 848.9006
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.2341868
+		-1.722865
+		-0.3531384
+		0.02323636
+		-0.01683064
+		0.004128575
+		-7.235776E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 86 2000. 857.8312
+	image	masterflat_ir
+	aperture	86
+	beam	86
+	center	2000. 857.8312
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		-0.2177127
+		-1.705275
+		-0.3440594
+		0.03695977
+		-0.009807136
+		0.003128635
+		-0.003726851
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 87 2000. 866.5917
+	image	masterflat_ir
+	aperture	87
+	beam	87
+	center	2000. 866.5917
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.2099023
+		-1.716083
+		-0.3316106
+		0.02263314
+		-0.01454123
+		0.004609779
+		0.001131768
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 88 2000. 875.8006
+	image	masterflat_ir
+	aperture	88
+	beam	88
+	center	2000. 875.8006
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.2006569
+		-1.682675
+		-0.2948498
+		0.02527989
+		-0.01765086
+		8.665754E-4
+		-0.00511214
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 89 2000. 884.4788
+	image	masterflat_ir
+	aperture	89
+	beam	89
+	center	2000. 884.4788
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		-0.1872393
+		-1.696056
+		-0.2815894
+		0.0304848
+		-0.004850966
+		0.002256263
+		-0.003837344
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 90 2000. 915.8573
+	image	masterflat_ir
+	aperture	90
+	beam	90
+	center	2000. 915.8573
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.2150868
+		-1.682468
+		-0.3019231
+		0.01149468
+		-0.01948586
+		0.00293182
+		0.001074114
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 91 2000. 924.8235
+	image	masterflat_ir
+	aperture	91
+	beam	91
+	center	2000. 924.8235
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.2220334
+		-1.715918
+		-0.3354603
+		0.008482581
+		-0.01595905
+		0.002207471
+		0.002610475
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 92 2000. 933.853
+	image	masterflat_ir
+	aperture	92
+	beam	92
+	center	2000. 933.853
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.2114591
+		-1.683797
+		-0.3113436
+		0.01345533
+		-0.02165593
+		-8.228225E-4
+		-0.001470278
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 93 2000. 942.5833
+	image	masterflat_ir
+	aperture	93
+	beam	93
+	center	2000. 942.5833
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		-0.1804314
+		-1.67168
+		-0.285852
+		-0.003798178
+		-0.02163302
+		0.001145876
+		-3.421880E-5
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 94 2000. 951.407
+	image	masterflat_ir
+	aperture	94
+	beam	94
+	center	2000. 951.407
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.3256438
+		-2.143451
+		-0.5443325
+		-0.07666597
+		-0.03359535
+		-0.005027376
+		-0.004418625
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 95 2000. 960.707
+	image	masterflat_ir
+	aperture	95
+	beam	95
+	center	2000. 960.707
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.1991765
+		-1.656172
+		-0.2755665
+		0.01458614
+		-0.0237066
+		-2.493611E-4
+		-0.001738629
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 96 2000. 969.5465
+	image	masterflat_ir
+	aperture	96
+	beam	96
+	center	2000. 969.5465
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.1593605
+		-1.643476
+		-0.2508059
+		0.0196719
+		-0.01929195
+		0.004635268
+		0.001141382
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 97 2000. 978.5096
+	image	masterflat_ir
+	aperture	97
+	beam	97
+	center	2000. 978.5096
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.1812126
+		-1.664373
+		-0.2650991
+		0.02219532
+		-0.01491353
+		0.002669065
+		0.002720995
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 98 2000. 987.5897
+	image	masterflat_ir
+	aperture	98
+	beam	98
+	center	2000. 987.5897
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.1580932
+		-1.643759
+		-0.2421574
+		0.01737693
+		-0.01556654
+		0.005716309
+		-0.008374313
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 99 2000. 1010.039
+	image	masterflat_ir
+	aperture	99
+	beam	99
+	center	2000. 1010.039
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.1968684
+		-1.718843
+		-0.2916187
+		0.004560486
+		-0.01114432
+		0.007092297
+		-0.002970807
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 100 2000. 1018.934
+	image	masterflat_ir
+	aperture	100
+	beam	100
+	center	2000. 1018.934
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		-0.1671092
+		-1.676201
+		-0.2772318
+		0.00915845
+		-0.01838296
+		0.005724595
+		-0.003437713
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 101 2000. 1028.118
+	image	masterflat_ir
+	aperture	101
+	beam	101
+	center	2000. 1028.118
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.2019133
+		-1.669059
+		-0.2780755
+		0.009503298
+		-0.02321726
+		0.001666548
+		-5.067357E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 102 2000. 1037.084
+	image	masterflat_ir
+	aperture	102
+	beam	102
+	center	2000. 1037.084
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.2167758
+		-1.699408
+		-0.2956673
+		0.01487542
+		-0.01249282
+		0.006697924
+		0.003047783
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 103 2000. 1046.311
+	image	masterflat_ir
+	aperture	103
+	beam	103
+	center	2000. 1046.311
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.1919837
+		-1.650236
+		-0.256506
+		0.01711956
+		-0.0137196
+		0.001650789
+		0.006835362
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 104 2000. 1055.333
+	image	masterflat_ir
+	aperture	104
+	beam	104
+	center	2000. 1055.333
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.161321
+		-1.629774
+		-0.2289701
+		0.02072536
+		-0.02194513
+		-0.004678649
+		-0.003553268
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 105 2000. 1064.383
+	image	masterflat_ir
+	aperture	105
+	beam	105
+	center	2000. 1064.383
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.1892259
+		-1.669452
+		-0.2617723
+		0.02600934
+		-0.0122063
+		0.01003438
+		0.00134523
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 106 2000. 1073.306
+	image	masterflat_ir
+	aperture	106
+	beam	106
+	center	2000. 1073.306
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.1888178
+		-1.674782
+		-0.2522051
+		0.02819764
+		-0.006436017
+		0.0071965
+		-0.001767186
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 107 2000. 1082.499
+	image	masterflat_ir
+	aperture	107
+	beam	107
+	center	2000. 1082.499
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.1572989
+		-1.622967
+		-0.1953277
+		0.01192176
+		-0.01622464
+		0.004453688
+		5.534269E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 108 2000. 1091.432
+	image	masterflat_ir
+	aperture	108
+	beam	108
+	center	2000. 1091.432
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.1487556
+		-1.628654
+		-0.2023014
+		0.01381654
+		-0.01480069
+		0.002280117
+		-0.001939913
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 109 2000. 1114.201
+	image	masterflat_ir
+	aperture	109
+	beam	109
+	center	2000. 1114.201
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.163677
+		-1.635538
+		-0.2032651
+		0.01406693
+		-0.01782944
+		0.001078887
+		-5.712679E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 110 2000. 1123.34
+	image	masterflat_ir
+	aperture	110
+	beam	110
+	center	2000. 1123.34
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		-0.1562436
+		-1.627972
+		-0.2085282
+		0.01318447
+		-0.01925692
+		0.002444946
+		1.516979E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 111 2000. 1132.439
+	image	masterflat_ir
+	aperture	111
+	beam	111
+	center	2000. 1132.439
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.139483
+		-1.619116
+		-0.1953222
+		0.01118567
+		-0.02141342
+		0.003954507
+		-0.002751555
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 112 2000. 1141.493
+	image	masterflat_ir
+	aperture	112
+	beam	112
+	center	2000. 1141.493
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		-0.1325718
+		-1.599098
+		-0.1789883
+		0.01173261
+		-0.01876663
+		0.003498684
+		-1.004204E-5
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 113 2000. 1150.497
+	image	masterflat_ir
+	aperture	113
+	beam	113
+	center	2000. 1150.497
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		-0.1557228
+		-1.617909
+		-0.1870906
+		0.002425477
+		-0.01530762
+		0.004384544
+		0.004410234
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 114 2000. 1159.696
+	image	masterflat_ir
+	aperture	114
+	beam	114
+	center	2000. 1159.696
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.1417343
+		-1.601488
+		-0.1810222
+		0.02164296
+		-0.01748212
+		0.002807966
+		1.754929E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 115 2000. 1168.696
+	image	masterflat_ir
+	aperture	115
+	beam	115
+	center	2000. 1168.696
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.1755957
+		-1.655957
+		-0.215283
+		0.0129513
+		-0.01305182
+		-3.280164E-4
+		-0.00883057
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 116 2000. 1178.006
+	image	masterflat_ir
+	aperture	116
+	beam	116
+	center	2000. 1178.006
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.1348955
+		-1.609294
+		-0.1804568
+		0.01960334
+		-0.01311989
+		0.008603499
+		-0.003323691
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 117 2000. 1186.999
+	image	masterflat_ir
+	aperture	117
+	beam	117
+	center	2000. 1186.999
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.1348084
+		-1.604228
+		-0.1595359
+		0.0222453
+		-0.01933978
+		0.003342469
+		-0.001374238
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 118 2000. 1196.149
+	image	masterflat_ir
+	aperture	118
+	beam	118
+	center	2000. 1196.149
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4100.
+		-0.1071058
+		-1.585827
+		-0.1521003
+		0.02401822
+		-0.0119397
+		0.008263482
+		2.356636E-5
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 119 2000. 1218.202
+	image	masterflat_ir
+	aperture	119
+	beam	119
+	center	2000. 1218.202
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4120.
+		-0.1287828
+		-1.591494
+		-0.1585977
+		0.02598758
+		-0.01523366
+		0.004923877
+		-2.593858E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 120 2000. 1227.129
+	image	masterflat_ir
+	aperture	120
+	beam	120
+	center	2000. 1227.129
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.1407647
+		-1.608648
+		-0.1618191
+		0.02079677
+		-0.009028634
+		0.009452167
+		-5.897344E-5
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 121 2000. 1236.416
+	image	masterflat_ir
+	aperture	121
+	beam	121
+	center	2000. 1236.416
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.1321949
+		-1.607795
+		-0.1738218
+		0.02013495
+		-0.01345851
+		0.003832551
+		-0.007027759
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 122 2000. 1245.569
+	image	masterflat_ir
+	aperture	122
+	beam	122
+	center	2000. 1245.569
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4120.
+		-0.1165434
+		-1.568846
+		-0.1367418
+		0.01166223
+		-0.01683949
+		0.005503153
+		-8.164594E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 123 2000. 1254.605
+	image	masterflat_ir
+	aperture	123
+	beam	123
+	center	2000. 1254.605
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.1168066
+		-1.555539
+		-0.1176775
+		0.008728215
+		-0.01629172
+		0.001261214
+		-0.002550233
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 124 2000. 1263.971
+	image	masterflat_ir
+	aperture	124
+	beam	124
+	center	2000. 1263.971
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.1147577
+		-1.586683
+		-0.1534726
+		0.02197578
+		-0.01029068
+		0.008240791
+		-0.003515469
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 125 2000. 1273.046
+	image	masterflat_ir
+	aperture	125
+	beam	125
+	center	2000. 1273.046
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.1164209
+		-1.571405
+		-0.1253294
+		0.02750808
+		-0.01078954
+		0.006850992
+		-0.00171992
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 126 2000. 1282.346
+	image	masterflat_ir
+	aperture	126
+	beam	126
+	center	2000. 1282.346
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.08233362
+		-1.529697
+		-0.07886522
+		0.02023464
+		-0.01852082
+		0.007750989
+		0.001215303
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 127 2000. 1291.28
+	image	masterflat_ir
+	aperture	127
+	beam	127
+	center	2000. 1291.28
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.09123106
+		-1.532106
+		-0.07936788
+		0.0245317
+		-0.01814463
+		0.006015109
+		8.445559E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 128 2000. 1300.583
+	image	masterflat_ir
+	aperture	128
+	beam	128
+	center	2000. 1300.583
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.08510618
+		-1.554006
+		-0.08868137
+		0.01354723
+		-0.008616528
+		0.009421726
+		-0.00329262
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 129 2000. 1323.42
+	image	masterflat_ir
+	aperture	129
+	beam	129
+	center	2000. 1323.42
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.07287803
+		-1.54618
+		-0.05082865
+		0.00255801
+		-0.01285248
+		0.008781564
+		-0.005563703
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 130 2000. 1332.602
+	image	masterflat_ir
+	aperture	130
+	beam	130
+	center	2000. 1332.602
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.06468771
+		-1.552543
+		-0.05852266
+		-6.425807E-5
+		-0.01781937
+		0.004260757
+		0.004252488
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 131 2000. 1341.767
+	image	masterflat_ir
+	aperture	131
+	beam	131
+	center	2000. 1341.767
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.07168351
+		-1.586833
+		-0.08920924
+		0.003788956
+		-0.02047189
+		-3.558783E-4
+		0.002234491
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 132 2000. 1351.116
+	image	masterflat_ir
+	aperture	132
+	beam	132
+	center	2000. 1351.116
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		-0.07067227
+		-1.575462
+		-0.09635478
+		0.00863849
+		-0.009824176
+		-0.001943326
+		-0.002411303
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 133 2000. 1360.209
+	image	masterflat_ir
+	aperture	133
+	beam	133
+	center	2000. 1360.209
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.0628352
+		-1.552959
+		-0.07020719
+		0.009170054
+		-0.01387138
+		0.007669078
+		-0.004748396
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 134 2000. 1369.503
+	image	masterflat_ir
+	aperture	134
+	beam	134
+	center	2000. 1369.503
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.07819968
+		-1.5579
+		-0.06568938
+		0.01375003
+		-0.01393507
+		0.005754145
+		-6.954596E-5
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 135 2000. 1378.585
+	image	masterflat_ir
+	aperture	135
+	beam	135
+	center	2000. 1378.585
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		-0.04949108
+		-1.546572
+		-0.04605592
+		0.003445077
+		-0.01380928
+		0.008444108
+		0.002794263
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 136 2000. 1387.751
+	image	masterflat_ir
+	aperture	136
+	beam	136
+	center	2000. 1387.751
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		-0.06019242
+		-1.545075
+		-0.04297475
+		0.01372224
+		-0.01454924
+		0.008149761
+		0.004573085
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 137 2000. 1397.294
+	image	masterflat_ir
+	aperture	137
+	beam	137
+	center	2000. 1397.294
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.08185969
+		-1.532174
+		-0.04308499
+		0.03804695
+		-0.004369861
+		0.008488391
+		0.003840117
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 138 2000. 1406.238
+	image	masterflat_ir
+	aperture	138
+	beam	138
+	center	2000. 1406.238
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.07180018
+		-1.544632
+		-0.01876209
+		0.008498937
+		-0.01885906
+		0.002209063
+		-0.005542463
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 139 2000. 1437.644
+	image	masterflat_ir
+	aperture	139
+	beam	139
+	center	2000. 1437.644
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.08217022
+		-1.554584
+		-0.04150663
+		0.01505014
+		-0.01462881
+		0.008243541
+		0.003465842
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 140 2000. 1446.849
+	image	masterflat_ir
+	aperture	140
+	beam	140
+	center	2000. 1446.849
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4120.
+		-0.05502263
+		-1.537944
+		-0.02319166
+		0.006319702
+		-0.01133554
+		0.004592526
+		-0.002642545
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 141 2000. 1456.038
+	image	masterflat_ir
+	aperture	141
+	beam	141
+	center	2000. 1456.038
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.09978653
+		-1.557813
+		-0.06167591
+		0.0239383
+		-0.01048383
+		0.004025212
+		0.003069766
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 142 2000. 1465.178
+	image	masterflat_ir
+	aperture	142
+	beam	142
+	center	2000. 1465.178
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.06616624
+		-1.54047
+		-0.0191636
+		0.008994959
+		-0.008986244
+		0.008699959
+		-0.004174078
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 143 2000. 1474.268
+	image	masterflat_ir
+	aperture	143
+	beam	143
+	center	2000. 1474.268
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.04111628
+		-1.54053
+		-0.03174698
+		0.01508232
+		-0.009429966
+		0.001613024
+		0.005237464
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 144 2000. 1483.439
+	image	masterflat_ir
+	aperture	144
+	beam	144
+	center	2000. 1483.439
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		-0.05963279
+		-1.537989
+		-0.02111869
+		0.01909984
+		-0.0072657
+		0.002849512
+		-0.002103819
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 145 2000. 1492.634
+	image	masterflat_ir
+	aperture	145
+	beam	145
+	center	2000. 1492.634
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.03088945
+		-1.531165
+		-0.008442827
+		0.01258288
+		-0.01147696
+		0.008678813
+		0.006674604
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 146 2000. 1501.818
+	image	masterflat_ir
+	aperture	146
+	beam	146
+	center	2000. 1501.818
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.05684922
+		-1.536297
+		-0.01281571
+		0.01737617
+		-0.01279595
+		0.001065953
+		-0.005070581
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 147 2000. 1510.966
+	image	masterflat_ir
+	aperture	147
+	beam	147
+	center	2000. 1510.966
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4120.
+		-0.006113926
+		-1.524928
+		0.01270183
+		0.01130357
+		-0.01622535
+		0.006440494
+		1.422350E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 148 2000. 1534.6
+	image	masterflat_ir
+	aperture	148
+	beam	148
+	center	2000. 1534.6
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.02382684
+		-1.521769
+		0.01670296
+		0.005636862
+		-0.007088457
+		0.01007328
+		0.004641093
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 149 2000. 1543.947
+	image	masterflat_ir
+	aperture	149
+	beam	149
+	center	2000. 1543.947
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.06114785
+		-1.549062
+		-0.04094413
+		0.01443123
+		-0.007153794
+		0.002788093
+		0.00655164
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 150 2000. 1553.127
+	image	masterflat_ir
+	aperture	150
+	beam	150
+	center	2000. 1553.127
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		-0.03307762
+		-1.535223
+		0.001139133
+		0.007621945
+		-0.005501359
+		0.005158083
+		-0.002696322
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 151 2000. 1562.357
+	image	masterflat_ir
+	aperture	151
+	beam	151
+	center	2000. 1562.357
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4120.
+		-0.05240227
+		-1.528949
+		-0.002087492
+		0.004552089
+		-0.01081489
+		0.004480354
+		-0.001382161
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 152 2000. 1571.628
+	image	masterflat_ir
+	aperture	152
+	beam	152
+	center	2000. 1571.628
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.07032701
+		-1.508569
+		0.02572839
+		0.006755252
+		-0.005338803
+		0.01376931
+		0.00684827
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 153 2000. 1580.829
+	image	masterflat_ir
+	aperture	153
+	beam	153
+	center	2000. 1580.829
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.04804837
+		-1.521565
+		0.0177282
+		0.009974918
+		-0.01274931
+		0.002898385
+		-0.001558179
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 154 2000. 1590.146
+	image	masterflat_ir
+	aperture	154
+	beam	154
+	center	2000. 1590.146
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		-0.04020767
+		-1.509226
+		0.03165565
+		0.00399049
+		-0.008978876
+		0.007456734
+		-0.003361675
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 155 2000. 1599.345
+	image	masterflat_ir
+	aperture	155
+	beam	155
+	center	2000. 1599.345
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4110.
+		-0.01503038
+		-1.489097
+		0.05558479
+		0.009267762
+		-0.009030023
+		0.003617827
+		0.004299487
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 156 2000. 1608.508
+	image	masterflat_ir
+	aperture	156
+	beam	156
+	center	2000. 1608.508
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.04162925
+		-1.516571
+		0.03441942
+		0.006043892
+		-0.0106758
+		0.004426445
+		0.001848079
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 157 2000. 1617.706
+	image	masterflat_ir
+	aperture	157
+	beam	157
+	center	2000. 1617.706
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.026507
+		-1.494802
+		0.0651968
+		0.01467729
+		-0.01517259
+		0.003017788
+		3.065333E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 158 2000. 1640.983
+	image	masterflat_ir
+	aperture	158
+	beam	158
+	center	2000. 1640.983
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.02143902
+		-1.473015
+		0.06477753
+		0.01411551
+		-0.003266567
+		0.004299055
+		0.004904354
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 159 2000. 1650.203
+	image	masterflat_ir
+	aperture	159
+	beam	159
+	center	2000. 1650.203
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		-0.03749383
+		-1.485768
+		0.05725145
+		0.008482458
+		-0.008539441
+		-0.002862816
+		-0.005667178
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 160 2000. 1659.558
+	image	masterflat_ir
+	aperture	160
+	beam	160
+	center	2000. 1659.558
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		-0.0376118
+		-1.485411
+		0.06502888
+		0.01256779
+		-0.01292825
+		0.005554307
+		0.001911797
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 161 2000. 1668.836
+	image	masterflat_ir
+	aperture	161
+	beam	161
+	center	2000. 1668.836
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.05172961
+		-1.483657
+		0.03862102
+		0.01753314
+		-0.006463053
+		9.210577E-4
+		-0.002805094
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 162 2000. 1678.057
+	image	masterflat_ir
+	aperture	162
+	beam	162
+	center	2000. 1678.057
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.02019207
+		-1.476807
+		0.07368213
+		0.01075412
+		-0.006310934
+		0.001973151
+		0.003086504
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 163 2000. 1687.291
+	image	masterflat_ir
+	aperture	163
+	beam	163
+	center	2000. 1687.291
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		0.001489611
+		-1.456478
+		0.09153218
+		0.006775082
+		-0.008776839
+		0.004979899
+		6.131551E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 164 2000. 1696.524
+	image	masterflat_ir
+	aperture	164
+	beam	164
+	center	2000. 1696.524
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		3.099259E-5
+		-1.460468
+		0.1023339
+		0.01094458
+		-0.005893411
+		0.01078062
+		0.003670733
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 165 2000. 1705.678
+	image	masterflat_ir
+	aperture	165
+	beam	165
+	center	2000. 1705.678
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4120.
+		0.002927344
+		-1.464284
+		0.09180637
+		0.007953287
+		-0.006634299
+		0.01117685
+		0.002427144
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 166 2000. 1714.97
+	image	masterflat_ir
+	aperture	166
+	beam	166
+	center	2000. 1714.97
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.004986293
+		-1.452138
+		0.109232
+		0.01432261
+		-0.002236226
+		5.643525E-4
+		-0.003187715
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 167 2000. 1724.268
+	image	masterflat_ir
+	aperture	167
+	beam	167
+	center	2000. 1724.268
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.0156221
+		-1.466848
+		0.1071522
+		0.01231678
+		-0.005593512
+		-0.002979142
+		-0.004710088
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 168 2000. 1746.668
+	image	masterflat_ir
+	aperture	168
+	beam	168
+	center	2000. 1746.668
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-5.551091E-5
+		-1.439551
+		0.1460966
+		0.007145245
+		-0.01208787
+		0.00396633
+		-0.002003304
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 169 2000. 1755.801
+	image	masterflat_ir
+	aperture	169
+	beam	169
+	center	2000. 1755.801
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.009835047
+		-1.461964
+		0.09803583
+		0.01567831
+		-0.008897528
+		-0.00102828
+		0.002383608
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 170 2000. 1765.101
+	image	masterflat_ir
+	aperture	170
+	beam	170
+	center	2000. 1765.101
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		0.01231973
+		-1.455613
+		0.1549211
+		-0.007090855
+		-0.01761708
+		0.005044787
+		-0.007242118
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 171 2000. 1774.404
+	image	masterflat_ir
+	aperture	171
+	beam	171
+	center	2000. 1774.404
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.02589494
+		-1.450133
+		0.148807
+		-0.004769612
+		-0.008007949
+		0.008710715
+		-0.006198036
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 172 2000. 1783.571
+	image	masterflat_ir
+	aperture	172
+	beam	172
+	center	2000. 1783.571
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		0.03377251
+		-1.43426
+		0.1542982
+		-0.001752032
+		-0.01146046
+		-0.003414965
+		0.004144837
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 173 2000. 1792.842
+	image	masterflat_ir
+	aperture	173
+	beam	173
+	center	2000. 1792.842
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.0707778
+		-1.419137
+		0.1911906
+		-0.005552373
+		-0.007734419
+		0.00665148
+		-0.00572399
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 174 2000. 1802.104
+	image	masterflat_ir
+	aperture	174
+	beam	174
+	center	2000. 1802.104
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.03491256
+		-1.432421
+		0.1732462
+		0.005704876
+		-0.005516303
+		0.006802008
+		-5.951699E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 175 2000. 1811.391
+	image	masterflat_ir
+	aperture	175
+	beam	175
+	center	2000. 1811.391
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.02222609
+		-1.426724
+		0.1587245
+		0.004718977
+		-0.005115995
+		0.004742155
+		-0.002176337
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 176 2000. 1820.618
+	image	masterflat_ir
+	aperture	176
+	beam	176
+	center	2000. 1820.618
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.004538883
+		-1.42783
+		0.1822169
+		2.080339E-4
+		-0.01039913
+		0.008091667
+		0.004570922
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 177 2000. 1830.037
+	image	masterflat_ir
+	aperture	177
+	beam	177
+	center	2000. 1830.037
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.01197476
+		-1.432078
+		0.1828492
+		0.002345488
+		-0.006905972
+		0.004303764
+		-0.003081607
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 178 2000. 1853.579
+	image	masterflat_ir
+	aperture	178
+	beam	178
+	center	2000. 1853.579
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.04819047
+		-1.506221
+		0.04071402
+		0.02687277
+		-0.002053538
+		-0.001128139
+		-0.004684262
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 179 2000. 1862.875
+	image	masterflat_ir
+	aperture	179
+	beam	179
+	center	2000. 1862.875
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.03529308
+		-1.434428
+		0.1477538
+		0.006729515
+		-0.006336035
+		0.008622382
+		0.004240511
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 180 2000. 1872.27
+	image	masterflat_ir
+	aperture	180
+	beam	180
+	center	2000. 1872.27
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		-0.02177759
+		-1.448139
+		0.1209838
+		0.01382187
+		-0.003961059
+		-2.809314E-4
+		-0.007367736
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 181 2000. 1881.6
+	image	masterflat_ir
+	aperture	181
+	beam	181
+	center	2000. 1881.6
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.04387738
+		-1.42243
+		0.1702423
+		0.01460386
+		-0.004705133
+		0.005703756
+		0.009478879
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 182 2000. 1890.725
+	image	masterflat_ir
+	aperture	182
+	beam	182
+	center	2000. 1890.725
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.03762259
+		-1.437505
+		0.1453391
+		0.009228242
+		-3.408043E-5
+		0.003158251
+		0.005458191
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 183 2000. 1900.282
+	image	masterflat_ir
+	aperture	183
+	beam	183
+	center	2000. 1900.282
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		-0.009239033
+		-1.451162
+		0.1274839
+		-0.008369748
+		-0.001724477
+		-6.297256E-4
+		-0.02063003
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 184 2000. 1909.463
+	image	masterflat_ir
+	aperture	184
+	beam	184
+	center	2000. 1909.463
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.03922648
+		-1.417634
+		0.1686944
+		0.009482531
+		-0.001010371
+		0.003181723
+		-0.001430804
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 185 2000. 1918.843
+	image	masterflat_ir
+	aperture	185
+	beam	185
+	center	2000. 1918.843
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.05812917
+		-1.402637
+		0.1897616
+		0.01733671
+		-0.002834987
+		0.004753814
+		0.001320143
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 186 2000. 1928.112
+	image	masterflat_ir
+	aperture	186
+	beam	186
+	center	2000. 1928.112
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4120.
+		0.0312163
+		-1.438569
+		0.1493006
+		0.0117927
+		0.003274118
+		-0.002576461
+		-0.004426585
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 187 2000. 1937.552
+	image	masterflat_ir
+	aperture	187
+	beam	187
+	center	2000. 1937.552
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.03132959
+		-1.417265
+		0.1880538
+		0.0199938
+		0.002630817
+		0.004437232
+		-0.002539207
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 188 2000. 1968.947
+	image	masterflat_ir
+	aperture	188
+	beam	188
+	center	2000. 1968.947
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.07125706
+		-1.394247
+		0.2259856
+		0.008015078
+		-0.005519114
+		0.005397821
+		0.01256725
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 189 2000. 1978.438
+	image	masterflat_ir
+	aperture	189
+	beam	189
+	center	2000. 1978.438
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.07412514
+		-1.37556
+		0.2735693
+		1.963772E-4
+		-0.006613041
+		0.003017458
+		-0.00447816
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 190 2000. 1987.667
+	image	masterflat_ir
+	aperture	190
+	beam	190
+	center	2000. 1987.667
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4120.
+		0.05418591
+		-1.386693
+		0.2428856
+		0.004887309
+		-0.00485205
+		-0.002426096
+		-0.006837382
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 191 2000. 1996.872
+	image	masterflat_ir
+	aperture	191
+	beam	191
+	center	2000. 1996.872
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		0.06543387
+		-1.384398
+		0.2141709
+		0.008936897
+		-0.004456075
+		-0.002997368
+		-0.005706606
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 192 2000. 2006.187
+	image	masterflat_ir
+	aperture	192
+	beam	192
+	center	2000. 2006.187
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.09991661
+		-1.377654
+		0.2442595
+		0.00915477
+		-0.003264184
+		0.005313823
+		-4.017456E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 193 2000. 2015.356
+	image	masterflat_ir
+	aperture	193
+	beam	193
+	center	2000. 2015.356
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.05681153
+		-1.379277
+		0.2287495
+		0.007475162
+		0.002952986
+		0.007983155
+		-0.00671587
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 194 2000. 2024.719
+	image	masterflat_ir
+	aperture	194
+	beam	194
+	center	2000. 2024.719
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.06349444
+		-1.363492
+		0.2616112
+		0.01358791
+		-0.001230317
+		0.006872274
+		-7.870558E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 195 2000. 2034.042
+	image	masterflat_ir
+	aperture	195
+	beam	195
+	center	2000. 2034.042
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.09447984
+		-1.367635
+		0.2622354
+		0.01328088
+		-0.006272805
+		-0.0046364
+		2.547688E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 196 2000. 2043.433
+	image	masterflat_ir
+	aperture	196
+	beam	196
+	center	2000. 2043.433
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		0.1236797
+		-1.371887
+		0.2627494
+		0.009761188
+		0.004958843
+		0.008376139
+		-3.441990E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 197 2000. 2066.939
+	image	masterflat_ir
+	aperture	197
+	beam	197
+	center	2000. 2066.939
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		0.09749968
+		-1.363041
+		0.2526457
+		0.01503559
+		-0.001117905
+		0.00399394
+		0.001848243
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 198 2000. 2076.301
+	image	masterflat_ir
+	aperture	198
+	beam	198
+	center	2000. 2076.301
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.05988568
+		-1.406608
+		0.2106737
+		0.00734546
+		0.002996968
+		0.005434845
+		-0.005488257
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 199 2000. 2085.689
+	image	masterflat_ir
+	aperture	199
+	beam	199
+	center	2000. 2085.689
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.07754429
+		-1.387678
+		0.2249977
+		0.01013091
+		0.001082247
+		0.002832142
+		0.002516555
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 200 2000. 2095.001
+	image	masterflat_ir
+	aperture	200
+	beam	200
+	center	2000. 2095.001
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.07221725
+		-1.383508
+		0.2388524
+		-0.001946977
+		-0.005139183
+		-0.009686165
+		-0.001687536
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 201 2000. 2104.342
+	image	masterflat_ir
+	aperture	201
+	beam	201
+	center	2000. 2104.342
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.06589769
+		-1.366135
+		0.2619371
+		0.001720369
+		0.006137192
+		0.008957826
+		-9.983878E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 202 2000. 2113.625
+	image	masterflat_ir
+	aperture	202
+	beam	202
+	center	2000. 2113.625
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.03678545
+		-1.393099
+		0.1919087
+		0.02068933
+		0.003498567
+		-0.004817748
+		0.003186972
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 203 2000. 2123.134
+	image	masterflat_ir
+	aperture	203
+	beam	203
+	center	2000. 2123.134
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4120.
+		0.07267814
+		-1.353388
+		0.2773928
+		0.003771319
+		-3.805044E-4
+		0.001554771
+		-0.001213714
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 204 2000. 2132.537
+	image	masterflat_ir
+	aperture	204
+	beam	204
+	center	2000. 2132.537
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		0.06841531
+		-1.360211
+		0.2704467
+		0.001328314
+		0.002483038
+		0.003553926
+		0.005371484
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 205 2000. 2141.956
+	image	masterflat_ir
+	aperture	205
+	beam	205
+	center	2000. 2141.956
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.06516033
+		-1.341458
+		0.2921073
+		0.01588321
+		0.008439429
+		0.00399943
+		-0.001346283
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 206 2000. 2151.123
+	image	masterflat_ir
+	aperture	206
+	beam	206
+	center	2000. 2151.123
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		0.09271728
+		-1.344043
+		0.2845669
+		0.01500827
+		0.008672577
+		0.006770832
+		0.004769295
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 207 2000. 2174.02
+	image	masterflat_ir
+	aperture	207
+	beam	207
+	center	2000. 2174.02
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.09865544
+		-1.348546
+		0.2934687
+		0.01111649
+		0.001839506
+		-3.995513E-4
+		-0.003217748
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 208 2000. 2183.228
+	image	masterflat_ir
+	aperture	208
+	beam	208
+	center	2000. 2183.228
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.1140233
+		-1.351091
+		0.2907973
+		0.008083728
+		0.006919679
+		7.321215E-4
+		0.001450018
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 209 2000. 2192.675
+	image	masterflat_ir
+	aperture	209
+	beam	209
+	center	2000. 2192.675
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.1103337
+		-1.352878
+		0.2903671
+		0.00413462
+		0.001769198
+		0.006708786
+		0.005606449
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 210 2000. 2201.996
+	image	masterflat_ir
+	aperture	210
+	beam	210
+	center	2000. 2201.996
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.07343182
+		-1.348388
+		0.2750668
+		0.0146292
+		0.004597929
+		-7.930508E-4
+		-0.001507112
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 211 2000. 2211.421
+	image	masterflat_ir
+	aperture	211
+	beam	211
+	center	2000. 2211.421
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		0.1150974
+		-1.34292
+		0.2996003
+		0.007369747
+		0.003147216
+		8.898855E-4
+		6.036691E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 212 2000. 2220.574
+	image	masterflat_ir
+	aperture	212
+	beam	212
+	center	2000. 2220.574
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.101072
+		-1.328458
+		0.3194087
+		0.007847475
+		0.003323229
+		9.388884E-4
+		0.003516255
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 213 2000. 2229.93
+	image	masterflat_ir
+	aperture	213
+	beam	213
+	center	2000. 2229.93
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.09481608
+		-1.330113
+		0.2910293
+		0.01577396
+		0.004392883
+		0.002853636
+		-0.002508911
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 214 2000. 2239.294
+	image	masterflat_ir
+	aperture	214
+	beam	214
+	center	2000. 2239.294
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		0.1146901
+		-1.31321
+		0.345064
+		0.007964268
+		-0.001205085
+		-0.002039053
+		-0.003599516
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 215 2000. 2248.624
+	image	masterflat_ir
+	aperture	215
+	beam	215
+	center	2000. 2248.624
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.09624351
+		-1.334897
+		0.2752521
+		0.03761051
+		0.007080431
+		0.001980736
+		0.001508377
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 216 2000. 2257.948
+	image	masterflat_ir
+	aperture	216
+	beam	216
+	center	2000. 2257.948
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.1074331
+		-1.314802
+		0.3286097
+		0.01671658
+		0.007390085
+		-0.001318876
+		-0.00337938
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 217 2000. 2279.895
+	image	masterflat_ir
+	aperture	217
+	beam	217
+	center	2000. 2279.895
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4120.
+		0.1204687
+		-1.321774
+		0.3376171
+		0.003082182
+		-0.001892139
+		0.002697117
+		6.192540E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 218 2000. 2289.25
+	image	masterflat_ir
+	aperture	218
+	beam	218
+	center	2000. 2289.25
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.09641275
+		-1.326888
+		0.3259699
+		0.007772888
+		0.004471563
+		0.00481305
+		-0.006372529
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 219 2000. 2298.554
+	image	masterflat_ir
+	aperture	219
+	beam	219
+	center	2000. 2298.554
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.1061125
+		-1.309029
+		0.3379321
+		0.007813198
+		0.003177598
+		0.004659627
+		-0.00630819
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 220 2000. 2307.802
+	image	masterflat_ir
+	aperture	220
+	beam	220
+	center	2000. 2307.802
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.1692059
+		-1.262338
+		0.4116075
+		-0.003124967
+		9.944880E-4
+		4.435446E-4
+		-0.004652941
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 221 2000. 2317.165
+	image	masterflat_ir
+	aperture	221
+	beam	221
+	center	2000. 2317.165
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.1039472
+		-1.327682
+		0.3282083
+		0.006541647
+		0.007185709
+		-2.964033E-4
+		-0.001482426
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 222 2000. 2326.478
+	image	masterflat_ir
+	aperture	222
+	beam	222
+	center	2000. 2326.478
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4110.
+		0.1296855
+		-1.314925
+		0.336382
+		0.007823531
+		0.005644792
+		-0.001396943
+		1.427781E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 223 2000. 2335.79
+	image	masterflat_ir
+	aperture	223
+	beam	223
+	center	2000. 2335.79
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.1209008
+		-1.288578
+		0.3769132
+		0.003399129
+		0.00492436
+		0.002313076
+		-0.008192432
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 224 2000. 2345.077
+	image	masterflat_ir
+	aperture	224
+	beam	224
+	center	2000. 2345.077
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.1618428
+		-1.285587
+		0.3779218
+		0.01356576
+		0.006761411
+		0.006355741
+		-0.00367217
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 225 2000. 2354.328
+	image	masterflat_ir
+	aperture	225
+	beam	225
+	center	2000. 2354.328
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.0844541
+		-1.305412
+		0.3090461
+		0.03118309
+		0.00774869
+		0.001896087
+		0.007443192
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 226 2000. 2363.719
+	image	masterflat_ir
+	aperture	226
+	beam	226
+	center	2000. 2363.719
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.1436407
+		-1.295516
+		0.3715106
+		0.01118104
+		0.009379831
+		0.002522981
+		3.165583E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 227 2000. 2387.113
+	image	masterflat_ir
+	aperture	227
+	beam	227
+	center	2000. 2387.113
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		0.1129701
+		-1.252537
+		0.4110949
+		0.006918673
+		0.005542405
+		9.644101E-4
+		-0.01148906
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 228 2000. 2396.497
+	image	masterflat_ir
+	aperture	228
+	beam	228
+	center	2000. 2396.497
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		0.1218677
+		-1.316594
+		0.3426773
+		0.01009621
+		0.003016797
+		-0.001881745
+		-0.003849203
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 229 2000. 2405.813
+	image	masterflat_ir
+	aperture	229
+	beam	229
+	center	2000. 2405.813
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.1624817
+		-1.294077
+		0.3755792
+		-0.003218008
+		0.006254414
+		0.00572764
+		6.221795E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 230 2000. 2415.222
+	image	masterflat_ir
+	aperture	230
+	beam	230
+	center	2000. 2415.222
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.1368883
+		-1.283413
+		0.3714629
+		0.007904121
+		0.005210698
+		5.658817E-4
+		-0.004209484
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 231 2000. 2424.352
+	image	masterflat_ir
+	aperture	231
+	beam	231
+	center	2000. 2424.352
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.1324682
+		-1.269872
+		0.3857956
+		0.009499635
+		0.008464278
+		-2.856978E-4
+		0.001844684
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 232 2000. 2433.755
+	image	masterflat_ir
+	aperture	232
+	beam	232
+	center	2000. 2433.755
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.1832401
+		-1.235791
+		0.4341842
+		8.490600E-4
+		0.00351058
+		0.005361307
+		0.00439514
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 233 2000. 2443.053
+	image	masterflat_ir
+	aperture	233
+	beam	233
+	center	2000. 2443.053
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4100.
+		0.1643728
+		-1.237389
+		0.4287334
+		0.009333668
+		0.01012798
+		-0.001452222
+		-0.008645483
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 234 2000. 2452.346
+	image	masterflat_ir
+	aperture	234
+	beam	234
+	center	2000. 2452.346
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4100.
+		0.1360352
+		-1.245231
+		0.3762109
+		0.02300148
+		0.01027855
+		0.003522038
+		-0.002132559
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 235 2000. 2461.711
+	image	masterflat_ir
+	aperture	235
+	beam	235
+	center	2000. 2461.711
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		0.1833958
+		-1.242999
+		0.4189606
+		0.006976135
+		0.008778547
+		-7.816304E-4
+		-3.282173E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 236 2000. 2471.013
+	image	masterflat_ir
+	aperture	236
+	beam	236
+	center	2000. 2471.013
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		0.1565869
+		-1.252677
+		0.411687
+		0.0111283
+		0.009665123
+		0.004955144
+		1.484067E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 237 2000. 2503.051
+	image	masterflat_ir
+	aperture	237
+	beam	237
+	center	2000. 2503.051
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.1350996
+		-1.318506
+		0.3455086
+		0.00110098
+		0.009166673
+		0.001460854
+		-0.002126112
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 238 2000. 2512.293
+	image	masterflat_ir
+	aperture	238
+	beam	238
+	center	2000. 2512.293
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.1409597
+		-1.30172
+		0.3497194
+		0.01194019
+		0.01080961
+		0.004689008
+		0.006254876
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 239 2000. 2521.578
+	image	masterflat_ir
+	aperture	239
+	beam	239
+	center	2000. 2521.578
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.1207559
+		-1.286487
+		0.3502476
+		0.02407563
+		0.00150801
+		-0.003948073
+		0.006189018
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 240 2000. 2530.788
+	image	masterflat_ir
+	aperture	240
+	beam	240
+	center	2000. 2530.788
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.1374797
+		-1.281153
+		0.3687851
+		0.0212587
+		0.01269989
+		0.004161837
+		0.003145776
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 241 2000. 2540.008
+	image	masterflat_ir
+	aperture	241
+	beam	241
+	center	2000. 2540.008
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.1543008
+		-1.247322
+		0.4186422
+		0.01455583
+		0.01158261
+		-0.003313986
+		0.0021848
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 242 2000. 2549.233
+	image	masterflat_ir
+	aperture	242
+	beam	242
+	center	2000. 2549.233
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.1474733
+		-1.232701
+		0.4231257
+		0.01882432
+		0.01094904
+		0.004777216
+		0.001627899
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 243 2000. 2558.486
+	image	masterflat_ir
+	aperture	243
+	beam	243
+	center	2000. 2558.486
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4100.
+		0.1593527
+		-1.246724
+		0.406723
+		0.007814733
+		0.0130626
+		0.00923806
+		0.001418987
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 244 2000. 2567.698
+	image	masterflat_ir
+	aperture	244
+	beam	244
+	center	2000. 2567.698
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.1719436
+		-1.214951
+		0.4316524
+		0.02947433
+		0.008031651
+		0.001328567
+		0.009436765
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 245 2000. 2577.105
+	image	masterflat_ir
+	aperture	245
+	beam	245
+	center	2000. 2577.105
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.1555447
+		-1.255871
+		0.4152148
+		0.01727066
+		0.01394039
+		1.319544E-4
+		-0.002560286
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 246 2000. 2599.932
+	image	masterflat_ir
+	aperture	246
+	beam	246
+	center	2000. 2599.932
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.1960616
+		-1.188952
+		0.4775985
+		0.02141713
+		0.008826143
+		0.003199673
+		0.005132565
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 247 2000. 2609.014
+	image	masterflat_ir
+	aperture	247
+	beam	247
+	center	2000. 2609.014
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.2051072
+		-1.208133
+		0.4710864
+		0.01425193
+		0.008619493
+		-0.001019547
+		0.001706333
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 248 2000. 2618.423
+	image	masterflat_ir
+	aperture	248
+	beam	248
+	center	2000. 2618.423
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.1832083
+		-1.209492
+		0.4567495
+		0.01655275
+		0.006930359
+		0.005399028
+		5.351863E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 249 2000. 2627.67
+	image	masterflat_ir
+	aperture	249
+	beam	249
+	center	2000. 2627.67
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.2228146
+		-1.179654
+		0.5071126
+		0.008720153
+		0.008349278
+		0.001415074
+		0.00257361
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 250 2000. 2636.951
+	image	masterflat_ir
+	aperture	250
+	beam	250
+	center	2000. 2636.951
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		0.1945562
+		-1.181845
+		0.4888478
+		0.01814713
+		0.01243891
+		2.252278E-4
+		-0.002885184
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 251 2000. 2646.21
+	image	masterflat_ir
+	aperture	251
+	beam	251
+	center	2000. 2646.21
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		0.1892505
+		-1.190824
+		0.4887327
+		0.01646726
+		0.01118199
+		-0.00153009
+		-1.558426E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 252 2000. 2655.472
+	image	masterflat_ir
+	aperture	252
+	beam	252
+	center	2000. 2655.472
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.2129083
+		-1.173739
+		0.5104004
+		0.01704987
+		0.01022647
+		0.003869542
+		0.003128114
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 253 2000. 2664.692
+	image	masterflat_ir
+	aperture	253
+	beam	253
+	center	2000. 2664.692
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4100.
+		0.2312968
+		-1.145567
+		0.5242363
+		0.02300537
+		0.01416321
+		0.006490338
+		6.333448E-5
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 254 2000. 2673.954
+	image	masterflat_ir
+	aperture	254
+	beam	254
+	center	2000. 2673.954
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.1829121
+		-1.179854
+		0.4969923
+		0.03460735
+		0.01877395
+		0.001947258
+		0.002646118
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 255 2000. 2683.395
+	image	masterflat_ir
+	aperture	255
+	beam	255
+	center	2000. 2683.395
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.2226334
+		-1.134531
+		0.5387982
+		0.03543088
+		0.01259772
+		0.004104842
+		-0.005681731
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 256 2000. 2706.502
+	image	masterflat_ir
+	aperture	256
+	beam	256
+	center	2000. 2706.502
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.2276772
+		-1.157253
+		0.5411796
+		0.01427506
+		0.01211643
+		0.004866836
+		-0.01252203
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 257 2000. 2715.791
+	image	masterflat_ir
+	aperture	257
+	beam	257
+	center	2000. 2715.791
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.2128132
+		-1.174254
+		0.523624
+		0.01284113
+		0.01425298
+		0.004984634
+		-0.002083266
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 258 2000. 2724.988
+	image	masterflat_ir
+	aperture	258
+	beam	258
+	center	2000. 2724.988
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.2276539
+		-1.191562
+		0.512464
+		0.003368969
+		0.00875595
+		8.132304E-5
+		-0.007416625
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 259 2000. 2734.237
+	image	masterflat_ir
+	aperture	259
+	beam	259
+	center	2000. 2734.237
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.2017602
+		-1.189775
+		0.5040825
+		0.02623333
+		0.009776747
+		0.001949443
+		-0.002905999
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 260 2000. 2743.358
+	image	masterflat_ir
+	aperture	260
+	beam	260
+	center	2000. 2743.358
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.2113714
+		-1.192896
+		0.5056543
+		0.01187627
+		0.004916032
+		0.005222034
+		0.004570678
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 261 2000. 2752.627
+	image	masterflat_ir
+	aperture	261
+	beam	261
+	center	2000. 2752.627
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.2264475
+		-1.165648
+		0.529782
+		0.0202777
+		0.008725871
+		0.007599751
+		0.003224316
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 262 2000. 2761.879
+	image	masterflat_ir
+	aperture	262
+	beam	262
+	center	2000. 2761.879
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.2381322
+		-1.150528
+		0.5577249
+		0.01519254
+		0.006195182
+		0.007785199
+		-8.752743E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 263 2000. 2771.134
+	image	masterflat_ir
+	aperture	263
+	beam	263
+	center	2000. 2771.134
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.2224172
+		-1.142592
+		0.5564436
+		0.02369607
+		0.01564809
+		4.311180E-4
+		0.001514532
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 264 2000. 2780.508
+	image	masterflat_ir
+	aperture	264
+	beam	264
+	center	2000. 2780.508
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		0.1917323
+		-1.172705
+		0.500631
+		0.03294075
+		0.01100193
+		0.006814114
+		0.003554845
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 265 2000. 2789.43
+	image	masterflat_ir
+	aperture	265
+	beam	265
+	center	2000. 2789.43
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		0.2347473
+		-1.128077
+		0.5744328
+		0.01939601
+		0.008114863
+		0.001306647
+		-0.001912271
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 266 2000. 2811.701
+	image	masterflat_ir
+	aperture	266
+	beam	266
+	center	2000. 2811.701
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4100.
+		0.224145
+		-1.162252
+		0.539696
+		0.0232325
+		0.007348983
+		0.005614067
+		0.003690749
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 267 2000. 2820.879
+	image	masterflat_ir
+	aperture	267
+	beam	267
+	center	2000. 2820.879
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.222798
+		-1.155424
+		0.5678559
+		0.01738171
+		0.01010527
+		0.00932541
+		-0.001156588
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 268 2000. 2830.223
+	image	masterflat_ir
+	aperture	268
+	beam	268
+	center	2000. 2830.223
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.2268098
+		-1.159326
+		0.5387747
+		0.0264549
+		0.01277879
+		0.006290879
+		0.001229235
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 269 2000. 2839.214
+	image	masterflat_ir
+	aperture	269
+	beam	269
+	center	2000. 2839.214
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.2382264
+		-1.152584
+		0.562921
+		0.02178076
+		0.01046323
+		0.001816296
+		3.340670E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 270 2000. 2848.288
+	image	masterflat_ir
+	aperture	270
+	beam	270
+	center	2000. 2848.288
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		0.2523223
+		-1.143855
+		0.5657188
+		0.01847413
+		0.008865174
+		0.001481419
+		-0.001041068
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 271 2000. 2857.454
+	image	masterflat_ir
+	aperture	271
+	beam	271
+	center	2000. 2857.454
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.2306838
+		-1.126211
+		0.5879906
+		0.01807701
+		0.006854643
+		0.003857512
+		-0.001245071
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 272 2000. 2866.588
+	image	masterflat_ir
+	aperture	272
+	beam	272
+	center	2000. 2866.588
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.2590202
+		-1.124733
+		0.592415
+		0.02376221
+		0.01275536
+		0.003709987
+		-0.001701666
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 273 2000. 2875.696
+	image	masterflat_ir
+	aperture	273
+	beam	273
+	center	2000. 2875.696
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.1906414
+		-1.189754
+		0.4852845
+		0.03271914
+		0.01073386
+		0.004718941
+		0.01088162
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 274 2000. 2884.891
+	image	masterflat_ir
+	aperture	274
+	beam	274
+	center	2000. 2884.891
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.2658219
+		-1.11982
+		0.6002154
+		0.02530909
+		0.01243647
+		0.006636186
+		-0.002246953
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 275 2000. 2893.964
+	image	masterflat_ir
+	aperture	275
+	beam	275
+	center	2000. 2893.964
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.276915
+		-1.10325
+		0.59185
+		0.03581985
+		0.01100181
+		0.01181724
+		0.001255482
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 276 2000. 2916.755
+	image	masterflat_ir
+	aperture	276
+	beam	276
+	center	2000. 2916.755
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.2702824
+		-1.103852
+		0.6193928
+		0.01833221
+		0.005074295
+		3.703664E-4
+		-5.097102E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 277 2000. 2925.848
+	image	masterflat_ir
+	aperture	277
+	beam	277
+	center	2000. 2925.848
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.2834358
+		-1.100258
+		0.6368657
+		0.006748372
+		0.004543936
+		-4.809475E-4
+		-0.00355489
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 278 2000. 2934.811
+	image	masterflat_ir
+	aperture	278
+	beam	278
+	center	2000. 2934.811
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.06695081
+		-1.555887
+		0.2007135
+		-0.02135573
+		-0.006604059
+		0.006412925
+		0.04786322
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 279 2000. 2944.166
+	image	masterflat_ir
+	aperture	279
+	beam	279
+	center	2000. 2944.166
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4120.
+		0.2618496
+		-1.107963
+		0.6188079
+		0.01037375
+		0.01022732
+		7.471337E-4
+		0.006369625
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 280 2000. 2953.264
+	image	masterflat_ir
+	aperture	280
+	beam	280
+	center	2000. 2953.264
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		0.2748788
+		-1.095833
+		0.6387768
+		0.01243823
+		0.01669195
+		0.008099702
+		-0.002870701
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 281 2000. 2962.488
+	image	masterflat_ir
+	aperture	281
+	beam	281
+	center	2000. 2962.488
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		0.2829686
+		-1.079149
+		0.6447104
+		0.01691771
+		0.01732171
+		0.00435387
+		0.005564672
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 282 2000. 2971.475
+	image	masterflat_ir
+	aperture	282
+	beam	282
+	center	2000. 2971.475
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.2570845
+		-1.092232
+		0.6217384
+		0.01654902
+		0.01062863
+		-0.002834579
+		7.722052E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 283 2000. 2980.725
+	image	masterflat_ir
+	aperture	283
+	beam	283
+	center	2000. 2980.725
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.2689784
+		-1.087353
+		0.6634088
+		0.01482888
+		0.01106487
+		0.002353185
+		0.001137088
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 284 2000. 2989.863
+	image	masterflat_ir
+	aperture	284
+	beam	284
+	center	2000. 2989.863
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.2659323
+		-1.077397
+		0.6475884
+		0.02274785
+		0.01784961
+		-6.396587E-4
+		-0.003736427
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 285 2000. 2999.008
+	image	masterflat_ir
+	aperture	285
+	beam	285
+	center	2000. 2999.008
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4120.
+		0.1175075
+		-1.3183
+		0.3352342
+		-0.04850758
+		-0.05647637
+		-0.02885124
+		0.006383951
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 286 2000. 3030.481
+	image	masterflat_ir
+	aperture	286
+	beam	286
+	center	2000. 3030.481
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.2848344
+		-1.076441
+		0.6654175
+		0.01700853
+		0.007771018
+		-0.00104351
+		-0.007744756
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 287 2000. 3039.681
+	image	masterflat_ir
+	aperture	287
+	beam	287
+	center	2000. 3039.681
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.3006236
+		-1.065563
+		0.6857789
+		0.01650057
+		0.01589666
+		0.009498567
+		0.005913075
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 288 2000. 3048.741
+	image	masterflat_ir
+	aperture	288
+	beam	288
+	center	2000. 3048.741
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.2889692
+		-1.079045
+		0.6644089
+		0.0197272
+		0.01389377
+		-0.001448888
+		0.002406937
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 289 2000. 3057.885
+	image	masterflat_ir
+	aperture	289
+	beam	289
+	center	2000. 3057.885
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		0.2900487
+		-1.064117
+		0.6862988
+		0.01681982
+		0.01495949
+		0.006431893
+		-0.002833719
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 290 2000. 3066.817
+	image	masterflat_ir
+	aperture	290
+	beam	290
+	center	2000. 3066.817
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.3076825
+		-1.052716
+		0.6913871
+		0.01559601
+		0.02007783
+		0.00679725
+		0.007019109
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 291 2000. 3075.956
+	image	masterflat_ir
+	aperture	291
+	beam	291
+	center	2000. 3075.956
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.3076086
+		-1.030578
+		0.716361
+		0.01547337
+		0.01381264
+		0.003269488
+		0.001269222
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 292 2000. 3084.977
+	image	masterflat_ir
+	aperture	292
+	beam	292
+	center	2000. 3084.977
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		0.3050033
+		-1.030805
+		0.6888595
+		0.03666437
+		0.01152284
+		0.006087404
+		0.004790741
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 293 2000. 3094.136
+	image	masterflat_ir
+	aperture	293
+	beam	293
+	center	2000. 3094.136
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.3222978
+		-1.050684
+		0.7009532
+		0.01850142
+		0.009798021
+		0.004469797
+		-0.002127601
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 294 2000. 3103.21
+	image	masterflat_ir
+	aperture	294
+	beam	294
+	center	2000. 3103.21
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.312332
+		-1.060061
+		0.6817164
+		0.01978916
+		0.00775055
+		5.899676E-4
+		0.003595579
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 295 2000. 3126.153
+	image	masterflat_ir
+	aperture	295
+	beam	295
+	center	2000. 3126.153
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.2818867
+		-1.082453
+		0.6610523
+		0.0352853
+		0.009511317
+		0.009359982
+		0.01432543
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 296 2000. 3135.293
+	image	masterflat_ir
+	aperture	296
+	beam	296
+	center	2000. 3135.293
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4110.
+		0.2654116
+		-1.107712
+		0.6332576
+		0.02680524
+		0.006975789
+		-0.003320981
+		-0.002240343
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 297 2000. 3144.238
+	image	masterflat_ir
+	aperture	297
+	beam	297
+	center	2000. 3144.238
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4110.
+		0.2757359
+		-1.125772
+		0.6329515
+		0.009265798
+		0.01052366
+		-2.266744E-4
+		0.006193826
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 298 2000. 3153.319
+	image	masterflat_ir
+	aperture	298
+	beam	298
+	center	2000. 3153.319
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.2949241
+		-1.092898
+		0.6880584
+		-2.489312E-4
+		0.01717156
+		-0.006477282
+		-0.004566493
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 299 2000. 3162.357
+	image	masterflat_ir
+	aperture	299
+	beam	299
+	center	2000. 3162.357
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		0.3132294
+		-1.080451
+		0.696174
+		0.005215887
+		0.01915943
+		-8.059012E-4
+		8.668801E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 300 2000. 3171.313
+	image	masterflat_ir
+	aperture	300
+	beam	300
+	center	2000. 3171.313
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		0.2899998
+		-1.079522
+		0.6729256
+		0.02015352
+		0.01740111
+		-0.004954534
+		0.001299151
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 301 2000. 3180.377
+	image	masterflat_ir
+	aperture	301
+	beam	301
+	center	2000. 3180.377
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.2874866
+		-1.062166
+		0.6793959
+		0.02109978
+		0.01718688
+		-0.005406436
+		0.007231819
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 302 2000. 3189.362
+	image	masterflat_ir
+	aperture	302
+	beam	302
+	center	2000. 3189.362
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.3096645
+		-1.048486
+		0.7372213
+		0.008853628
+		0.01613765
+		0.005102644
+		9.152045E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 303 2000. 3198.435
+	image	masterflat_ir
+	aperture	303
+	beam	303
+	center	2000. 3198.435
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		0.331285
+		-1.052829
+		0.7335758
+		0.008547363
+		0.01788525
+		-2.303403E-4
+		0.002810762
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 304 2000. 3207.422
+	image	masterflat_ir
+	aperture	304
+	beam	304
+	center	2000. 3207.422
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		0.3123196
+		-1.040847
+		0.7065482
+		0.02457528
+		0.0152413
+		-0.002515377
+		7.489737E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 305 2000. 3229.877
+	image	masterflat_ir
+	aperture	305
+	beam	305
+	center	2000. 3229.877
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.3060239
+		-1.032073
+		0.7173929
+		0.04350108
+		0.004600844
+		0.006462205
+		0.007295834
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 306 2000. 3238.683
+	image	masterflat_ir
+	aperture	306
+	beam	306
+	center	2000. 3238.683
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		0.2868588
+		-1.087954
+		0.663151
+		0.01758679
+		-0.004768346
+		-0.003103789
+		0.004767998
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 307 2000. 3247.713
+	image	masterflat_ir
+	aperture	307
+	beam	307
+	center	2000. 3247.713
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.330718
+		-1.061979
+		0.6898394
+		0.009427869
+		-0.005838541
+		-0.005508693
+		-0.003155096
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 308 2000. 3256.765
+	image	masterflat_ir
+	aperture	308
+	beam	308
+	center	2000. 3256.765
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.3277201
+		-1.03405
+		0.7455018
+		0.01524385
+		0.01251359
+		0.002393014
+		4.545923E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 309 2000. 3265.642
+	image	masterflat_ir
+	aperture	309
+	beam	309
+	center	2000. 3265.642
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.3714535
+		-1.005725
+		0.7827145
+		0.02140186
+		0.01446308
+		0.00745428
+		-2.214868E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 310 2000. 3274.766
+	image	masterflat_ir
+	aperture	310
+	beam	310
+	center	2000. 3274.766
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.3742859
+		-0.9984404
+		0.7718359
+		0.02536738
+		0.006452817
+		-0.002633444
+		0.002754591
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 311 2000. 3283.774
+	image	masterflat_ir
+	aperture	311
+	beam	311
+	center	2000. 3283.774
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.3308596
+		-0.9863935
+		0.7904329
+		0.02489896
+		0.01139957
+		0.008994618
+		0.004594074
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 312 2000. 3292.703
+	image	masterflat_ir
+	aperture	312
+	beam	312
+	center	2000. 3292.703
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.3374594
+		-1.034664
+		0.7449124
+		0.0246056
+		0.003920767
+		-0.003292905
+		-2.484003E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 313 2000. 3301.709
+	image	masterflat_ir
+	aperture	313
+	beam	313
+	center	2000. 3301.709
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.3449919
+		-0.9857165
+		0.7896047
+		0.02997564
+		0.01316724
+		0.0054567
+		5.555461E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 314 2000. 3310.692
+	image	masterflat_ir
+	aperture	314
+	beam	314
+	center	2000. 3310.692
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.3275335
+		-0.9797114
+		0.7899941
+		0.03027749
+		0.004536646
+		0.004315339
+		0.002584757
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 315 2000. 3332.608
+	image	masterflat_ir
+	aperture	315
+	beam	315
+	center	2000. 3332.608
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.3825765
+		-0.9901897
+		0.8076905
+		0.02626618
+		0.01771126
+		-0.001406038
+		0.004668027
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 316 2000. 3341.656
+	image	masterflat_ir
+	aperture	316
+	beam	316
+	center	2000. 3341.656
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.3745247
+		-1.006056
+		0.8170769
+		0.01237974
+		0.01692737
+		0.003231895
+		-3.199433E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 317 2000. 3350.456
+	image	masterflat_ir
+	aperture	317
+	beam	317
+	center	2000. 3350.456
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.3780765
+		-1.003597
+		0.8212415
+		0.01097786
+		0.01690317
+		-0.0022957
+		0.001157949
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 318 2000. 3359.615
+	image	masterflat_ir
+	aperture	318
+	beam	318
+	center	2000. 3359.615
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.3586845
+		-0.9950527
+		0.8398376
+		0.004316582
+		0.02049458
+		2.167542E-4
+		1.222897E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 319 2000. 3368.616
+	image	masterflat_ir
+	aperture	319
+	beam	319
+	center	2000. 3368.616
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.3434853
+		-1.010545
+		0.8060703
+		0.005800132
+		0.01906559
+		-0.007580207
+		-8.033516E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 320 2000. 3377.441
+	image	masterflat_ir
+	aperture	320
+	beam	320
+	center	2000. 3377.441
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.3811536
+		-1.005804
+		0.8334303
+		0.01461196
+		0.01960356
+		-0.005089719
+		-0.002413959
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 321 2000. 3386.441
+	image	masterflat_ir
+	aperture	321
+	beam	321
+	center	2000. 3386.441
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.3640138
+		-0.9876298
+		0.8297783
+		0.01275302
+		0.02459975
+		-0.002822972
+		5.290543E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 322 2000. 3395.176
+	image	masterflat_ir
+	aperture	322
+	beam	322
+	center	2000. 3395.176
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4120.
+		0.3086596
+		-1.077242
+		0.7256915
+		0.004465129
+		0.01886226
+		-0.0127065
+		0.01016969
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 323 2000. 3404.066
+	image	masterflat_ir
+	aperture	323
+	beam	323
+	center	2000. 3404.066
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.3839753
+		-0.9550956
+		0.8435565
+		0.02809793
+		0.01921614
+		-0.002472919
+		-1.796486E-5
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 324 2000. 3413.131
+	image	masterflat_ir
+	aperture	324
+	beam	324
+	center	2000. 3413.131
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.3795936
+		-0.9622623
+		0.8641769
+		0.01270914
+		0.02278525
+		0.00369309
+		-5.438213E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 325 2000. 3434.7
+	image	masterflat_ir
+	aperture	325
+	beam	325
+	center	2000. 3434.7
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.3626916
+		-0.9724189
+		0.8148764
+		0.02496129
+		0.007158526
+		0.001029779
+		0.001456697
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 326 2000. 3443.594
+	image	masterflat_ir
+	aperture	326
+	beam	326
+	center	2000. 3443.594
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.3442597
+		-0.9988436
+		0.8138754
+		0.009928484
+		0.00297326
+		-0.004571819
+		-7.141898E-5
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 327 2000. 3452.485
+	image	masterflat_ir
+	aperture	327
+	beam	327
+	center	2000. 3452.485
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.3617021
+		-1.017613
+		0.8307122
+		0.007978325
+		0.01875308
+		-4.417926E-4
+		-0.003436885
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 328 2000. 3461.178
+	image	masterflat_ir
+	aperture	328
+	beam	328
+	center	2000. 3461.178
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.3613954
+		-0.9809744
+		0.8585129
+		0.01128895
+		0.02138757
+		-0.004632867
+		-0.003270302
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 329 2000. 3469.902
+	image	masterflat_ir
+	aperture	329
+	beam	329
+	center	2000. 3469.902
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4100.
+		0.4125767
+		-0.993157
+		0.8601939
+		0.00745398
+		0.01848357
+		-1.934344E-4
+		0.001927826
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 330 2000. 3478.818
+	image	masterflat_ir
+	aperture	330
+	beam	330
+	center	2000. 3478.818
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.3967452
+		-0.94851
+		0.885447
+		0.02120522
+		0.01967147
+		-5.232267E-5
+		0.003269489
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 331 2000. 3487.635
+	image	masterflat_ir
+	aperture	331
+	beam	331
+	center	2000. 3487.635
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.4170564
+		-0.9369507
+		0.9071737
+		0.01498593
+		0.02465407
+		0.005401504
+		6.134663E-4
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 332 2000. 3496.48
+	image	masterflat_ir
+	aperture	332
+	beam	332
+	center	2000. 3496.48
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.4105488
+		-0.934954
+		0.9070823
+		0.02058415
+		0.02277
+		-0.004859546
+		-4.585620E-6
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 333 2000. 3505.103
+	image	masterflat_ir
+	aperture	333
+	beam	333
+	center	2000. 3505.103
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.4002103
+		-0.9523497
+		0.8808646
+		0.01540052
+		0.02040812
+		0.001928626
+		0.005227058
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 334 2000. 3513.97
+	image	masterflat_ir
+	aperture	334
+	beam	334
+	center	2000. 3513.97
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.3810456
+		-0.9765464
+		0.8504674
+		3.675408E-4
+		0.01025954
+		-0.01510866
+		0.002196487
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 335 2000. 3545.715
+	image	masterflat_ir
+	aperture	335
+	beam	335
+	center	2000. 3545.715
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.4071886
+		-0.9674253
+		0.8968732
+		0.01177782
+		0.01999673
+		8.178473E-4
+		0.008029209
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 336 2000. 3554.563
+	image	masterflat_ir
+	aperture	336
+	beam	336
+	center	2000. 3554.563
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.3989071
+		-0.958777
+		0.8932661
+		0.006101485
+		0.01205333
+		-0.005985357
+		0.003097029
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 337 2000. 3563.238
+	image	masterflat_ir
+	aperture	337
+	beam	337
+	center	2000. 3563.238
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.4010006
+		-1.014681
+		0.8831588
+		-0.01551613
+		0.01968253
+		-0.009125541
+		0.007932261
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 338 2000. 3571.865
+	image	masterflat_ir
+	aperture	338
+	beam	338
+	center	2000. 3571.865
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.3537702
+		-1.234114
+		0.6579912
+		-0.1154277
+		-0.01381422
+		-0.007209425
+		0.04424341
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 339 2000. 3580.771
+	image	masterflat_ir
+	aperture	339
+	beam	339
+	center	2000. 3580.771
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.4034582
+		-0.9565335
+		0.9324762
+		0.01197564
+		0.03360178
+		0.004317139
+		0.01447194
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 340 2000. 3589.541
+	image	masterflat_ir
+	aperture	340
+	beam	340
+	center	2000. 3589.541
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.3608425
+		-1.096171
+		0.8019975
+		-0.04493916
+		0.007038391
+		-0.01264204
+		0.02251651
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 341 2000. 3598.321
+	image	masterflat_ir
+	aperture	341
+	beam	341
+	center	2000. 3598.321
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4120.
+		0.4170062
+		-0.97617
+		0.9134529
+		3.363557E-4
+		0.02553536
+		-0.005483853
+		0.007181469
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 342 2000. 3607.191
+	image	masterflat_ir
+	aperture	342
+	beam	342
+	center	2000. 3607.191
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.4353851
+		-0.904263
+		0.9483171
+		0.01502097
+		0.02290703
+		0.001042742
+		0.009747303
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 343 2000. 3615.992
+	image	masterflat_ir
+	aperture	343
+	beam	343
+	center	2000. 3615.992
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.4036762
+		-0.9512506
+		0.8540071
+		-0.004856577
+		-0.00323938
+		-0.02137564
+		0.01269243
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 344 2000. 3637.708
+	image	masterflat_ir
+	aperture	344
+	beam	344
+	center	2000. 3637.708
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.4109988
+		-0.9092661
+		0.9006917
+		0.02343718
+		-0.004550921
+		0.004815908
+		0.01923036
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 345 2000. 3646.306
+	image	masterflat_ir
+	aperture	345
+	beam	345
+	center	2000. 3646.306
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.4510957
+		-0.9399624
+		0.9072949
+		0.00441792
+		5.135185E-4
+		0.004385184
+		0.01388864
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 346 2000. 3655.086
+	image	masterflat_ir
+	aperture	346
+	beam	346
+	center	2000. 3655.086
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		0.448115
+		-0.9173971
+		0.9492872
+		0.01924627
+		0.007465619
+		-0.002130348
+		0.00680642
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 347 2000. 3663.695
+	image	masterflat_ir
+	aperture	347
+	beam	347
+	center	2000. 3663.695
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.4214042
+		-0.8838392
+		0.9839154
+		0.02585846
+		0.02382379
+		0.006102788
+		0.00513044
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 348 2000. 3672.305
+	image	masterflat_ir
+	aperture	348
+	beam	348
+	center	2000. 3672.305
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4100.
+		0.4201092
+		-0.9649523
+		0.8974919
+		-0.01872588
+		-1.478174E-4
+		-0.0102602
+		0.004972576
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 349 2000. 3681.084
+	image	masterflat_ir
+	aperture	349
+	beam	349
+	center	2000. 3681.084
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.4806587
+		-0.84419
+		1.011619
+		0.02328748
+		0.01983245
+		-0.003184521
+		0.004661651
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 350 2000. 3689.744
+	image	masterflat_ir
+	aperture	350
+	beam	350
+	center	2000. 3689.744
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.4651931
+		-0.855663
+		1.009155
+		0.01721592
+		0.02426446
+		-5.160431E-4
+		0.008869824
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 351 2000. 3698.314
+	image	masterflat_ir
+	aperture	351
+	beam	351
+	center	2000. 3698.314
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.4444389
+		-0.8828685
+		1.004375
+		-0.005296799
+		0.01889163
+		-0.001111291
+		0.006783479
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 352 2000. 3707.138
+	image	masterflat_ir
+	aperture	352
+	beam	352
+	center	2000. 3707.138
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		0.455305
+		-0.8531016
+		1.010408
+		0.02525532
+		0.01803806
+		0.003226542
+		0.005234731
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 353 2000. 3715.783
+	image	masterflat_ir
+	aperture	353
+	beam	353
+	center	2000. 3715.783
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.4464275
+		-0.8555257
+		0.9946488
+		0.01488992
+		0.01118106
+		-0.001124854
+		0.003611867
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 354 2000. 3737.266
+	image	masterflat_ir
+	aperture	354
+	beam	354
+	center	2000. 3737.266
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		0.2943837
+		-1.142516
+		0.7236573
+		-0.05035915
+		-0.0246565
+		-0.008386363
+		0.02298832
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 355 2000. 3745.892
+	image	masterflat_ir
+	aperture	355
+	beam	355
+	center	2000. 3745.892
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.4487481
+		-0.891623
+		0.974492
+		-0.001299285
+		0.009802999
+		-0.01327623
+		0.01030348
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 356 2000. 3754.431
+	image	masterflat_ir
+	aperture	356
+	beam	356
+	center	2000. 3754.431
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.4595965
+		-0.8729849
+		1.039733
+		2.789708E-4
+		0.02466637
+		-0.008544253
+		0.002950936
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 357 2000. 3762.97
+	image	masterflat_ir
+	aperture	357
+	beam	357
+	center	2000. 3762.97
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		0.3868599
+		-1.066101
+		0.8639387
+		-0.06464139
+		-0.001368459
+		-0.01701134
+		0.03426595
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 358 2000. 3771.713
+	image	masterflat_ir
+	aperture	358
+	beam	358
+	center	2000. 3771.713
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.4865687
+		-0.866951
+		1.057271
+		0.0040674
+		0.04020059
+		-0.004955058
+		0.00462336
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 359 2000. 3780.286
+	image	masterflat_ir
+	aperture	359
+	beam	359
+	center	2000. 3780.286
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.4982479
+		-0.8174602
+		1.10081
+		0.008721629
+		0.03910211
+		-0.001150854
+		-0.00113955
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 360 2000. 3788.651
+	image	masterflat_ir
+	aperture	360
+	beam	360
+	center	2000. 3788.651
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.5078681
+		-0.8539864
+		1.08665
+		0.004883585
+		0.03734016
+		-0.006186885
+		0.008093897
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 361 2000. 3797.406
+	image	masterflat_ir
+	aperture	361
+	beam	361
+	center	2000. 3797.406
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.4985152
+		-0.8281592
+		1.086097
+		0.00373426
+		0.03894271
+		-0.002598766
+		0.01448696
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 362 2000. 3806.042
+	image	masterflat_ir
+	aperture	362
+	beam	362
+	center	2000. 3806.042
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4110.
+		0.4828944
+		-0.8488963
+		1.062364
+		-0.006663113
+		0.02667671
+		-0.007619852
+		0.009164737
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 363 2000. 3814.459
+	image	masterflat_ir
+	aperture	363
+	beam	363
+	center	2000. 3814.459
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.4183937
+		-1.121526
+		0.8957109
+		-0.1151184
+		0.01826929
+		-0.02297525
+		0.02238818
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 364 2000. 3836.459
+	image	masterflat_ir
+	aperture	364
+	beam	364
+	center	2000. 3836.459
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.5262364
+		-0.8519356
+		1.129281
+		-6.849574E-4
+		0.03095351
+		0.00669283
+		0.00135251
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 365 2000. 3844.802
+	image	masterflat_ir
+	aperture	365
+	beam	365
+	center	2000. 3844.802
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.5009215
+		-0.9604747
+		1.071275
+		-0.04021701
+		0.02939412
+		-0.002552341
+		0.01434094
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 366 2000. 3853.489
+	image	masterflat_ir
+	aperture	366
+	beam	366
+	center	2000. 3853.489
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.5059843
+		-0.913415
+		1.110886
+		-0.03079405
+		0.02972683
+		-0.004066758
+		0.01404005
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 367 2000. 3861.727
+	image	masterflat_ir
+	aperture	367
+	beam	367
+	center	2000. 3861.727
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.5479464
+		-0.8831043
+		1.163799
+		-0.002312287
+		0.04115249
+		0.0113618
+		0.001166306
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 368 2000. 3870.254
+	image	masterflat_ir
+	aperture	368
+	beam	368
+	center	2000. 3870.254
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		0.5302467
+		-0.8595163
+		1.146552
+		-0.01272004
+		0.03556139
+		8.115608E-4
+		0.009611502
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 369 2000. 3878.611
+	image	masterflat_ir
+	aperture	369
+	beam	369
+	center	2000. 3878.611
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.5510749
+		-0.899213
+		1.173718
+		-0.01208051
+		0.04561567
+		0.003649473
+		0.004791004
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 370 2000. 3887.176
+	image	masterflat_ir
+	aperture	370
+	beam	370
+	center	2000. 3887.176
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.5151897
+		-0.8951794
+		1.137541
+		-0.04391275
+		0.05005971
+		-0.01370483
+		0.009945879
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 371 2000. 3895.744
+	image	masterflat_ir
+	aperture	371
+	beam	371
+	center	2000. 3895.744
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.4943665
+		-0.9027808
+		1.110941
+		-0.05068301
+		0.05035176
+		-0.01059184
+		0.02177266
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 372 2000. 3904.238
+	image	masterflat_ir
+	aperture	372
+	beam	372
+	center	2000. 3904.238
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.5716045
+		-0.7543637
+		1.206261
+		-0.0166317
+		0.04189342
+		-0.002518974
+		0.007495319
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 373 2000. 3912.515
+	image	masterflat_ir
+	aperture	373
+	beam	373
+	center	2000. 3912.515
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.5612589
+		-0.7934594
+		1.211021
+		-0.01053525
+		0.03522425
+		0.003260654
+		0.002501188
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 374 2000. 3934.512
+	image	masterflat_ir
+	aperture	374
+	beam	374
+	center	2000. 3934.512
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4120.
+		0.562623
+		-0.8309394
+		1.136398
+		-0.004688585
+		0.02782524
+		0.001739417
+		0.006333087
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 375 2000. 3942.937
+	image	masterflat_ir
+	aperture	375
+	beam	375
+	center	2000. 3942.937
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.5497739
+		-0.8157073
+		1.19788
+		-0.008104884
+		0.0347638
+		0.00384705
+		0.002634309
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 376 2000. 3951.457
+	image	masterflat_ir
+	aperture	376
+	beam	376
+	center	2000. 3951.457
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		0.5653573
+		-0.8037683
+		1.20692
+		6.150125E-4
+		0.04227505
+		0.008251782
+		0.006991142
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 377 2000. 3959.748
+	image	masterflat_ir
+	aperture	377
+	beam	377
+	center	2000. 3959.748
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4120.
+		0.5632905
+		-0.8658302
+		1.177195
+		-0.03217385
+		0.03955484
+		-0.01260936
+		0.008152452
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 378 2000. 3968.141
+	image	masterflat_ir
+	aperture	378
+	beam	378
+	center	2000. 3968.141
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.5846724
+		-0.7863649
+		1.237379
+		-2.797675E-4
+		0.04952873
+		-4.902243E-4
+		0.008010097
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 379 2000. 3976.567
+	image	masterflat_ir
+	aperture	379
+	beam	379
+	center	2000. 3976.567
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4120.
+		0.5291478
+		-0.816651
+		1.250141
+		-0.01645868
+		0.05372039
+		0.003789806
+		0.002776898
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 380 2000. 3984.71
+	image	masterflat_ir
+	aperture	380
+	beam	380
+	center	2000. 3984.71
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.5735275
+		-0.8697115
+		1.205076
+		-0.02803529
+		0.0624117
+		-0.01966122
+		0.01735544
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 381 2000. 3993.224
+	image	masterflat_ir
+	aperture	381
+	beam	381
+	center	2000. 3993.224
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.5794845
+		-0.7634276
+		1.273765
+		-0.003988633
+		0.05120221
+		-0.001930899
+		0.006798144
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 382 2000. 4001.42
+	image	masterflat_ir
+	aperture	382
+	beam	382
+	center	2000. 4001.42
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.5660121
+		-0.8051717
+		1.258798
+		-0.01454389
+		0.05589426
+		1.008567E-4
+		0.01339513
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 383 2000. 4009.842
+	image	masterflat_ir
+	aperture	383
+	beam	383
+	center	2000. 4009.842
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.5683665
+		-0.866082
+		1.209155
+		-0.04681467
+		0.03682159
+		-0.0184742
+		0.01768105
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 384 2000. 4040.083
+	image	masterflat_ir
+	aperture	384
+	beam	384
+	center	2000. 4040.083
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		0.6051945
+		-0.7608179
+		1.281571
+		-0.0138715
+		0.04662699
+		-0.009707646
+		0.008729055
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 385 2000. 4048.337
+	image	masterflat_ir
+	aperture	385
+	beam	385
+	center	2000. 4048.337
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.623156
+		-0.734642
+		1.306968
+		-0.001031339
+		0.05499048
+		-0.001923936
+		0.01015974
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 386 2000. 4056.261
+	image	masterflat_ir
+	aperture	386
+	beam	386
+	center	2000. 4056.261
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.5536457
+		-1.097936
+		1.256302
+		-0.04877299
+		0.1182958
+		-0.02313277
+		0.04382835
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 387 2000. 4064.63
+	image	masterflat_ir
+	aperture	387
+	beam	387
+	center	2000. 4064.63
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.569369
+		-0.8168727
+		1.273219
+		-0.0382595
+		0.06954259
+		-0.01994493
+		0.02044411
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 388 2000. 4072.782
+	image	masterflat_ir
+	aperture	388
+	beam	388
+	center	2000. 4072.782
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.6156056
+		-0.7739936
+		1.319811
+		-0.03309334
+		0.06757248
+		-0.02031317
+		0.009962495
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 389 2000. 4081.16
+	image	masterflat_ir
+	aperture	389
+	beam	389
+	center	2000. 4081.16
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4130.
+		0.6278507
+		-0.717355
+		1.332082
+		-0.01989242
+		0.06716527
+		-0.005752396
+		0.01496435
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 390 2000. 4089.02
+	image	masterflat_ir
+	aperture	390
+	beam	390
+	center	2000. 4089.02
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.5516812
+		-0.9758478
+		1.271594
+		-0.06326526
+		0.1116334
+		-0.02734468
+		0.03426239
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 391 2000. 4097.294
+	image	masterflat_ir
+	aperture	391
+	beam	391
+	center	2000. 4097.294
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4140.
+		0.6058968
+		-0.7843649
+		1.312418
+		-0.04908172
+		0.07957816
+		-0.0140634
+		0.02320546
+
+# Thu 15:39:02 27-Feb-2014
+begin	aperture masterflat_ir 392 2000. 4105.458
+	image	masterflat_ir
+	aperture	392
+	beam	392
+	center	2000. 4105.458
+	low	-1999. -2.
+	high	2146. 2.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4120.
+		0.6126523
+		-0.9071653
+		1.312902
+		-0.097758
+		0.06611305
+		-0.01210478
+		0.01343737
+
