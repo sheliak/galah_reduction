@@ -2646,15 +2646,34 @@ def create_database(date, output='fits', database='all'):
 	header['TFORM29']='28A7'#this is wav_n_lines column
 	hdul.close()
 
-	#conver table to ascii. add _1, _2, _3, _4 to fields in arrays (always representing four arms)
-	#hdul=fits.open('reductions/results/%s/db/%s.fits' % (date, date))
-	#hdu=hdul[1]
-	#t=Table(hdu.data)
-	#print t.colnames
-	#print hdu.data
-	#for n,colname in t.colnames:
-	#	if 
+	# convert table to ascii. add _1, _2, _3, _4 to fields in arrays (always representing four arms)
+	csv_db=open('reductions/results/%s/db/%s.csv' % (date, date), 'w')
+	hdul=fits.open('reductions/results/%s/db/%s.fits' % (date, date))
+	hdu=hdul[1]
+	t=Table(hdu.data)
+	data=np.array(hdu.data)
+	str_to_write=[]
+	for n,colname in enumerate(t.colnames):
+		if data[0][n].shape==(4,):
+			for i in range(1,5):
+				str_to_write.append(colname+'_'+str(i))
+		else:
+			str_to_write.append(colname)
 
+	csv_db.write(','.join(str_to_write))
+	csv_db.write('\n')
+
+	for i in data:
+		str_to_write=[]
+		for j in i:
+			if j.shape==(4,):
+				for k in j:
+					str_to_write.append(str(k))
+			else:
+				str_to_write.append(str(j))
+		csv_db.write(','.join(str_to_write))
+		csv_db.write('\n')
+	csv_db.close()
 					
 
 def analyze(date):
