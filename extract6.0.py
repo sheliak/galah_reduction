@@ -307,6 +307,9 @@ def remove_bias(date):
 	Returns:
 		none
 
+	ToDo:
+		Use overscan if there are no biases (or <3 biases)
+
 	"""
 	logging.info('Correcting bias.')
 	for ccd in [1,2,3,4]:
@@ -334,7 +337,7 @@ def remove_bias(date):
 
 def fix_gain(date):
 	"""
-	Images are transfered through two ADCs with different gains. This function converts flux from ADU to electrons.
+	Images are transfered through two ADCs with different gains. This function converts flux from ADU to electrons and hence corrects different gain of different ADCs.
 
 	Parameters:
 		date (str): date string (e.g. 190210)
@@ -360,7 +363,7 @@ def fix_gain(date):
 
 def fix_bad_pixels(date):
 	"""
-	CCDs 2 and 4 (green and IR) have bad columns. This is fixed, and the bad columns are linearly interpolated from the neighbouring pixels.
+	CCDs 2 and 4 (green and IR) have bad columns. This is fixed so the bad columns are linearly interpolated from the neighbouring pixels.
 
 	Parameters:
 		date (str): date string (e.g. 190210)
@@ -812,7 +815,6 @@ def remove_scattered(date, ncpu=1):
 
 	To do:
 		Do some cleaning
-		Paralelize
 
 	"""
 
@@ -880,6 +882,9 @@ def measure_cross_on_flat(date):
 	
 	Returns:
 		none
+
+	ToDo:
+		Everything.
 	"""
 	pass
 
@@ -1032,7 +1037,7 @@ def plot_wav_coeff(date, cob_id, ccd):
 
 def resolution_profile(date):
 	"""
-	Calculates the resolution profile of each spectrum. Produces an image with ''_res'' prefix with FWHM in Angstroms.
+	Calculates the resolution profile of each spectrum. Produces an image with ''res_'' prefix with FWHM in Angstroms.
 
 	Parameters:
 		date (str): date string (e.g. 190210)
@@ -1289,8 +1294,8 @@ def v_bary_correction(date, quick=False, ncpu=1):
 
 	To do:
 		Sort out downloading UT1-UTC tables.
-		Write interpolation for quick method.
-		Make sure the header cleans OK for both cases.
+		Make sure the header cleans OK for both (quick=True and False) cases.
+		Check with Tomaz whether vbary is the same as his
 
 	"""
 
@@ -1606,7 +1611,7 @@ def remove_sky(date, method='nearest', thr_method='flat', ncpu=1):
 	To do:
 		More options for different methods of sky removal
 		Urgent: separate magnitude based throughput for plate 0 and plate 1
-		Find out why it is so slow or paralelize
+		Check if method='nearest3' works with paralelization
 
 	"""
 
@@ -1766,7 +1771,7 @@ def remove_telurics(date):
 
 
 	"""
-	# Use the following part of the code to generate HITRAN atmospheric absorption spectra
+	# Use the following part of the code to generate HITRAN atmospheric absorption spectra. You probably don't need this. Spectra are already in folder hitran_data
 	def wavenumber2l(w):
 		return 1./w/0.00000001
 
@@ -2015,7 +2020,7 @@ def create_final_spectra(date, output='fits', database='all'):
 		none
 
 	To do:
-		Edit headers, so they are in accordance with Datacentral requirements
+		CHeck if headers are in accordance with Datacentral requirements
 
 	"""
 
@@ -2311,7 +2316,7 @@ def create_final_spectra(date, output='fits', database='all'):
 						hdul[5].header['BUNIT']=('counts', '')
 						hdul[6].header['BUNIT']=('counts', '')
 						hdul[7].header['BUNIT']=('angstroms', '')
-						#fix size of extension 7
+						#fix size of extension 7. No need for double precision here
 						hdul[7].data=np.array(hdul[7].data, dtype=np.dtype('f4'))
 						#fix meanra and meandec for extension 7
 						hdul[7].header['MEANRA']=hdul[0].header['MEANRA']
@@ -2484,6 +2489,8 @@ def create_database(date, output='fits', database='all'):
 	cols.append(fits.Column(name='ra', format='E', unit='deg'))
 	cols.append(fits.Column(name='dec', format='E', unit='deg'))
 	cols.append(fits.Column(name='mjd', format='D'))
+	cols.append(fits.Column(name='utdate', format='A23'))
+	cols.append(fits.Column(name='epoch', format='D'))
 	cols.append(fits.Column(name='aperture', format='I'))
 	cols.append(fits.Column(name='pivot', format='I'))
 	cols.append(fits.Column(name='fibre', format='I'))
@@ -2491,14 +2498,32 @@ def create_database(date, output='fits', database='all'):
 	cols.append(fits.Column(name='fibre_y', format='E', unit='um'))
 	cols.append(fits.Column(name='fibre_theta', format='E', unit='deg'))
 	cols.append(fits.Column(name='aperture_position', format='4E'))
+	cols.append(fits.Column(name='mean_ra', format='E', unit='deg'))
+	cols.append(fits.Column(name='mean_dec', format='E', unit='deg'))
+	cols.append(fits.Column(name='mean_zd', format='E', unit='deg'))
+	cols.append(fits.Column(name='mean_ha', format='E', unit='deg'))
+	cols.append(fits.Column(name='cfg_file', format='A48', null=None))
+	cols.append(fits.Column(name='cfg_field_name', format='A56', null=None))
+	cols.append(fits.Column(name='obj_name', format='A48', null=None))
+	cols.append(fits.Column(name='galah_id', format='K', null=None))
 	cols.append(fits.Column(name='snr', format='4E', null=None))
 	cols.append(fits.Column(name='res', format='4E', null=None, unit='A'))
+	cols.append(fits.Column(name='b_par', format='4E', null=None))
+	cols.append(fits.Column(name='v_bary_eff', format='E', unit='km/s'))
+	cols.append(fits.Column(name='exposed', format='E', unit='s'))
 	cols.append(fits.Column(name='mag', format='E'))
 	cols.append(fits.Column(name='wav_rms', format='4E', unit='km/s', null=None))
+	cols.append(fits.Column(name='wav_n_lines', format='28A7'))
 	cols.append(fits.Column(name='rv', format='4E', unit='km/s', null=None))
 	cols.append(fits.Column(name='e_rv', format='4E', unit='km/s', null=None))
 	cols.append(fits.Column(name='rv_com', format='E', unit='km/s', null=None))
 	cols.append(fits.Column(name='e_rv_com', format='E', unit='km/s', null=None))
+	cols.append(fits.Column(name='teff', format='E', unit='K', null=None))
+	cols.append(fits.Column(name='logg', format='E', unit='cm / s^-2', null=None))
+	cols.append(fits.Column(name='met', format='E', null=None))
+	cols.append(fits.Column(name='obs_comment', format='A32'))
+	cols.append(fits.Column(name='pipeline_version', format='A5'))
+	cols.append(fits.Column(name='reduction_flags', format='I'))
 	hdu=fits.BinTableHDU.from_columns(cols)
 	table=Table.read(hdu)	
 
@@ -2530,7 +2555,13 @@ def create_database(date, output='fits', database='all'):
 		#read parameters from headers
 		ra=header1['RA_OBJ']
 		dec=header1['DEC_OBJ']
+		mean_ra=header1['MEANRA']
+		mean_dec=header1['MEANDEC']
+		mean_zd=header1['MEAN_ZD']
+		mean_ha=header1['MEAN_HA']
 		mjd=header1['UTMJD']
+		utdate=header1['UTDATE']
+		epoch=header1['EPOCH']
 		aperture=header1['APERTURE']
 		pivot=header1['pivot']
 		fibre=header1['fibre']
@@ -2538,13 +2569,30 @@ def create_database(date, output='fits', database='all'):
 		fibre_y=header1['Y']
 		fibre_theta=header1['THETA']
 		aperture_position=[header1['AP_POS'], header2['AP_POS'], header3['AP_POS'], header4['AP_POS']]
+		cfg_file=header1['CFG_FILE']
+		if cfg_file=='None': cfg_file=None
+		cfg_field_name=header1['OBJECT']
+		if cfg_field_name=='None': cfg_field_name=None
+		obj_name=header1['OBJ_NAME']
+		if obj_name=='None': obj_name=None
+		galah_id=header1['GALAH_ID']
+		if galah_id=='None': galah_id=-1#not sure why None is not working here
 		mag=header1['mag']
 		wav_rms=[header1['WAV_RMS'], header2['WAV_RMS'], header3['WAV_RMS'], header4['WAV_RMS']]
 		wav_rms=[None if i=='None' else i for i in wav_rms]
+		wav_n_lines=[header1['WAVLINES'], header2['WAVLINES'], header3['WAVLINES'], header4['WAVLINES']]
+		wav_n_lines_arr=[None if i=='None' else i for i in wav_n_lines]
+		wav_n_lines=''.join([i.ljust(7, ' ') for i in wav_n_lines_arr])#weird formating because of astropy bugs
 		snr=[header1['SNR'], header2['SNR'], header3['SNR'], header4['SNR']]
 		snr=[None if i=='None' else i for i in snr]
 		res=[header1['RES'], header2['RES'], header3['RES'], header4['RES']]
 		res=[None if i=='None' else i for i in res]
+		b=[header1['B'], header2['B'], header3['B'], header4['B']]
+		b=[None if i=='None' else i for i in b]
+		v_bary_eff=header1['BARYEFF']
+		if v_bary_eff=='None': v_bary_eff=None
+		exposed=header1['EXPOSED']
+		if exposed=='None': exposed=None
 		rv=[header1['rv'], header2['rv'], header3['rv'], header4['rv']]
 		rv=[None if i=='None' else i for i in rv]
 		e_rv=[header1['E_RV'], header2['E_RV'], header3['E_RV'], header4['E_RV']]
@@ -2553,9 +2601,33 @@ def create_database(date, output='fits', database='all'):
 		if rv_com=='None': rv_com=None
 		e_rv_com=header1['rvcom']
 		if e_rv_com=='None': e_rv_com=None
+		teff=header1['TEFF']
+		if teff=='None': teff=None
+		logg=header1['LOGG']
+		if logg=='None': logg=None
+		met=header1['MET']
+		if met=='None': met=None
+		pipeline_version=header1['PIPE_VER']
+		obs_comment=header1['COMM_OBS']
+		#bin mask reduction flags
+		flag=0
+		if header1['TRACE_OK']==0: flag+=1
+		if header2['TRACE_OK']==0: flag+=2
+		if header3['TRACE_OK']==0: flag+=4
+		if header4['TRACE_OK']==0: flag+=8
+		if header1['WAV_OK']==0: flag+=16
+		if header2['WAV_OK']==0: flag+=32
+		if header3['WAV_OK']==0: flag+=64
+		if header4['WAV_OK']==0: flag+=128
+		if header1['RV_OK']==0: flag+=256
+		if header2['RV_OK']==0: flag+=512
+		if header3['RV_OK']==0: flag+=1024
+		if header4['RV_OK']==0: flag+=2048
+		if header1['RVCOM_OK']==0: flag+=4096#this one is the same in all 4 ccds
+		if header1['PAR_OK']==0: flag+=8192#parameters are calculated over all arms, so this flag is the same for all 4 ccds
 
 		#add parameters into the table
-		table.add_row([sobject, ra, dec, header1['UTMJD'], header1['aperture'], header1['pivot'], header1['fibre'], fibre_x, fibre_y, fibre_theta, aperture_position, snr, res, header1['mag'], wav_rms, rv, e_rv, rv_com, e_rv_com])
+		table.add_row([sobject, ra, dec, mjd, utdate, epoch, aperture, pivot, fibre, fibre_x, fibre_y, fibre_theta, aperture_position, mean_ra, mean_dec, mean_zd, mean_ha, cfg_file, cfg_field_name, obj_name, galah_id, snr, res, b, v_bary_eff, exposed, mag, wav_rms, wav_n_lines, rv, e_rv, rv_com, e_rv_com, teff, logg, met, obs_comment, pipeline_version, flag])
 
 	#write table to hdu
 	hdu=fits.BinTableHDU(table)
@@ -2567,12 +2639,21 @@ def create_database(date, output='fits', database='all'):
 	hdul=fits.open('reductions/results/%s/db/%s.fits' % (date, date), mode='update')
 	header=hdul[1].header
 	header['TTYPE1']=(header['TTYPE1'], 'sobject_id is unique for each GALAH observation')
-	header['TTYPE2']=(header['TTYPE2'], 'RA of object in deg')
-	header['TTYPE3']=(header['TTYPE3'], 'dec of object in deg')
-	header['TTYPE4']=(header['TTYPE4'], 'modified UT julian date, exposures weighted')
+	#header['TTYPE2']=(header['TTYPE2'], 'RA of object in deg')
+	#header['TTYPE3']=(header['TTYPE3'], 'dec of object in deg')
+	#header['TTYPE4']=(header['TTYPE4'], 'modified UT julian date, exposures weighted')
+	#fix bug in astropy (formating of string arrays)
+	header['TFORM29']='28A7'#this is wav_n_lines column
 	hdul.close()
 
-	#conver table to ascii. add _1 to fields in arrays
+	#conver table to ascii. add _1, _2, _3, _4 to fields in arrays (always representing four arms)
+	#hdul=fits.open('reductions/results/%s/db/%s.fits' % (date, date))
+	#hdu=hdul[1]
+	#t=Table(hdu.data)
+	#print t.colnames
+	#print hdu.data
+	#for n,colname in t.colnames:
+	#	if 
 
 					
 
@@ -2601,6 +2682,10 @@ def min_red(dir):
 
 	Returns:
 		none
+
+	ToDo:
+		Option to reduce just one COB or one image
+		Option to use whichever flat and arc are available, even, if they are from the previous field done with the same plate.
 	"""
 
 	date,cobs=inspect_dir(dir)
@@ -2637,14 +2722,14 @@ if __name__ == "__main__":
 
 	logging.basicConfig(level=logging.DEBUG)
 	if len(sys.argv)==2:
-		date,cobs=inspect_dir(sys.argv[1])
-		remove_bias(date)
-		fix_gain(date)
-		fix_bad_pixels(date)
-		prepare_flat_arc(date,cobs)
-		#date='190210'
-		remove_cosmics(date, ncpu=4)
-		find_apertures(date)
+		#date,cobs=inspect_dir(sys.argv[1])
+		#remove_bias(date)
+		#fix_gain(date)
+		#fix_bad_pixels(date)
+		#prepare_flat_arc(date,cobs)
+		date='190210'
+		#remove_cosmics(date, ncpu=4)
+		#find_apertures(date)
 		#plot_apertures(190210, 1902100045, 3)
 		#remove_scattered(date, ncpu=4)
 		#measure_cross_on_flat(date)
@@ -2657,9 +2742,9 @@ if __name__ == "__main__":
 		#v_bary_correction(date, quick=False, ncpu=6)
 		#os.system('cp -r reductions_bary reductions')
 		#resolution_profile(date)
-		#os.system('cp -r reductions-test reductions')
+		os.system('cp -r reductions-test reductions')
 		#create_final_spectra(date)
-		#create_database(date)
+		create_database(date)
 		
 	else:
 		logging.critical('Wrong number of command line arguments.')
