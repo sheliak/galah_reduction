@@ -10,6 +10,8 @@ U{http://www.astro.yale.edu/dokkum/lacosmic/}
 
 (article : U{http://arxiv.org/abs/astro-ph/0108003})
 
+The original code was modified by Janez Kos and is optimised for GALAH.
+
 
 Additional features
 ===================
