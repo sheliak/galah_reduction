@@ -1266,10 +1266,14 @@ def v_bary_correction_proc(args):
 
 	file, fibre_table, obstime, AAT=args
 	hdul=fits.open(file, mode='update')
-	hdul_sky=fits.open('/'.join(file.split('/')[:-1])+'/sky_'+file.split('/')[-1], mode='update')
-	hdul_tel=fits.open('/'.join(file.split('/')[:-1])+'/telurics_'+file.split('/')[-1], mode='update')
-	hdul_scat=fits.open('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1], mode='update')
+	if os.path.exists('/'.join(file.split('/')[:-1])+'/sky_'+file.split('/')[-1]): 
+		hdul_sky=fits.open('/'.join(file.split('/')[:-1])+'/sky_'+file.split('/')[-1], mode='update')
+	if os.path.exists('/'.join(file.split('/')[:-1])+'/telurics_'+file.split('/')[-1]): 
+		hdul_tel=fits.open('/'.join(file.split('/')[:-1])+'/telurics_'+file.split('/')[-1], mode='update')
+	if os.path.exists('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1]): 
+		hdul_scat=fits.open('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1], mode='update')
 	n=0 # n counts apertures (increase whenever fibre type!='F')
+	logging.info('Processing (v_bary correction) file %s.' % file)
 	for i in fibre_table:
 		if i[8]!='F':
 			n+=1
@@ -1277,18 +1281,29 @@ def v_bary_correction_proc(args):
 			sc=SkyCoord(ra=(i[1]/np.pi*180.)*u.deg, dec=(i[2]/np.pi*180.)*u.deg)
 			barycorr=sc.radial_velocity_correction(obstime=obstime, location=AAT)
 			v_bary=float(barycorr.to(u.km/u.s).value)
+
 			hdul[0].header['BARY_%s' % str(n)]=v_bary
-			hdul_sky[0].header['BARY_%s' % str(n)]=v_bary
-			hdul_tel[0].header['BARY_%s' % str(n)]=v_bary
-			hdul_scat[0].header['BARY_%s' % str(n)]=v_bary
+			if os.path.exists('/'.join(file.split('/')[:-1])+'/sky_'+file.split('/')[-1]):
+				hdul_sky[0].header['BARY_%s' % str(n)]=v_bary
+			if os.path.exists('/'.join(file.split('/')[:-1])+'/telurics_'+file.split('/')[-1]):
+				hdul_tel[0].header['BARY_%s' % str(n)]=v_bary
+			if os.path.exists('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1]):
+				hdul_scat[0].header['BARY_%s' % str(n)]=v_bary
+			
 			iraf.dopcor(input=file, output='', redshift='-%s' % v_bary, isveloc='yes', add='yes', dispers='yes', apertures=n, flux='no')
-			iraf.dopcor(input='/'.join(file.split('/')[:-1])+'/sky_'+file.split('/')[-1], output='', redshift='-%s' % v_bary, isveloc='yes', add='yes', dispers='yes', apertures=n, flux='no')
-			iraf.dopcor(input='/'.join(file.split('/')[:-1])+'/telurics_'+file.split('/')[-1], output='', redshift='-%s' % v_bary, isveloc='yes', add='yes', dispers='yes', apertures=n, flux='no')
-			iraf.dopcor(input='/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1], output='', redshift='-%s' % v_bary, isveloc='yes', add='yes', dispers='yes', apertures=n, flux='no')
+			if os.path.exists('/'.join(file.split('/')[:-1])+'/sky_'+file.split('/')[-1]): 
+				iraf.dopcor(input='/'.join(file.split('/')[:-1])+'/sky_'+file.split('/')[-1], output='', redshift='-%s' % v_bary, isveloc='yes', add='yes', dispers='yes', apertures=n, flux='no')
+			if os.path.exists('/'.join(file.split('/')[:-1])+'/telurics_'+file.split('/')[-1]): 
+				iraf.dopcor(input='/'.join(file.split('/')[:-1])+'/telurics_'+file.split('/')[-1], output='', redshift='-%s' % v_bary, isveloc='yes', add='yes', dispers='yes', apertures=n, flux='no')
+			if os.path.exists('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1]): 
+				iraf.dopcor(input='/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1], output='', redshift='-%s' % v_bary, isveloc='yes', add='yes', dispers='yes', apertures=n, flux='no')
 	hdul.close()
-	hdul_sky.close()
-	hdul_tel.close()
-	hdul_scat.close()
+	if os.path.exists('/'.join(file.split('/')[:-1])+'/sky_'+file.split('/')[-1]):
+		hdul_sky.close()
+	if os.path.exists('/'.join(file.split('/')[:-1])+'/telurics_'+file.split('/')[-1]):
+		hdul_tel.close()
+	if os.path.exists('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1]): 
+		hdul_scat.close()
 
 
 def v_bary_correction(date, quick=False, ncpu=1):
@@ -1307,6 +1322,7 @@ def v_bary_correction(date, quick=False, ncpu=1):
 		Sort out downloading UT1-UTC tables.
 		Make sure the header cleans OK for both (quick=True and False) cases.
 		Check with Tomaz whether vbary is the same as his
+		correct other files than main one in quick=True method
 
 	"""
 
@@ -1326,7 +1342,6 @@ def v_bary_correction(date, quick=False, ncpu=1):
 
 	files=glob.glob("reductions/%s/ccd*/*/[1-31]*.ms.fits" % (date))
 	for file in files:
-		logging.info('Processing (v_bary correction) file %s.' % file)
 		# we need coordinates for indivisual fibres
 		fibre_table_file='/'.join(file.split('/')[:-1])+'/fibre_table_'+file.split('/')[-1].replace('.ms', '')
 		hdul=fits.open(fibre_table_file)
@@ -1352,32 +1367,8 @@ def v_bary_correction(date, quick=False, ncpu=1):
 			hdul.close()
 			iraf.dopcor(input=file, output='', redshift='-%s' % v_bary_mean, isveloc='yes', add='yes', dispers='yes', apertures='', flux='no')
 		else:
-			args.append([file, fibre_table, obstime, AAT])
 			# Otherwise do it aperture by aperture. Downloading is currently turned off. 
-			hdul=fits.open(file, mode='update')
-			hdul_sky=fits.open('/'.join(file.split('/')[:-1])+'/sky_'+file.split('/')[-1], mode='update')
-			hdul_tel=fits.open('/'.join(file.split('/')[:-1])+'/telurics_'+file.split('/')[-1], mode='update')
-			hdul_scat=fits.open('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1], mode='update')
-			n=0
-			for i in fibre_table:
-				if i[8]!='F':
-					n+=1
-				if i[8]=='P':
-					sc=SkyCoord(ra=(i[1]/np.pi*180.)*u.deg, dec=(i[2]/np.pi*180.)*u.deg)
-					barycorr=sc.radial_velocity_correction(obstime=obstime, location=AAT)
-					v_bary=float(barycorr.to(u.km/u.s).value)
-					hdul[0].header['BARY_%s' % str(n)]=v_bary
-					hdul_sky[0].header['BARY_%s' % str(n)]=v_bary
-					hdul_tel[0].header['BARY_%s' % str(n)]=v_bary
-					hdul_scat[0].header['BARY_%s' % str(n)]=v_bary
-					iraf.dopcor(input=file, output='', redshift='-%s' % v_bary, isveloc='yes', add='yes', dispers='yes', apertures=n, flux='no')
-					iraf.dopcor(input='/'.join(file.split('/')[:-1])+'/sky_'+file.split('/')[-1], output='', redshift='-%s' % v_bary, isveloc='yes', add='yes', dispers='yes', apertures=n, flux='no')
-					iraf.dopcor(input='/'.join(file.split('/')[:-1])+'/telurics_'+file.split('/')[-1], output='', redshift='-%s' % v_bary, isveloc='yes', add='yes', dispers='yes', apertures=n, flux='no')
-					iraf.dopcor(input='/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1], output='', redshift='-%s' % v_bary, isveloc='yes', add='yes', dispers='yes', apertures=n, flux='no')
-			hdul.close()
-			hdul_sky.close()
-			hdul_tel.close()
-			hdul_scat.close()
+			args.append([file, fibre_table, obstime, AAT])
 	
 	if quick==False:
 		pool = Pool(processes=ncpu)
@@ -1820,7 +1811,7 @@ def remove_sky(date, method='nearest', thr_method='flat', ncpu=1):
 				fibre_table_arr.append(fibre_table_dict[ap][8])
 
 			#save fibre throughputs
-			np.save(cob+'fibre_throughputs', fibre_throughputs_arr_use)
+			np.save(cob+'/fibre_throughputs', fibre_throughputs_arr_use)
 
 			for file in files:
 				args.append([cob,file,fibre_throughputs_arr_use,fibre_table_arr])
@@ -2101,14 +2092,12 @@ def remove_telurics(date):
 				#	show()
 
 
-def create_final_spectra(date, output='fits', database='all'):
+def create_final_spectra(date):
 	"""
 	Turn reduced spectra into final output and combine consecutive exposures.
 
 	Parameters:
 		date (str): date string (e.g. 190210)
-		output (str): 'fits' (default) or 'hdf' or 'both'.
-		database (str): 'fits' or 'csv' or 'sql' or 'all (default)'.
 
 	Returns:
 		none
@@ -2295,6 +2284,9 @@ def create_final_spectra(date, output='fits', database='all'):
 							if 'BARY_%s' % ap in hdul[extension].header: hdul[extension].header['BARYEFF']=(hdul[extension].header['BARY_%s' % ap], 'Barycentric velocity correction in km/s')
 							elif 'BARYEFF' in hdul[extension].header: pass
 							else: hdul[extension].header['BARYEFF']=('None', 'Barycentric velocity correction was not done')
+							if hdul[0].header['SOURCE']=='Plate 1': hdul[extension].header['PLATE']=(1, '2dF plate source')
+							elif hdul[0].header['SOURCE']=='Plate 0': hdul[extension].header['PLATE']=(0, '2dF plate source')
+							else: hdul[extension].header['PLATE']=('None', 'Problem determining plate number')
 							del hdul[extension].header['BARY_*']
 							del hdul[extension].header['BANDID*']
 							del hdul[extension].header['APNUM*']
@@ -2401,6 +2393,8 @@ def create_final_spectra(date, output='fits', database='all'):
 						del hdul[0].header['HAEND']
 						del hdul[0].header['ZDSTART']
 						del hdul[0].header['ZDEND']
+						for extension in range(8):
+							del hdul[extension].header['SOURCE']
 						#units
 						hdul[0].header['BUNIT']=('counts', '')
 						hdul[1].header['BUNIT']=('', '')
@@ -2560,20 +2554,18 @@ def create_final_spectra(date, output='fits', database='all'):
 					hdul.close()
 					iraf.flprcache()
 
-def create_database(date, output='fits', database='all'):
+def create_database(date):
 	"""
 	Create databse
 
 	Parameters:
 		date (str): date string (e.g. 190210)
-		output (str): 'fits' (default) or 'hdf' or 'both'.
-		database (str): 'fits' or 'csv' or 'sql' or 'all (default)'.
 
 	Returns:
 		none
 
 	To do:
-		Everything
+		Add fibre throughput into the db and add flags for poor throughput
 
 	"""
 
@@ -2591,6 +2583,7 @@ def create_database(date, output='fits', database='all'):
 	cols.append(fits.Column(name='fibre_x', format='E', unit='um'))
 	cols.append(fits.Column(name='fibre_y', format='E', unit='um'))
 	cols.append(fits.Column(name='fibre_theta', format='E', unit='deg'))
+	cols.append(fits.Column(name='plate', format='I', null=None))
 	cols.append(fits.Column(name='aperture_position', format='4E'))
 	cols.append(fits.Column(name='mean_ra', format='E', unit='deg'))
 	cols.append(fits.Column(name='mean_dec', format='E', unit='deg'))
@@ -2662,6 +2655,8 @@ def create_database(date, output='fits', database='all'):
 		fibre_x=header1['X']
 		fibre_y=header1['Y']
 		fibre_theta=header1['THETA']
+		plate=header1['PLATE']
+		if plate=='None': plate=None
 		aperture_position=[header1['AP_POS'], header2['AP_POS'], header3['AP_POS'], header4['AP_POS']]
 		cfg_file=header1['CFG_FILE'].replace(',', ';')#replace commas, so the don't interfere with a csv version of the database
 		if cfg_file=='None': cfg_file=None
@@ -2721,7 +2716,7 @@ def create_database(date, output='fits', database='all'):
 		if header1['PAR_OK']==0: flag+=8192#parameters are calculated over all arms, so this flag is the same for all 4 ccds
 
 		#add parameters into the table
-		table.add_row([sobject, ra, dec, mjd, utdate, epoch, aperture, pivot, fibre, fibre_x, fibre_y, fibre_theta, aperture_position, mean_ra, mean_dec, mean_zd, mean_ha, cfg_file, cfg_field_name, obj_name, galah_id, snr, res, b, v_bary_eff, exposed, mag, wav_rms, wav_n_lines, rv, e_rv, rv_com, e_rv_com, teff, logg, met, obs_comment, pipeline_version, flag])
+		table.add_row([sobject, ra, dec, mjd, utdate, epoch, aperture, pivot, fibre, fibre_x, fibre_y, fibre_theta, plate, aperture_position, mean_ra, mean_dec, mean_zd, mean_ha, cfg_file, cfg_field_name, obj_name, galah_id, snr, res, b, v_bary_eff, exposed, mag, wav_rms, wav_n_lines, rv, e_rv, rv_com, e_rv_com, teff, logg, met, obs_comment, pipeline_version, flag])
 
 	#write table to hdu
 	hdu=fits.BinTableHDU(table)
@@ -2737,7 +2732,7 @@ def create_database(date, output='fits', database='all'):
 	#header['TTYPE3']=(header['TTYPE3'], 'dec of object in deg')
 	#header['TTYPE4']=(header['TTYPE4'], 'modified UT julian date, exposures weighted')
 	#fix bug in astropy (formating of string arrays)
-	header['TFORM29']='28A7'#this is wav_n_lines column
+	header['TFORM30']='28A7'#this is wav_n_lines column
 	hdul.close()
 
 	# convert table to ascii. add _1, _2, _3, _4 to fields in arrays (always representing four arms)
@@ -2850,12 +2845,12 @@ if __name__ == "__main__":
 		#extract_spectra(date)
 		#wav_calibration(date)
 		os.system('cp -r reductions-test reductions')
-		remove_sky(date, method='nearest3', thr_method='flat', ncpu=6)
+		remove_sky(date, method='nearest3', thr_method='flat', ncpu=7)
 		#plot_spectra(190210, 1902100045, 3)
-		#remove_telurics(date)
-		#v_bary_correction(date, quick=False, ncpu=6)
+		remove_telurics(date)
+		v_bary_correction(date, quick=False, ncpu=8)
 		#os.system('cp -r reductions_bary reductions')
-		#resolution_profile(date)
+		resolution_profile(date)
 		#os.system('cp -r reductions-test reductions')
 		#create_final_spectra(date)
 		#create_database(date)
