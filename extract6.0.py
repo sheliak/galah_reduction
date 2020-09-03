@@ -299,7 +299,7 @@ def inspect_dir(dir):
 
 def remove_bias(date):
 	"""
-	Bias is removed from all images.
+	Bias is removed from all images. If there are not enough biases (less than 3) overscan is used.
 
 	Parameters:
 		date (str): date string (e.g. 190210)
@@ -315,23 +315,34 @@ def remove_bias(date):
 	for ccd in [1,2,3,4]:
 		files=glob.glob("reductions/%s/ccd%s/biases/*.fits" % (date,ccd))
 		
-		# create masterbias
-		biases=[]
-		for f in files:
-			hdul=fits.open(f)
-			biases.append(hdul[0].data)
-			hdul.close()
-		masterbias=np.median(np.array(biases), axis=0)
+		if len(files)>=3:
+			# create masterbias
+			biases=[]
+			for f in files:
+				hdul=fits.open(f)
+				biases.append(hdul[0].data)
+				hdul.close()
+			masterbias=np.median(np.array(biases), axis=0)
 
-		# remove bias from images
-		files=glob.glob("reductions/%s/ccd%s/*/[1-31]*.fits" % (date,ccd))
-		for f in files:
-			if 'biases' in f: 
-				continue
-			else:
-				with fits.open(f, mode='update') as hdu_c:
-					hdu_c[0].data=hdu_c[0].data-masterbias
-					hdu_c.flush()
+			# remove bias from images
+			files=glob.glob("reductions/%s/ccd%s/*/[1-31]*.fits" % (date,ccd))
+			for f in files:
+				if 'biases' in f: 
+					continue
+				else:
+					with fits.open(f, mode='update') as hdu_c:
+						hdu_c[0].data=hdu_c[0].data-masterbias
+						hdu_c.flush()
+		else: # if there are not enough biases, use overscan
+			files=glob.glob("reductions/%s/ccd%s/*/[1-31]*.fits" % (date,ccd))
+			for f in files:
+				if 'biases' in f: 
+					continue
+				else:
+					with fits.open(f, mode='update') as hdu_c:
+						pass
+						hdu_c.flush()
+						
 		
 		shutil.rmtree("reductions/%s/ccd%s/biases" % (date,ccd))
 
@@ -1559,41 +1570,115 @@ def remove_sky_nearest3(arg):
 		else:
 			return -1
 
+	def sky_diff(a, spec,sky):
+		"""
+		Calculates total variation of a signal over a kernel. V(y)=\sum_i \sum_n \left| y_{n+i} - y_n \right| w(i)
+
+		Parameters:
+			a (array): parameters (scale)
+			spec (array): array representing a 1D spectrum (columns are wavelength and flux)
+			sky (array): sky spectrum, same shape as spec
+	
+		Returns:
+			total variation (float)
+
+		To Do:
+			fine tune the total variation kernel
+			Add mask to use only sky line regions.
+		"""
+
+		print a['scale'].value
+		sky=a['scale'].value*sky
+		# Below is a crude implementation of a kernel
+		div=spec-sky
+		div_roll1=np.roll(div,1)
+		tot_var=np.sum(abs(div-div_roll1))*0.4
+		div_roll2=np.roll(div,2)
+		tot_var+=np.sum(abs(div-div_roll2))*0.3
+		div_roll3=np.roll(div,3)
+		tot_var+=np.sum(abs(div-div_roll3))*0.2
+		div_roll4=np.roll(div,4)
+		tot_var+=np.sum(abs(div-div_roll4))*0.1
+		return tot_var
+
 	cob,file,fibre_throughputs_dict_use,fibre_table_dict=arg
 
 	logging.info('Processing (removing sky) file %s' % file)
+
+	os.chdir(cob)
+	file=file.split('/')[-1]
 
 	for ap in range(1,393):
 		sky_aps=nearest_3_sky(ap)
 		if sky_aps==-1:
 			logging.error('There are no sky fibres in image %s.' % file)
-		if os.path.exists(cob+'/sky1.fits'):	
-			os.remove(cob+'/sky1.fits')
-		if os.path.exists(cob+'/sky2.fits'):	
-			os.remove(cob+'/sky2.fits')
-		if os.path.exists(cob+'/sky3.fits'):	
-			os.remove(cob+'/sky3.fits')
-		iraf.imcopy(input=file+'[*,%s]' % sky_aps[0], output=cob+'/sky1.fits', Stdout="/dev/null")
-		iraf.imcopy(input=file+'[*,%s]' % sky_aps[1], output=cob+'/sky2.fits', Stdout="/dev/null")
-		iraf.imcopy(input=file+'[*,%s]' % sky_aps[2], output=cob+'/sky3.fits', Stdout="/dev/null")
-		iraf.sarith(input1=cob+'/sky1.fits', op='*', input2=fibre_throughputs_dict_use[ap]/fibre_throughputs_dict_use[sky_aps[0]], output=cob+'/sky1_scaled.fits', clobber='no', merge='no', ignorea='yes', Stdout="/dev/null")
-		iraf.sarith(input1=cob+'/sky2.fits', op='*', input2=fibre_throughputs_dict_use[ap]/fibre_throughputs_dict_use[sky_aps[1]], output=cob+'/sky2_scaled.fits', clobber='no', merge='no', ignorea='yes', Stdout="/dev/null")
-		iraf.sarith(input1=cob+'/sky3.fits', op='*', input2=fibre_throughputs_dict_use[ap]/fibre_throughputs_dict_use[sky_aps[2]], output=cob+'/sky3_scaled.fits', clobber='no', merge='no', ignorea='yes', Stdout="/dev/null")
-		iraf.scombine(input=cob+'/sky1.fits, '+cob+'/sky2.fits, '+cob+'/sky3.fits', output=cob+'/sky_scaled.fits', apertures='', group='all', combine='median', Stdout="/dev/null")
-		iraf.sarith(input1=file+'[*,%s]' % (ap), op='-', input2=cob+'/sky_scaled.fits', clobber='yes', merge='yes', ignorea='yes', output='/'.join(file.split('/')[:-1])+'/nosky_'+file.split('/')[-1],Stdout="/dev/null")
-		os.remove(cob+'/sky_scaled.fits')
-		os.remove(cob+'/sky1_scaled.fits')
-		os.remove(cob+'/sky2_scaled.fits')
-		os.remove(cob+'/sky3_scaled.fits')
+		if os.path.exists(file+'sky1.fits'):	
+			os.remove(file+'sky1.fits')
+		if os.path.exists(file+'sky2.fits'):	
+			os.remove(file+'sky2.fits')
+		if os.path.exists(file+'sky3.fits'):	
+			os.remove(file+'sky3.fits')
+		iraf.scopy(input=file, output=file+'sky1.fits', apertures=sky_aps[0], Stdout="/dev/null")
+		iraf.scopy(input=file, output=file+'sky2.fits', apertures=sky_aps[1], Stdout="/dev/null")
+		iraf.scopy(input=file, output=file+'sky3.fits', apertures=sky_aps[2], Stdout="/dev/null")
+		iraf.sarith(input1=file+'sky1.fits', op='*', input2=fibre_throughputs_dict_use[ap]/fibre_throughputs_dict_use[sky_aps[0]], output=file+'sky1_scaled.fits', clobber='no', merge='no', ignorea='yes', Stdout="/dev/null")
+		iraf.sarith(input1=file+'sky2.fits', op='*', input2=fibre_throughputs_dict_use[ap]/fibre_throughputs_dict_use[sky_aps[1]], output=file+'sky2_scaled.fits', clobber='no', merge='no', ignorea='yes', Stdout="/dev/null")
+		iraf.sarith(input1=file+'sky3.fits', op='*', input2=fibre_throughputs_dict_use[ap]/fibre_throughputs_dict_use[sky_aps[2]], output=file+'sky3_scaled.fits', clobber='no', merge='no', ignorea='yes', Stdout="/dev/null")
+		iraf.scombine(input=file+'sky1.fits, '+file+'sky2.fits, '+file+'sky3.fits', output=file+'sky_scaled.fits', apertures='', group='all', combine='median', Stdout="/dev/null")
+		iraf.sarith(input1=file, op='-', input2=file+'sky_scaled.fits', clobber='yes', merge='yes', ignorea='yes', output='nosky_'+file, apertures=ap,  Stdout="/dev/null")
+		
+		"""
+		#test fitting sky the same way telurics are fit
+		hdul=fits.open(file)
+		spec=hdul[0].data[ap-1]
+		hdul.close()
+		hdul=fits.open('nosky_'+file)
+		if ap==1:
+			no_sky_spec=hdul[0].data
+		else:
+			no_sky_spec=hdul[0].data[ap-1]
+		hdul.close()
+		params = Parameters()
+		params.add('scale', value=1.0, min=0.7, max=1.3)
+		print no_sky_spec.shape
+		minner = Minimizer(sky_diff, params, fcn_args=(spec[1800:],spec[1800:]-no_sky_spec[1800:]))
+		result = minner.minimize(method='brute')
+		print file, report_fit(result)
+		res=result.params['scale'].value*1.08
+		#print res
+		#print file, ap, [sky_diff_a(i, spec,spec-no_sky_spec) for i in np.linspace(0.9,1.1,30)]
+		#fig=figure(0)
+		#ax=fig.add_subplot(111)
+		#ax.plot(np.linspace(0.7,1.3,60), [sky_diff_a(i, spec,spec-no_sky_spec) for i in np.linspace(0.7,1.3,60)], 'ko')
+		#ax.plot(spec,'k-', lw=0.5)
+		#ax.plot(spec-(spec-no_sky_spec),'r-', lw=0.5)
+		#ax.plot(spec-0.5*(spec-no_sky_spec),'g-', lw=0.5)
+		#ax.plot(spec-1.5*(spec-no_sky_spec),'b-', lw=0.5)
+		#ax.plot(spec-no_sky_spec, 'r-')
+		#ax.plot(0.5*(spec-no_sky_spec), 'g-')
+		#ax.plot(1.5*(spec-no_sky_spec), 'b-')
+		#show()
+		iraf.sarith(input1=file+'sky_scaled.fits', op='*', input2=res, output=file+'sky_scaled2.fits', clobber='no', merge='no', ignorea='yes', Stdout="/dev/null")
+		iraf.sarith(input1=file, op='-', input2=file+'sky_scaled2.fits', clobber='yes', merge='yes', ignorea='yes', output='nosky2_'+file, apertures=ap,  Stdout="/dev/null")
+		os.remove(file+'sky_scaled2.fits')
+		
+		"""
+
+		os.remove(file+'sky_scaled.fits')
+		os.remove(file+'sky1_scaled.fits')
+		os.remove(file+'sky2_scaled.fits')
+		os.remove(file+'sky3_scaled.fits')
 
 	# save sky spectrum and processed spectrum
-	iraf.sarith(input1='/'.join(file.split('/')[:-1])+'/'+file.split('/')[-1], op='-', input2='/'.join(file.split('/')[:-1])+'/nosky_'+file.split('/')[-1], output='/'.join(file.split('/')[:-1])+'/sky_'+file.split('/')[-1])
-	os.remove('/'.join(file.split('/')[:-1])+'/'+file.split('/')[-1])
-	iraf.scopy(input='/'.join(file.split('/')[:-1])+'/nosky_'+file.split('/')[-1], output='/'.join(file.split('/')[:-1])+'/'+file.split('/')[-1])
-	os.remove('/'.join(file.split('/')[:-1])+'/nosky_'+file.split('/')[-1])
-	os.remove(cob+'/sky1.fits')
-	os.remove(cob+'/sky2.fits')
-	os.remove(cob+'/sky3.fits')
+	iraf.sarith(input1=file, op='-', input2='nosky_'+file, output='sky_'+file)
+	os.remove(file)
+	iraf.scopy(input='nosky_'+file, output=file)
+	os.remove('nosky_'+file)
+	os.remove(file+'sky1.fits')
+	os.remove(file+'sky2.fits')
+	os.remove(file+'sky3.fits')
+	iraf.flprcache()
+	os.chdir('../../../../')
 
 def remove_sky(date, method='nearest', thr_method='flat', ncpu=1):
 	"""
@@ -1749,8 +1834,8 @@ def remove_sky(date, method='nearest', thr_method='flat', ncpu=1):
 
 		if method=='nearest3':
 			# Second method is where we use three nearest sky spectra. Resolution is still somewhat similar, but we can take a median of three sky spectra and thus remove any remaining cosmics
-			pool = Pool(processes=ncpu)
-			pool.map(remove_sky_nearest3, args)
+			pool = Pool(processes=1)
+			pool.map(remove_sky_nearest3, args[3:])
 			#for arg in args:
 			#	remove_sky_nearest3(arg)
 					
@@ -1913,21 +1998,21 @@ def remove_telurics(date):
 						params.add('scale_h2o', value=trans_params[exposure_number][0], min=trans_params[exposure_number][0]*0.7, max=trans_params[exposure_number][0]*1.3)
 						params.add('scale_o2', value=0.1, min=0.01, max=2.0, vary=False) # there is no O2 in red ccd
 						params.add('vr', value=0.0, min=-0.05, max=0.05)
-						params.add('res', value=40.0, min=32.0, max=48.0)
+						params.add('res', value=82.0, min=75.0, max=95.0)
 						params.add('b', value=2.08, vary=False)
 					if ccd==2:
 						params = Parameters()
 						params.add('scale_h2o', value=trans_params[exposure_number][0], min=trans_params[exposure_number][0]*0.7, max=trans_params[exposure_number][0]*1.3)
 						params.add('scale_o2', value=trans_params[exposure_number][1], min=trans_params[exposure_number][1]*0.7, max=trans_params[exposure_number][1]*1.3)
 						params.add('vr', value=0.0, min=-0.05, max=0.05)
-						params.add('res', value=35.0, min=29.0, max=41.0)
+						params.add('res', value=75.0, min=65.0, max=90.0)
 						params.add('b', value=2.15, vary=False)
 					if ccd==1:
 						params = Parameters()
 						params.add('scale_h2o', value=trans_params[exposure_number][0], vary=False) # use already measured values, because tellurics in blue are too weak to fit
 						params.add('scale_o2', value=0.1, min=0.01, max=2.0, vary=False) # there is no O2 in blue ccd
 						params.add('vr', value=0.0, min=-0.05, max=0.05)
-						params.add('res', value=29.0, min=22.0, max=36.0)
+						params.add('res', value=65.0, min=55.0, max=90.0)
 						params.add('b', value=2.4, vary=False)
 
 					minner = Minimizer(total_variation, params, fcn_args=(data,trans_h2o,trans_o2))
@@ -1940,11 +2025,18 @@ def remove_telurics(date):
 					params.add('scale_h2o', value=0.9, min=0.01, max=2.0)
 					params.add('scale_o2', value=0.1, min=0.01, max=2.0)
 					params.add('vr', value=0.0, min=-0.05, max=0.05)
-					if ccd==4: params.add('res', value=128.0, min=10, max=1000)
-					if ccd==3: params.add('res', value=40.0, min=32, max=48)
-					if ccd==2: params.add('res', value=35.0, min=29, max=41)
-					if ccd==1: params.add('res', value=29.0, min=22, max=36)
-					params.add('b', value=2.0, vary=False)
+					if ccd==4: 
+						params.add('res', value=98.0, min=85, max=110)
+						params.add('b', value=2.01, vary=False)
+					if ccd==3: 
+						params.add('res', value=82.0, min=75, max=95)
+						params.add('b', value=2.08, vary=False)
+					if ccd==2: 
+						params.add('res', value=75.0, min=65, max=90)
+						params.add('b', value=2.15, vary=False)
+					if ccd==1: 
+						params.add('res', value=65.0, min=55, max=90)
+						params.add('b', value=2.4, vary=False)
 					minner = Minimizer(total_variation, params, fcn_args=(data,trans_h2o,trans_o2))
 					result = minner.minimize(method='lbfgsb')
 					print file, report_fit(result)
@@ -1994,7 +2086,7 @@ def remove_telurics(date):
 				iraf.flprcache()
 
 
-				#if ccd==4:
+				#if ccd<5:
 				#	fig=figure('test')
 				#	ax=fig.add_subplot(111)
 				#	ax.plot(data[:,0], data[:,1]/np.percentile(data[:,1],95), 'k-', label='Input spectrum')
@@ -2193,7 +2285,7 @@ def create_final_spectra(date, output='fits', database='all'):
 									aperture_flags_dict[n]=(y,0)
 								else:
 									aperture_flags_dict[n]=(y,1)
-						#load fitting results for wavelength sollution
+						#load fitting results for wavelength solution
 						wav_dict=np.load(cob+'/wav_fit.npy')
 						#write to fits
 						for extension in range(8):
@@ -2569,11 +2661,11 @@ def create_database(date, output='fits', database='all'):
 		fibre_y=header1['Y']
 		fibre_theta=header1['THETA']
 		aperture_position=[header1['AP_POS'], header2['AP_POS'], header3['AP_POS'], header4['AP_POS']]
-		cfg_file=header1['CFG_FILE']
+		cfg_file=header1['CFG_FILE'].replace(',', ';')#replace commas, so the don't interfere with a csv version of the database
 		if cfg_file=='None': cfg_file=None
-		cfg_field_name=header1['OBJECT']
+		cfg_field_name=header1['OBJECT'].replace(',', ';')
 		if cfg_field_name=='None': cfg_field_name=None
-		obj_name=header1['OBJ_NAME']
+		obj_name=header1['OBJ_NAME'].replace(',', ';')
 		if obj_name=='None': obj_name=None
 		galah_id=header1['GALAH_ID']
 		if galah_id=='None': galah_id=-1#not sure why None is not working here
@@ -2608,7 +2700,7 @@ def create_database(date, output='fits', database='all'):
 		met=header1['MET']
 		if met=='None': met=None
 		pipeline_version=header1['PIPE_VER']
-		obs_comment=header1['COMM_OBS']
+		obs_comment=header1['COMM_OBS'].replace(',', ';')
 		#bin mask reduction flags
 		flag=0
 		if header1['TRACE_OK']==0: flag+=1
@@ -2652,6 +2744,7 @@ def create_database(date, output='fits', database='all'):
 	hdu=hdul[1]
 	t=Table(hdu.data)
 	data=np.array(hdu.data)
+	#print line with column names
 	str_to_write=[]
 	for n,colname in enumerate(t.colnames):
 		if data[0][n].shape==(4,):
@@ -2662,7 +2755,7 @@ def create_database(date, output='fits', database='all'):
 
 	csv_db.write(','.join(str_to_write))
 	csv_db.write('\n')
-
+	#add data
 	for i in data:
 		str_to_write=[]
 		for j in i:
@@ -2754,16 +2847,16 @@ if __name__ == "__main__":
 		#measure_cross_on_flat(date)
 		#extract_spectra(date)
 		#wav_calibration(date)
-		#os.system('cp -r reductions-test reductions')
-		#remove_sky(date, method='nearest', thr_method='flat', ncpu=6)
+		os.system('cp -r reductions-test reductions')
+		remove_sky(date, method='nearest3', thr_method='flat', ncpu=6)
 		#plot_spectra(190210, 1902100045, 3)
 		#remove_telurics(date)
 		#v_bary_correction(date, quick=False, ncpu=6)
 		#os.system('cp -r reductions_bary reductions')
 		#resolution_profile(date)
-		os.system('cp -r reductions-test reductions')
+		#os.system('cp -r reductions-test reductions')
 		#create_final_spectra(date)
-		create_database(date)
+		#create_database(date)
 		
 	else:
 		logging.critical('Wrong number of command line arguments.')
