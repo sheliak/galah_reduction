@@ -1809,16 +1809,18 @@ def remove_sky(date, method='nearest', thr_method='flat', ncpu=1):
 
 			fibre_throughputs_dict_use=defaultdict(lambda:1.0, fibre_throughputs_dict_use)
 
-
 			#list of ms files
 			files=glob.glob("%s/[1-31]*.ms.fits" % cob)
 
-			#change dicts into arrays, because parallelization fails with dicts
+			#change dicts into arrays, because parallelization fails with dicts. First entry in the array will be unused, because apertures are counted with 1,2,3,4, so element 0 is necessary in the array, but was not in the dict
 			fibre_throughputs_arr_use=[fibre_throughputs_dict_use[-1]]
 			fibre_table_arr=[fibre_table_dict[-1]]
 			for ap in range(1,393):
 				fibre_throughputs_arr_use.append(fibre_throughputs_dict_use[ap])
 				fibre_table_arr.append(fibre_table_dict[ap][8])
+
+			#save fibre throughputs
+			np.save(cob+'fibre_throughputs', fibre_throughputs_arr_use)
 
 			for file in files:
 				args.append([cob,file,fibre_throughputs_arr_use,fibre_table_arr])
@@ -1834,8 +1836,8 @@ def remove_sky(date, method='nearest', thr_method='flat', ncpu=1):
 
 		if method=='nearest3':
 			# Second method is where we use three nearest sky spectra. Resolution is still somewhat similar, but we can take a median of three sky spectra and thus remove any remaining cosmics
-			pool = Pool(processes=1)
-			pool.map(remove_sky_nearest3, args[3:])
+			pool = Pool(processes=ncpu)
+			pool.map(remove_sky_nearest3, args)
 			#for arg in args:
 			#	remove_sky_nearest3(arg)
 					
