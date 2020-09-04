@@ -21,5 +21,5 @@
 *.log
 
 # Other
-
+login.cl
 pyraf/clcache.v2/
