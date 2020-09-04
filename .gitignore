@@ -19,7 +19,11 @@
 
 # Log files
 *.log
+logfile
 
 # Other
 login.cl
-pyraf/clcache.v2/
+pyraf
+reductions
+uparm
+aux
