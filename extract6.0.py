@@ -2091,8 +2091,441 @@ def remove_telurics(date):
 				#	ax.legend()
 				#	show()
 
+def create_final_spectra_proc(args):
+	"""
+	Multiprocessing wrapper for create_final_spectra
+	"""
+	ccd, cob, files=args
 
-def create_final_spectra(date):
+	# save individual spectra
+	for file in files:
+		#create a dict from fibre table
+		fibre_table_file='/'.join(file.split('/')[:-1])+'/fibre_table_'+file.split('/')[-1].replace('.ms', '')
+		hdul=fits.open(fibre_table_file)
+		fibre_table=hdul[1].data
+		hdul.close
+		fibre_table_dict={}
+		n=0
+		for fibre,i in enumerate(fibre_table):
+			if i[8]=='F': 
+				pass
+			else: 
+				n+=1
+				fibre_table_dict[n]=np.append(np.array(i), np.array([fibre+1]))
+		fibre_table_dict=defaultdict(lambda:np.array(['FIBRE NOT IN USE', 0.0, 0.0, 0, 0, 0, 0, 0.0, 'N', 0, 0.0, 0, 'Not in use', '0', 0.0, 0.0, 0.0, fibre+1]), fibre_table_dict)
+
+		#read saved b_values
+		if os.path.exists(cob+'/b_values.npy'): b_values=np.load(cob+'/b_values.npy')
+		else: b_values=np.array([2.0]*392)
+
+		#make a normalized spectrum, because this will be added to the final fits files
+		iraf.continuum(input=file, output='/'.join(file.split('/')[:-1])+'/norm_'+file.split('/')[-1], order=5, interactive='no', low_reject=2.0, high_reject=0.0, niterate=5, naverage=11, Stdout="/dev/null")
+
+		#make a sqrt spectrum for adding errors to it
+		iraf.sarith(input1=file, op='^', input2='-0.5', output='/'.join(file.split('/')[:-1])+'/err_'+file.split('/')[-1], apertures='', Stdout="/dev/null")
+
+		#make a cross_talk spectrum placeholder
+		iraf.sarith(input1=file, op='*', input2='0.0', output='/'.join(file.split('/')[:-1])+'/cross_'+file.split('/')[-1], apertures='', Stdout="/dev/null")
+
+		#linearize all spectra
+		iraf.disptrans(input=file, output='', linearize='yes', units='angstroms', Stdout="/dev/null")
+		iraf.disptrans(input='/'.join(file.split('/')[:-1])+'/norm_'+file.split('/')[-1], output='', linearize='yes', units='angstroms', Stdout="/dev/null")
+		if os.path.exists('/'.join(file.split('/')[:-1])+'/sky_'+file.split('/')[-1]): iraf.disptrans(input='/'.join(file.split('/')[:-1])+'/sky_'+file.split('/')[-1], output='', linearize='yes', units='angstroms', Stdout="/dev/null")
+		if os.path.exists('/'.join(file.split('/')[:-1])+'/telurics_'+file.split('/')[-1]): iraf.disptrans(input='/'.join(file.split('/')[:-1])+'/telurics_'+file.split('/')[-1], output='', linearize='yes', units='angstroms', Stdout="/dev/null")
+		if os.path.exists('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1]): iraf.disptrans(input='/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1], output='', linearize='yes', units='angstroms', Stdout="/dev/null")
+		if os.path.exists('/'.join(file.split('/')[:-1])+'/cross_'+file.split('/')[-1]): iraf.disptrans(input='/'.join(file.split('/')[:-1])+'/cross_'+file.split('/')[-1], output='', linearize='yes', units='angstroms', Stdout="/dev/null")
+		if os.path.exists('/'.join(file.split('/')[:-1])+'/res_'+file.split('/')[-1]): iraf.disptrans(input='/'.join(file.split('/')[:-1])+'/res_'+file.split('/')[-1], output='', linearize='yes', units='angstroms', Stdout="/dev/null")
+		#return 0
+
+		for ap in range(1,393):
+			print 'producing individual spectra for file %s and aperture %s' % (file, ap)
+			if fibre_table_dict[ap][8]=='P':
+				filename=str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits'
+				iraf.scopy(input=file, output='reductions/results/%s/spectra/all/%s' % (date,filename), apertures=ap, Stdout="/dev/null")
+				#add normalized spectrum
+				iraf.scopy(input='/'.join(file.split('/')[:-1])+'/norm_'+file.split('/')[-1], output='reductions/results/%s/spectra/all/tmp_norm_%s.fits' % (date, filename), apertures=ap, Stdout="/dev/null")
+				iraf.imcopy(input='reductions/results/%s/spectra/all/tmp_norm_%s.fits' % (date, filename), output='reductions/results/%s/spectra/all/%s[append]' % (date,filename), Stdout="/dev/null")
+				os.remove('reductions/results/%s/spectra/all/tmp_norm_%s.fits' % (date, filename))
+				iraf.hedit(images='reductions/results/%s/spectra/all/%s[1]' % (date,filename), fields="EXTNAME", value='normalized', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
+				#add error spectrum (add a copy of the spectrum as a placeholder)
+				iraf.scopy(input=file, output='reductions/results/%s/spectra/all/tmp_err_%s.fits' % (date, filename), apertures=ap, Stdout="/dev/null")
+				iraf.imcopy(input='reductions/results/%s/spectra/all/tmp_err_%s.fits' % (date, filename), output='reductions/results/%s/spectra/all/%s[append]' % (date,filename), Stdout="/dev/null")
+				os.remove('reductions/results/%s/spectra/all/tmp_err_%s.fits' % (date, filename))
+				iraf.hedit(images='reductions/results/%s/spectra/all/%s[2]' % (date,filename), fields="EXTNAME", value='relative_error', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
+				#add sky spectrum
+				if os.path.exists('/'.join(file.split('/')[:-1])+'/sky_'+file.split('/')[-1]):
+					iraf.scopy(input='/'.join(file.split('/')[:-1])+'/sky_'+file.split('/')[-1], output='reductions/results/%s/spectra/all/tmp_sky_%s.fits' % (date, filename), apertures=ap, Stdout="/dev/null")
+					iraf.imcopy(input='reductions/results/%s/spectra/all/tmp_sky_%s.fits' % (date, filename), output='reductions/results/%s/spectra/all/%s[append]' % (date,filename), Stdout="/dev/null")
+					os.remove('reductions/results/%s/spectra/all/tmp_sky_%s.fits' % (date, filename))
+					iraf.hedit(images='reductions/results/%s/spectra/all/%s[3]' % (date,filename), fields="EXTNAME", value='sky', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
+				else:
+					hdul=fits.open('reductions/results/%s/spectra/all/%s' % (date,filename), mode='update')
+					hdul.append(fits.ImageHDU([0]))
+					hdul.close()
+					iraf.hedit(images='reductions/results/%s/spectra/all/%s[3]' % (date,filename), fields="EXTNAME", value='sky', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
+				#add teluric correction
+				if os.path.exists('/'.join(file.split('/')[:-1])+'/telurics_'+file.split('/')[-1]):
+					iraf.scopy(input='/'.join(file.split('/')[:-1])+'/telurics_'+file.split('/')[-1], output='reductions/results/%s/spectra/all/tmp_tel_%s.fits' % (date, filename), apertures=ap, Stdout="/dev/null")#scopy does not accept [append] option
+					iraf.imcopy(input='reductions/results/%s/spectra/all/tmp_tel_%s.fits' % (date, filename), output='reductions/results/%s/spectra/all/%s[append]' % (date,filename), Stdout="/dev/null")
+					os.remove('reductions/results/%s/spectra/all/tmp_tel_%s.fits' % (date, filename))
+					iraf.hedit(images='reductions/results/%s/spectra/all/%s[4]' % (date,filename), fields="EXTNAME", value='teluric', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
+				else:
+					hdul=fits.open('reductions/results/%s/spectra/all/%s' % (date,filename), mode='update')
+					hdul.append(fits.ImageHDU([0]))
+					hdul.close()
+					iraf.hedit(images='reductions/results/%s/spectra/all/%s[4]' % (date,filename), fields="EXTNAME", value='teluric', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
+				#add scattered light
+				if os.path.exists('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1]):
+					iraf.scopy(input='/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1], output='reductions/results/%s/spectra/all/tmp_scat_%s.fits' % (date, filename), apertures=ap, Stdout="/dev/null")
+					iraf.imcopy(input='reductions/results/%s/spectra/all/tmp_scat_%s.fits' % (date, filename), output='reductions/results/%s/spectra/all/%s[append]' % (date,filename), Stdout="/dev/null")
+					os.remove('reductions/results/%s/spectra/all/tmp_scat_%s.fits' % (date, filename))
+					iraf.hedit(images='reductions/results/%s/spectra/all/%s[5]' % (date,filename), fields="EXTNAME", value='scattered', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
+				else:
+					hdul=fits.open('reductions/results/%s/spectra/all/%s' % (date,filename), mode='update')
+					hdul.append(fits.ImageHDU([0]))
+					hdul.close()
+					iraf.hedit(images='reductions/results/%s/spectra/all/%s[5]' % (date,filename), fields="EXTNAME", value='scattered', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
+				#add cross talk spectrum
+				if os.path.exists('/'.join(file.split('/')[:-1])+'/cross_'+file.split('/')[-1]):
+					iraf.scopy(input='/'.join(file.split('/')[:-1])+'/cross_'+file.split('/')[-1], output='reductions/results/%s/spectra/all/tmp_cross_%s.fits' % (date, filename), apertures=ap, Stdout="/dev/null")
+					iraf.imcopy(input='reductions/results/%s/spectra/all/tmp_cross_%s.fits' % (date, filename), output='reductions/results/%s/spectra/all/%s[append]' % (date,filename), Stdout="/dev/null")
+					os.remove('reductions/results/%s/spectra/all/tmp_cross_%s.fits' % (date, filename))
+					iraf.hedit(images='reductions/results/%s/spectra/all/%s[6]' % (date,filename), fields="EXTNAME", value='cross_talk', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
+				else:
+					hdul=fits.open('reductions/results/%s/spectra/all/%s' % (date,filename), mode='update')
+					hdul.append(fits.ImageHDU([0]))
+					hdul.close()
+					iraf.hedit(images='reductions/results/%s/spectra/all/%s[6]' % (date,filename), fields="EXTNAME", value='cross_talk', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
+				#add resolution profile
+				if os.path.exists('/'.join(file.split('/')[:-1])+'/res_'+file.split('/')[-1]):
+					iraf.scopy(input='/'.join(file.split('/')[:-1])+'/res_'+file.split('/')[-1], output='reductions/results/%s/spectra/all/tmp_res_%s.fits' % (date, filename), apertures=ap, Stdout="/dev/null")
+					iraf.imcopy(input='reductions/results/%s/spectra/all/tmp_res_%s.fits' % (date, filename), output='reductions/results/%s/spectra/all/%s[append]' % (date,filename), Stdout="/dev/null")
+					os.remove('reductions/results/%s/spectra/all/tmp_res_%s.fits' % (date, filename))
+					iraf.hedit(images='reductions/results/%s/spectra/all/%s[7]' % (date,filename), fields="EXTNAME", value='resolution_profile', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
+				else:
+					hdul=fits.open('reductions/results/%s/spectra/all/%s' % (date,filename), mode='update')
+					hdul.append(fits.ImageHDU([0]))
+					hdul.close()
+					iraf.hedit(images='reductions/results/%s/spectra/all/%s[7]' % (date,filename), fields="EXTNAME", value='resolution_profile', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
+				#add errors to the error spectrum
+				hdul=fits.open('reductions/results/%s/spectra/all/%s' % (date,filename), mode='update')
+				noise_squared=hdul[0].data+hdul[3].data+hdul[5].data+hdul[6].data+float(hdul[0].header['RO_NOIS1'])**2
+				signal=hdul[0].data
+				rel_err=np.sqrt(noise_squared)/signal
+				hdul[2].data=rel_err
+				hdul.close()
+				#add data
+				hdul=fits.open('reductions/results/%s/spectra/all/%s' % (date,filename), mode='update')
+				#read some info drom fibre table
+				object_name=fibre_table_dict[ap][0]
+				ra=float(fibre_table_dict[ap][1])/np.pi*180.
+				dec=float(fibre_table_dict[ap][2])/np.pi*180.
+				pivot=fibre_table_dict[ap][9]
+				fibre=fibre_table_dict[ap][-1]
+				x=fibre_table_dict[ap][3]
+				y=fibre_table_dict[ap][4]
+				theta=fibre_table_dict[ap][7]
+				mag=fibre_table_dict[ap][10]
+				#check aperture flags
+				aperture_flags_dict={}
+				a=open('%s/aplast' % (cob))
+				failed_apertures=np.load('%s/failed_apertures.npy' % (cob))
+				for line in a:
+					l=line.split()
+					if len(l)>0 and l[0]=='begin':
+						y=float(l[5])
+						n=int(l[3])
+						if n in failed_apertures:
+							aperture_flags_dict[n]=(y,0)
+						else:
+							aperture_flags_dict[n]=(y,1)
+				#load fitting results for wavelength solution
+				wav_dict=np.load(cob+'/wav_fit.npy')
+				#load fibre throughputs
+				fib_thr=np.load(cob+'/fibre_throughputs.npy')
+				#write to fits
+				for extension in range(8):
+					#clean header
+					if 'BARY_%s' % ap in hdul[extension].header: hdul[extension].header['BARYEFF']=(hdul[extension].header['BARY_%s' % ap], 'Barycentric velocity correction in km/s')
+					elif 'BARYEFF' in hdul[extension].header: pass
+					else: hdul[extension].header['BARYEFF']=('None', 'Barycentric velocity correction was not done')
+					if hdul[0].header['SOURCE']=='Plate 1': hdul[extension].header['PLATE']=(1, '2dF plate source')
+					elif hdul[0].header['SOURCE']=='Plate 0': hdul[extension].header['PLATE']=(0, '2dF plate source')
+					else: hdul[extension].header['PLATE']=('None', 'Problem determining plate number')
+					del hdul[extension].header['BARY_*']
+					del hdul[extension].header['BANDID*']
+					del hdul[extension].header['APNUM*']
+					del hdul[extension].header['DC-FLAG*']
+					del hdul[extension].header['DCLOG*']
+					del hdul[extension].header['WAT1*']
+					del hdul[extension].header['CD1_1']
+					del hdul[extension].header['AAOPRGID']
+					del hdul[extension].header['RUN']
+					del hdul[extension].header['OBSNUM']
+					del hdul[extension].header['GRPNUM']
+					del hdul[extension].header['GRPMEM']
+					del hdul[extension].header['GRPMAX']
+					del hdul[extension].header['OBSTYPE']
+					del hdul[extension].header['NDFCLASS']
+					del hdul[extension].header['FILEORIG']
+					del hdul[extension].header['RO_GAIN1']
+					del hdul[extension].header['RO_NOIS1']
+					del hdul[extension].header['RO_GAIN']
+					del hdul[extension].header['RO_NOISE']
+					del hdul[extension].header['ELAPSED']
+					del hdul[extension].header['TOTALEXP']
+					del hdul[extension].header['UTSTART']
+					del hdul[extension].header['UTEND']
+					del hdul[extension].header['STSTART']
+					del hdul[extension].header['STEND']
+					del hdul[extension].header['APPRA']
+					del hdul[extension].header['APPDEC']
+					del hdul[extension].header['COMMENT']
+					#compatibility
+					hdul[extension].header['APNUM1']=('1 1   ', '')
+					hdul[extension].header['CD1_1']=(hdul[extension].header['CDELT1'], '')
+					hdul[extension].header['CTYPE1']=('Wavelength', '')
+					hdul[extension].header['CUNIT1']=('angstroms', '')
+					#add galah_id (galahic number) if it exists
+					if 'galahic' in object_name:
+						hdul[extension].header['GALAH_ID']=(object_name.split('_')[1], 'GALAH id number (if exists)')
+					else:
+						hdul[extension].header['GALAH_ID']='None'
+					#add object name (first column in fibre table)
+					hdul[extension].header['OBJ_NAME']=(object_name, 'Object name from the .fld file')
+					#add average snr and average resolution
+					hdul[extension].header['SNR']=(1.0/np.nanmedian(hdul[2].data), 'Average SNR of the final spectrum')
+					hdul[extension].header['RES']=(np.nanmean(hdul[7].data), 'Average resolution (FWHM in angstroms)')
+					#add ra and dec of object
+					hdul[extension].header['RA_OBJ']=(ra, 'RA of object in degrees')
+					hdul[extension].header['DEC_OBJ']=(dec, 'dec of object in degrees')
+					#fibre and pivot numbers
+					hdul[extension].header['APERTURE']=(ap, 'aperture number (1-392, in image)')
+					hdul[extension].header['PIVOT']=(int(pivot), 'pivot number (1-400, in 2dF)')
+					hdul[extension].header['FIBRE']=(int(fibre), 'fibre number (1-400, in image)')
+					hdul[extension].header['X']=(float(x), 'x position of fibre on plate in um')
+					hdul[extension].header['Y']=(float(y), 'y position of fibre on plate in um')
+					hdul[extension].header['THETA']=(float(theta), 'bend of fibre in degrees')
+					#position of aperture on image
+					hdul[extension].header['AP_POS']=(aperture_flags_dict[ap][0], 'Position of aperture in image at x=2000')
+					hdul[extension].header['TRACE_OK']=(aperture_flags_dict[ap][1], 'Is aperture trace OK? 1=yes, 0=no')
+					#magnitude
+					hdul[extension].header['MAG']=(float(mag), 'magnitude from the .fld file')
+					#origin
+					hdul[extension].header['ORIGIN']='IRAF reduction pipeline'
+					hdul[extension].header['PIPE_VER']=('6.0', 'IRAF reduction pipeline version')
+					#stellar parameters
+					hdul[extension].header['RV']=('None', 'radial velocity (one arm) in km/s')
+					hdul[extension].header['E_RV']=('None', 'radial velocity uncertainty in km/s')
+					hdul[extension].header['RV_OK']=('None', 'Did RV pipeline converge? 1=yes, 0=no')
+					hdul[extension].header['RVCOM']=('None', 'Combined radial velocity in km/s')
+					hdul[extension].header['E_RVCOM']=('None', 'radial velocity uncertainty in km/s')
+					hdul[extension].header['RVCOM_OK']=('None', 'Did RV pipeline converge? 1=yes, 0=no')
+					hdul[extension].header['TEFF']=('None', 'T_eff in K')
+					hdul[extension].header['LOGG']=('None', 'log g in log cm/s^2')
+					hdul[extension].header['MET']=('None', 'Metallicity in dex')#more parameters?
+					hdul[extension].header['PAR_OK']=('None', 'Are parameters trustworthy? 1=yes, 0=no')
+					#set exposure of the resolution profile to the same value as for spectra
+					hdul[extension].header['EXPOSED']=hdul[0].header['EXPOSED']
+					#correct times
+					hdul[extension].header['UTMJD']=hdul[0].header['UTMJD']+hdul[0].header['EXPOSED']/3600./24./2.#svae MJD in the middle of teh exposure
+					tm=Time(hdul[extension].header['UTMJD'], format='mjd')
+					hdul[extension].header['UTDATE']=(tm.iso, 'Mean UT date in iso format')#save date and time in iso format in the middle of the exposure
+					#convert start and end zd and ha to average ha and zd
+					hdul[extension].header['MEAN_ZD']=((hdul[0].header['ZDEND']+hdul[0].header['ZDSTART'])/2., 'Mean zenith distance')
+					hdul[extension].header['MEAN_HA']=((hdul[0].header['HAEND']+hdul[0].header['HASTART'])/2., 'Mean hour angle')
+					#wavelength solution
+					try: wav_rms=float(wav_dict[ap-1][1])
+					except: wav_rms='None'
+					hdul[extension].header['WAV_RMS']=(wav_rms, 'RMS of the wavelength solution in Angstroms')
+					hdul[extension].header['WAVLINES']=(wav_dict[ap-1][0], 'Number of arc lines (used/found)')
+					wav_flag=1
+					if int(wav_dict[ap-1][0].split('/')[0])<15: wav_flag=0
+					if wav_rms=='None' or wav_rms>0.2: wav_flag=0
+					hdul[extension].header['WAV_OK']=(wav_flag, 'Is wav. solution OK? 1=yes, 0=no')
+					#fibre throughput
+					fibre_throughput=fib_thr[ap]
+					hdul[extension].header['FIB_THR']=(fibre_throughput, 'Fibre throughput relative to best fibre in field')
+					#write down the LSF 
+					hdul[extension].header['LSF']=('exp(-0.693147|2x/fwhm|^B)', 'Line spread function')
+					hdul[extension].header['LSF_FULL']=('exp(-0.693147|2x/fwhm|^%s)' % round(b_values[ap-1],3), 'Line spread function')
+					hdul[extension].header['B']=(round(b_values[ap-1],3), 'Boxiness parameter for LSF')#2.5 is a placeholder
+					hdul[extension].header['COMMENT']=('Explanation of the LSF function: function is centred at 0. fwhm is full width at half maximum in angstroms and is given in extension 7, it is wavelength dependent and varies from fibre to fibre as well. It is advised to use the whole resolution profile from extension 7 rather than average resolution in RES keyword. B is a boxiness parameter. It is given in keyword B in the header. LSF_FULL includes B in the function.')
+					if extension>0:
+						del hdul[extension].header['HASTART']
+						del hdul[extension].header['HAEND']
+						del hdul[extension].header['ZDSTART']
+						del hdul[extension].header['ZDEND']
+
+				del hdul[0].header['HASTART']
+				del hdul[0].header['HAEND']
+				del hdul[0].header['ZDSTART']
+				del hdul[0].header['ZDEND']
+				for extension in range(8):
+					del hdul[extension].header['SOURCE']
+				#units
+				hdul[0].header['BUNIT']=('counts', '')
+				hdul[1].header['BUNIT']=('', '')
+				hdul[2].header['BUNIT']=('', '')
+				hdul[3].header['BUNIT']=('counts', '')
+				hdul[4].header['BUNIT']=('', '')
+				hdul[5].header['BUNIT']=('counts', '')
+				hdul[6].header['BUNIT']=('counts', '')
+				hdul[7].header['BUNIT']=('angstroms', '')
+				#fix size of extension 7. No need for double precision here
+				hdul[7].data=np.array(hdul[7].data, dtype=np.dtype('f4'))
+				#fix meanra and meandec for extension 7
+				hdul[7].header['MEANRA']=hdul[0].header['MEANRA']
+				hdul[7].header['MEANDEC']=hdul[0].header['MEANDEC']
+
+				hdul.close()
+
+				iraf.flprcache()
+
+	#save combined spectra
+	for ap in range(1,393):
+		if fibre_table_dict[ap][8]=='P':
+			filename=str(date)+cob.split('/')[-1][-4:]+'01'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits'
+			#sum of all exposures
+			filenames=[]
+			for file in files:
+				filenames.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits[0]')
+			to_combine=','.join(filenames)
+			iraf.scombine(input=to_combine, output='reductions/results/%s/spectra/com/%s' % (date,filename), aperture='', group='all', combine='sum', reject='none', first='no', Stdout="/dev/null")
+			#normalised spectrum
+			filenames=[]
+			for file in files:
+				filenames.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits[1]')
+			to_combine=','.join(filenames)
+			iraf.scombine(input=to_combine, output='reductions/results/%s/spectra/com/%s[append]' % (date,filename), aperture='', group='all', combine='average', reject='avsigclip', first='no', scale='none', weight='!EXPOSED', lsigma=3.0, hsigma=3.0, Stdout="/dev/null")
+			#error spectrum
+			filenames=[]
+			filenames_del=[]
+			for file in files:
+				filenames.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'_tmp2.fits')
+				filenames_del.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'_tmp.fits')
+				filenames_del.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'_tmp2.fits')
+				iraf.sarith(input1='reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits[2]', op='*', input2='reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits[0]', output='reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'_tmp.fits')#convert relative error to absolute error
+				iraf.sarith(input1='reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'_tmp.fits', op='^', input2='2', output='reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'_tmp2.fits')#square absolute errors, because we will add them in quadrature
+			to_combine=','.join(filenames)
+			iraf.scombine(input=to_combine, output='reductions/results/%s/spectra/com/errors_tmp_%s' % (date, filename), aperture='', group='all', combine='sum', reject='none', first='no', scale='none', Stdout="/dev/null")
+			for file in filenames_del:
+				os.remove(file)
+			iraf.sarith(input1='reductions/results/%s/spectra/com/errors_tmp_%s' % (date, filename), op='sqrt', input2='', output='reductions/results/%s/spectra/com/errors_abs_tmp_%s' % (date, filename))
+			iraf.sarith(input1='reductions/results/%s/spectra/com/errors_abs_tmp_%s' % (date, filename), op='/', input2='reductions/results/%s/spectra/com/%s[0]' % (date,filename), output='reductions/results/%s/spectra/com/errors_rel_tmp_%s' % (date, filename))
+			iraf.imcopy(input='reductions/results/%s/spectra/com/errors_rel_tmp_%s' % (date, filename), output='reductions/results/%s/spectra/com/%s[append]' % (date,filename), Stdout="/dev/null")
+			os.remove('reductions/results/%s/spectra/com/errors_abs_tmp_%s' % (date, filename))
+			os.remove('reductions/results/%s/spectra/com/errors_rel_tmp_%s' % (date, filename))
+			os.remove('reductions/results/%s/spectra/com/errors_tmp_%s' % (date, filename))
+			iraf.hedit(images='reductions/results/%s/spectra/com/%s[2]' % (date,filename), fields="EXTNAME", value='relative_error', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
+			#sky
+			filenames=[]
+			for file in files:
+				filenames.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits[3]')
+			to_combine=','.join(filenames)
+			iraf.scombine(input=to_combine, output='reductions/results/%s/spectra/com/%s[append]' % (date,filename), aperture='', group='all', combine='sum', reject='none', first='no', scale='none', Stdout="/dev/null")
+			#teluric
+			filenames=[]
+			for file in files:
+				filenames.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits[4]')
+			to_combine=','.join(filenames)
+			iraf.scombine(input=to_combine, output='reductions/results/%s/spectra/com/%s[append]' % (date,filename), aperture='', group='all', combine='average', reject='none', first='no', scale='none', weight='!EXPOSED', Stdout="/dev/null")
+			#scattered light
+			filenames=[]
+			for file in files:
+				filenames.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits[5]')
+			to_combine=','.join(filenames)
+			iraf.scombine(input=to_combine, output='reductions/results/%s/spectra/com/%s[append]' % (date,filename), aperture='', group='all', combine='sum', reject='none', first='no', scale='none', Stdout="/dev/null")
+			#cross_talk
+			filenames=[]
+			for file in files:
+				filenames.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits[6]')
+			to_combine=','.join(filenames)
+			iraf.scombine(input=to_combine, output='reductions/results/%s/spectra/com/%s[append]' % (date,filename), aperture='', group='all', combine='sum', reject='none', first='no', scale='none', Stdout="/dev/null")
+			#resolution profile
+			filenames=[]
+			for file in files:
+				filenames.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits[7]')
+			to_combine=','.join(filenames)
+			iraf.scombine(input=to_combine, output='reductions/results/%s/spectra/com/%s[append]' % (date,filename), aperture='', group='all', combine='average', reject='none', first='no', scale='none', weight='!EXPOSED', Stdout="/dev/null")
+			#add data
+			filenames=[]
+			for file in files:
+				filenames.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits')
+			#open combined fits file
+			hdul=fits.open('reductions/results/%s/spectra/com/%s' % (date,filename), mode='update')
+			#open individual headers read only
+			headers_dict={}
+			for file in filenames:
+				hdul_comb=fits.open(file)
+				headers_dict[file]=hdul_comb[0].header
+				hdul_comb.close()
+			#
+			#write to fits
+			for extension in range(8):
+				#write into header which spectra were combined
+				for n,file in enumerate(filenames):
+					hdul[extension].header['COMB%s' % n]=(file.split('/')[-1][:15], 'Combined spectra')
+				#combine UTMJD
+				mjd=0
+				for file in filenames:
+					mjd+=float(headers_dict[file]['UTMJD'])
+				hdul[extension].header['UTMJD']=mjd/len(filenames)
+				#combine epoch
+				epoch=0
+				for file in filenames:
+					epoch+=float(headers_dict[file]['EPOCH'])
+				hdul[extension].header['EPOCH']=epoch/len(filenames)
+				#combine times
+				tm=Time(hdul[extension].header['UTMJD'], format='mjd')
+				hdul[extension].header['UTDATE']=(tm.iso, 'Mean UT date of all exposures in ISO format')
+				#add exposure times
+				exposed=0
+				for file in filenames:
+					exposed+=float(headers_dict[file]['EXPOSED'])
+				hdul[extension].header['EXPOSED']=(exposed, 'Total exposure time of all combined spectra')
+				#trace_ok flag
+				traceok=[]
+				for file in filenames:
+					traceok.append(int(headers_dict[file]['TRACE_OK']))
+				if 0 in traceok: hdul[extension].header['TRACE_OK']=0
+				else: hdul[extension].header['TRACE_OK']=1
+				#combine BARYEFF
+				try:
+					baryeff=0
+					for file in filenames:
+						baryeff+=float(headers_dict[file]['BARYEFF'])
+					hdul[extension].header['BARYEFF']=baryeff/len(filenames)
+				except:
+					hdul[extension].header['BARYEFF']=('None', 'Barycentric velocity correction was not done.')
+				#correct HA, ZD
+				ha=[]
+				zd=[]
+				for file in filenames:
+					ha.append(float(headers_dict[file]['MEAN_HA']))
+					zd.append(float(headers_dict[file]['MEAN_ZD']))
+				hdul[extension].header['MEAN_HA']=(np.average(ha), 'Mean hour angle')
+				hdul[extension].header['MEAN_ZD']=(np.average(zd), 'Mean zenith distance')
+				#combine wavelength solution
+				wav_flag=[]
+				for file in filenames:
+					wav_flag.append(int(headers_dict[file]['WAV_OK']))
+				hdul[extension].header['WAV_OK']=(min(wav_flag), 'Is wav. solution OK? 1=yes, 0=no')
+				#combine resolution maps and B parameter
+				# There is only one resolution map for the whole COB. There is also only one wavelength sollution for the whole COB, so the resolution after combining should remain the same.
+				#fix origin
+				hdul[extension].header['ORIGIN']='IRAF reduction pipeline'
+				#edit combined SNR and resolution
+				hdul[extension].header['SNR']=(1.0/np.nanmedian(hdul[2].data), 'Average SNR of the final spectrum')
+				hdul[extension].header['RES']=(np.nanmean(hdul[7].data), 'Average resolution (FWHM in Angstroms)')
+
+			hdul.close()
+			iraf.flprcache()
+
+
+
+
+def create_final_spectra(date, ncpu=1):
 	"""
 	Turn reduced spectra into final output and combine consecutive exposures.
 
@@ -2127,432 +2560,17 @@ def create_final_spectra(date):
 	if not os.path.exists('reductions/results/%s/spectra/com' % date):
 		os.makedirs('reductions/results/%s/spectra/com' % date)
 	
+	args=[]
+
 	for ccd in [1,2,3,4]:
 		cobs=glob.glob("reductions/%s/ccd%s/*" % (date,ccd))
 		for cob in cobs:	
 			files=glob.glob("%s/[1-31]*.ms.fits" % cob)
+			args.append([ccd,cob,files])
 
-			logging.info('Saving spectra for COB %s.' % cob)
-			
-			# save individual spectra
-			for file in files:
-				#create a dict from fibre table
-				fibre_table_file='/'.join(file.split('/')[:-1])+'/fibre_table_'+file.split('/')[-1].replace('.ms', '')
-				hdul=fits.open(fibre_table_file)
-				fibre_table=hdul[1].data
-				hdul.close
-				fibre_table_dict={}
-				n=0
-				for fibre,i in enumerate(fibre_table):
-					if i[8]=='F': 
-						pass
-					else: 
-						n+=1
-						fibre_table_dict[n]=np.append(np.array(i), np.array([fibre+1]))
-				fibre_table_dict=defaultdict(lambda:np.array(['FIBRE NOT IN USE', 0.0, 0.0, 0, 0, 0, 0, 0.0, 'N', 0, 0.0, 0, 'Not in use', '0', 0.0, 0.0, 0.0, fibre+1]), fibre_table_dict)
+	pool = Pool(processes=ncpu)
+	pool.map(create_final_spectra_proc, args)
 
-				#read saved b_values
-				if os.path.exists(cob+'/b_values.npy'): b_values=np.load(cob+'/b_values.npy')
-				else: b_values=np.array([2.0]*392)
-
-				#make a normalized spectrum, because this will be added to the final fits files
-				iraf.continuum(input=file, output='/'.join(file.split('/')[:-1])+'/norm_'+file.split('/')[-1], order=5, interactive='no', low_reject=2.0, high_reject=0.0, niterate=5, naverage=11, Stdout="/dev/null")
-
-				#make a sqrt spectrum for adding errors to it
-				iraf.sarith(input1=file, op='^', input2='-0.5', output='/'.join(file.split('/')[:-1])+'/err_'+file.split('/')[-1], apertures='', Stdout="/dev/null")
-
-				#make a cross_talk spectrum placeholder
-				iraf.sarith(input1=file, op='*', input2='0.0', output='/'.join(file.split('/')[:-1])+'/cross_'+file.split('/')[-1], apertures='', Stdout="/dev/null")
-
-				#linearize all spectra
-				iraf.disptrans(input=file, output='', linearize='yes', units='angstroms', Stdout="/dev/null")
-				iraf.disptrans(input='/'.join(file.split('/')[:-1])+'/norm_'+file.split('/')[-1], output='', linearize='yes', units='angstroms', Stdout="/dev/null")
-				if os.path.exists('/'.join(file.split('/')[:-1])+'/sky_'+file.split('/')[-1]): iraf.disptrans(input='/'.join(file.split('/')[:-1])+'/sky_'+file.split('/')[-1], output='', linearize='yes', units='angstroms', Stdout="/dev/null")
-				if os.path.exists('/'.join(file.split('/')[:-1])+'/telurics_'+file.split('/')[-1]): iraf.disptrans(input='/'.join(file.split('/')[:-1])+'/telurics_'+file.split('/')[-1], output='', linearize='yes', units='angstroms', Stdout="/dev/null")
-				if os.path.exists('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1]): iraf.disptrans(input='/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1], output='', linearize='yes', units='angstroms', Stdout="/dev/null")
-				if os.path.exists('/'.join(file.split('/')[:-1])+'/cross_'+file.split('/')[-1]): iraf.disptrans(input='/'.join(file.split('/')[:-1])+'/cross_'+file.split('/')[-1], output='', linearize='yes', units='angstroms', Stdout="/dev/null")
-				if os.path.exists('/'.join(file.split('/')[:-1])+'/res_'+file.split('/')[-1]): iraf.disptrans(input='/'.join(file.split('/')[:-1])+'/res_'+file.split('/')[-1], output='', linearize='yes', units='angstroms', Stdout="/dev/null")
-				#return 0
-
-				for ap in range(1,393):
-					print ap
-					if fibre_table_dict[ap][8]=='P':
-						filename=str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits'
-						iraf.scopy(input=file, output='reductions/results/%s/spectra/all/%s' % (date,filename), apertures=ap, Stdout="/dev/null")
-						#add normalized spectrum
-						iraf.scopy(input='/'.join(file.split('/')[:-1])+'/norm_'+file.split('/')[-1], output='reductions/results/%s/spectra/all/tmp_norm.fits' % date, apertures=ap, Stdout="/dev/null")
-						iraf.imcopy(input='reductions/results/%s/spectra/all/tmp_norm.fits' % date, output='reductions/results/%s/spectra/all/%s[append]' % (date,filename), Stdout="/dev/null")
-						os.remove('reductions/results/%s/spectra/all/tmp_norm.fits' % date)
-						iraf.hedit(images='reductions/results/%s/spectra/all/%s[1]' % (date,filename), fields="EXTNAME", value='normalized', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
-						#add error spectrum (add a copy of the spectrum as a placeholder)
-						iraf.scopy(input=file, output='reductions/results/%s/spectra/all/tmp_err.fits' % date, apertures=ap, Stdout="/dev/null")
-						iraf.imcopy(input='reductions/results/%s/spectra/all/tmp_err.fits' % date, output='reductions/results/%s/spectra/all/%s[append]' % (date,filename), Stdout="/dev/null")
-						os.remove('reductions/results/%s/spectra/all/tmp_err.fits' % date)
-						iraf.hedit(images='reductions/results/%s/spectra/all/%s[2]' % (date,filename), fields="EXTNAME", value='relative_error', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
-						#add sky spectrum
-						if os.path.exists('/'.join(file.split('/')[:-1])+'/sky_'+file.split('/')[-1]):
-							iraf.scopy(input='/'.join(file.split('/')[:-1])+'/sky_'+file.split('/')[-1], output='reductions/results/%s/spectra/all/tmp_sky.fits' % date, apertures=ap, Stdout="/dev/null")
-							iraf.imcopy(input='reductions/results/%s/spectra/all/tmp_sky.fits' % date, output='reductions/results/%s/spectra/all/%s[append]' % (date,filename), Stdout="/dev/null")
-							os.remove('reductions/results/%s/spectra/all/tmp_sky.fits' % date)
-							iraf.hedit(images='reductions/results/%s/spectra/all/%s[3]' % (date,filename), fields="EXTNAME", value='sky', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
-						else:
-							hdul=fits.open('reductions/results/%s/spectra/all/%s' % (date,filename), mode='update')
-							hdul.append(fits.ImageHDU([0]))
-							hdul.close()
-							iraf.hedit(images='reductions/results/%s/spectra/all/%s[3]' % (date,filename), fields="EXTNAME", value='sky', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
-						#add teluric correction
-						if os.path.exists('/'.join(file.split('/')[:-1])+'/telurics_'+file.split('/')[-1]):
-							iraf.scopy(input='/'.join(file.split('/')[:-1])+'/telurics_'+file.split('/')[-1], output='reductions/results/%s/spectra/all/tmp_tel.fits' % date, apertures=ap, Stdout="/dev/null")#scopy does not accept [append] option
-							iraf.imcopy(input='reductions/results/%s/spectra/all/tmp_tel.fits' % date, output='reductions/results/%s/spectra/all/%s[append]' % (date,filename), Stdout="/dev/null")
-							os.remove('reductions/results/%s/spectra/all/tmp_tel.fits' % date)
-							iraf.hedit(images='reductions/results/%s/spectra/all/%s[4]' % (date,filename), fields="EXTNAME", value='teluric', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
-						else:
-							hdul=fits.open('reductions/results/%s/spectra/all/%s' % (date,filename), mode='update')
-							hdul.append(fits.ImageHDU([0]))
-							hdul.close()
-							iraf.hedit(images='reductions/results/%s/spectra/all/%s[4]' % (date,filename), fields="EXTNAME", value='teluric', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
-						#add scattered light
-						if os.path.exists('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1]):
-							iraf.scopy(input='/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1], output='reductions/results/%s/spectra/all/tmp_scat.fits' % date, apertures=ap, Stdout="/dev/null")
-							iraf.imcopy(input='reductions/results/%s/spectra/all/tmp_scat.fits' % date, output='reductions/results/%s/spectra/all/%s[append]' % (date,filename), Stdout="/dev/null")
-							os.remove('reductions/results/%s/spectra/all/tmp_scat.fits' % date)
-							iraf.hedit(images='reductions/results/%s/spectra/all/%s[5]' % (date,filename), fields="EXTNAME", value='scattered', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
-						else:
-							hdul=fits.open('reductions/results/%s/spectra/all/%s' % (date,filename), mode='update')
-							hdul.append(fits.ImageHDU([0]))
-							hdul.close()
-							iraf.hedit(images='reductions/results/%s/spectra/all/%s[5]' % (date,filename), fields="EXTNAME", value='scattered', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
-						#add cross talk spectrum
-						if os.path.exists('/'.join(file.split('/')[:-1])+'/cross_'+file.split('/')[-1]):
-							iraf.scopy(input='/'.join(file.split('/')[:-1])+'/cross_'+file.split('/')[-1], output='reductions/results/%s/spectra/all/tmp_cross.fits' % date, apertures=ap, Stdout="/dev/null")
-							iraf.imcopy(input='reductions/results/%s/spectra/all/tmp_cross.fits' % date, output='reductions/results/%s/spectra/all/%s[append]' % (date,filename), Stdout="/dev/null")
-							os.remove('reductions/results/%s/spectra/all/tmp_cross.fits' % date)
-							iraf.hedit(images='reductions/results/%s/spectra/all/%s[6]' % (date,filename), fields="EXTNAME", value='cross_talk', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
-						else:
-							hdul=fits.open('reductions/results/%s/spectra/all/%s' % (date,filename), mode='update')
-							hdul.append(fits.ImageHDU([0]))
-							hdul.close()
-							iraf.hedit(images='reductions/results/%s/spectra/all/%s[6]' % (date,filename), fields="EXTNAME", value='cross_talk', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
-						#add resolution profile
-						if os.path.exists('/'.join(file.split('/')[:-1])+'/res_'+file.split('/')[-1]):
-							iraf.scopy(input='/'.join(file.split('/')[:-1])+'/res_'+file.split('/')[-1], output='reductions/results/%s/spectra/all/tmp_res.fits' % date, apertures=ap, Stdout="/dev/null")
-							iraf.imcopy(input='reductions/results/%s/spectra/all/tmp_res.fits' % date, output='reductions/results/%s/spectra/all/%s[append]' % (date,filename), Stdout="/dev/null")
-							os.remove('reductions/results/%s/spectra/all/tmp_res.fits' % date)
-							iraf.hedit(images='reductions/results/%s/spectra/all/%s[7]' % (date,filename), fields="EXTNAME", value='resolution_profile', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
-						else:
-							hdul=fits.open('reductions/results/%s/spectra/all/%s' % (date,filename), mode='update')
-							hdul.append(fits.ImageHDU([0]))
-							hdul.close()
-							iraf.hedit(images='reductions/results/%s/spectra/all/%s[7]' % (date,filename), fields="EXTNAME", value='resolution_profile', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
-						#add errors to the error spectrum
-						hdul=fits.open('reductions/results/%s/spectra/all/%s' % (date,filename), mode='update')
-						noise_squared=hdul[0].data+hdul[3].data+hdul[5].data+hdul[6].data+float(hdul[0].header['RO_NOIS1'])**2
-						signal=hdul[0].data
-						rel_err=np.sqrt(noise_squared)/signal
-						hdul[2].data=rel_err
-						hdul.close()
-						#add data
-						hdul=fits.open('reductions/results/%s/spectra/all/%s' % (date,filename), mode='update')
-						#read some info drom fibre table
-						object_name=fibre_table_dict[ap][0]
-						ra=float(fibre_table_dict[ap][1])/np.pi*180.
-						dec=float(fibre_table_dict[ap][2])/np.pi*180.
-						pivot=fibre_table_dict[ap][9]
-						fibre=fibre_table_dict[ap][-1]
-						x=fibre_table_dict[ap][3]
-						y=fibre_table_dict[ap][4]
-						theta=fibre_table_dict[ap][7]
-						mag=fibre_table_dict[ap][10]
-						#check aperture flags
-						aperture_flags_dict={}
-						a=open('%s/aplast' % (cob))
-						failed_apertures=np.load('%s/failed_apertures.npy' % (cob))
-						for line in a:
-							l=line.split()
-							if len(l)>0 and l[0]=='begin':
-								y=float(l[5])
-								n=int(l[3])
-								if n in failed_apertures:
-									aperture_flags_dict[n]=(y,0)
-								else:
-									aperture_flags_dict[n]=(y,1)
-						#load fitting results for wavelength solution
-						wav_dict=np.load(cob+'/wav_fit.npy')
-						#write to fits
-						for extension in range(8):
-							#clean header
-							if 'BARY_%s' % ap in hdul[extension].header: hdul[extension].header['BARYEFF']=(hdul[extension].header['BARY_%s' % ap], 'Barycentric velocity correction in km/s')
-							elif 'BARYEFF' in hdul[extension].header: pass
-							else: hdul[extension].header['BARYEFF']=('None', 'Barycentric velocity correction was not done')
-							if hdul[0].header['SOURCE']=='Plate 1': hdul[extension].header['PLATE']=(1, '2dF plate source')
-							elif hdul[0].header['SOURCE']=='Plate 0': hdul[extension].header['PLATE']=(0, '2dF plate source')
-							else: hdul[extension].header['PLATE']=('None', 'Problem determining plate number')
-							del hdul[extension].header['BARY_*']
-							del hdul[extension].header['BANDID*']
-							del hdul[extension].header['APNUM*']
-							del hdul[extension].header['DC-FLAG*']
-							del hdul[extension].header['DCLOG*']
-							del hdul[extension].header['WAT1*']
-							del hdul[extension].header['CD1_1']
-							del hdul[extension].header['AAOPRGID']
-							del hdul[extension].header['RUN']
-							del hdul[extension].header['OBSNUM']
-							del hdul[extension].header['GRPNUM']
-							del hdul[extension].header['GRPMEM']
-							del hdul[extension].header['GRPMAX']
-							del hdul[extension].header['OBSTYPE']
-							del hdul[extension].header['NDFCLASS']
-							del hdul[extension].header['FILEORIG']
-							del hdul[extension].header['RO_GAIN1']
-							del hdul[extension].header['RO_NOIS1']
-							del hdul[extension].header['RO_GAIN']
-							del hdul[extension].header['RO_NOISE']
-							del hdul[extension].header['ELAPSED']
-							del hdul[extension].header['TOTALEXP']
-							del hdul[extension].header['UTSTART']
-							del hdul[extension].header['UTEND']
-							del hdul[extension].header['STSTART']
-							del hdul[extension].header['STEND']
-							del hdul[extension].header['APPRA']
-							del hdul[extension].header['APPDEC']
-							del hdul[extension].header['COMMENT']
-							#compatibility
-							hdul[extension].header['APNUM1']=('1 1   ', '')
-							hdul[extension].header['CD1_1']=(hdul[extension].header['CDELT1'], '')
-							hdul[extension].header['CTYPE1']=('Wavelength', '')
-							hdul[extension].header['CUNIT1']=('angstroms', '')
-							#add galah_id (galahic number) if it exists
-							if 'galahic' in object_name:
-								hdul[extension].header['GALAH_ID']=(object_name.split('_')[1], 'GALAH id number (if exists)')
-							else:
-								hdul[extension].header['GALAH_ID']='None'
-							#add object name (first column in fibre table)
-							hdul[extension].header['OBJ_NAME']=(object_name, 'Object name from the .fld file')
-							#add average snr and average resolution
-							hdul[extension].header['SNR']=(1.0/np.nanmedian(hdul[2].data), 'Average SNR of the final spectrum')
-							hdul[extension].header['RES']=(np.nanmean(hdul[7].data), 'Average resolution (FWHM in angstroms)')
-							#add ra and dec of object
-							hdul[extension].header['RA_OBJ']=(ra, 'RA of object in degrees')
-							hdul[extension].header['DEC_OBJ']=(dec, 'dec of object in degrees')
-							#fibre and pivot numbers
-							hdul[extension].header['APERTURE']=(ap, 'aperture number (1-392, in image)')
-							hdul[extension].header['PIVOT']=(int(pivot), 'pivot number (1-400, in 2dF)')
-							hdul[extension].header['FIBRE']=(int(fibre), 'fibre number (1-400, in image)')
-							hdul[extension].header['X']=(float(x), 'x position of fibre on plate in um')
-							hdul[extension].header['Y']=(float(y), 'y position of fibre on plate in um')
-							hdul[extension].header['THETA']=(float(theta), 'bend of fibre in degrees')
-							#position of aperture on image
-							hdul[extension].header['AP_POS']=(aperture_flags_dict[ap][0], 'Position of aperture in image at x=2000')
-							hdul[extension].header['TRACE_OK']=(aperture_flags_dict[ap][1], 'Is aperture trace OK? 1=yes, 0=no')
-							#magnitude
-							hdul[extension].header['MAG']=(float(mag), 'magnitude from the .fld file')
-							#origin
-							hdul[extension].header['ORIGIN']='IRAF reduction pipeline'
-							hdul[extension].header['PIPE_VER']=('6.0', 'IRAF reduction pipeline version')
-							#stellar parameters
-							hdul[extension].header['RV']=('None', 'radial velocity (one arm) in km/s')
-							hdul[extension].header['E_RV']=('None', 'radial velocity uncertainty in km/s')
-							hdul[extension].header['RV_OK']=('None', 'Did RV pipeline converge? 1=yes, 0=no')
-							hdul[extension].header['RVCOM']=('None', 'Combined radial velocity in km/s')
-							hdul[extension].header['E_RVCOM']=('None', 'radial velocity uncertainty in km/s')
-							hdul[extension].header['RVCOM_OK']=('None', 'Did RV pipeline converge? 1=yes, 0=no')
-							hdul[extension].header['TEFF']=('None', 'T_eff in K')
-							hdul[extension].header['LOGG']=('None', 'log g in log cm/s^2')
-							hdul[extension].header['MET']=('None', 'Metallicity in dex')#more parameters?
-							hdul[extension].header['PAR_OK']=('None', 'Are parameters trustworthy? 1=yes, 0=no')
-							#set exposure of the resolution profile to the same value as for spectra
-							hdul[extension].header['EXPOSED']=hdul[0].header['EXPOSED']
-							#correct times
-							hdul[extension].header['UTMJD']=hdul[0].header['UTMJD']+hdul[0].header['EXPOSED']/3600./24./2.#svae MJD in the middle of teh exposure
-							tm=Time(hdul[extension].header['UTMJD'], format='mjd')
-							hdul[extension].header['UTDATE']=(tm.iso, 'Mean UT date in iso format')#save date and time in iso format in the middle of the exposure
-							#convert start and end zd and ha to average ha and zd
-							hdul[extension].header['MEAN_ZD']=((hdul[0].header['ZDEND']+hdul[0].header['ZDSTART'])/2., 'Mean zenith distance')
-							hdul[extension].header['MEAN_HA']=((hdul[0].header['HAEND']+hdul[0].header['HASTART'])/2., 'Mean hour angle')
-							#wavelength solution
-							try: wav_rms=float(wav_dict[ap-1][1])
-							except: wav_rms='None'
-							hdul[extension].header['WAV_RMS']=(wav_rms, 'RMS of the wavelength solution in Angstroms')
-							hdul[extension].header['WAVLINES']=(wav_dict[ap-1][0], 'Number of arc lines (used/found)')
-							wav_flag=1
-							if int(wav_dict[ap-1][0].split('/')[0])<15: wav_flag=0
-							if wav_rms=='None' or wav_rms>0.2: wav_flag=0
-							hdul[extension].header['WAV_OK']=(wav_flag, 'Is wav. solution OK? 1=yes, 0=no')
-							#write down the LSF 
-							hdul[extension].header['LSF']=('exp(-0.693147|2(x-m)/fwhm|^B)', 'Line spread function')
-							hdul[extension].header['LSF_FULL']=('exp(-0.693147|2(x-m)/fwhm|^%s)' % round(b_values[ap-1],3), 'Line spread function')
-							hdul[extension].header['B']=(round(b_values[ap-1],3), 'Boxiness parameter for LSF')#2.5 is a placeholder
-							hdul[extension].header['COMMENT']=('Explanation of the LSF function: m is the position in the spectrum. fwhm is full width at half maximum in angstroms and is given in extension 7, it is wavelength dependent and varies from fibre to fibre as well. It is advised to use the whole resolution profile from extension 7 rather than average resolution in RES keyword. B is a boxiness parameter. It is given in keyword B in the header. LSF_FULL includes B in the function.')
-							if extension>0:
-								del hdul[extension].header['HASTART']
-								del hdul[extension].header['HAEND']
-								del hdul[extension].header['ZDSTART']
-								del hdul[extension].header['ZDEND']
-
-						del hdul[0].header['HASTART']
-						del hdul[0].header['HAEND']
-						del hdul[0].header['ZDSTART']
-						del hdul[0].header['ZDEND']
-						for extension in range(8):
-							del hdul[extension].header['SOURCE']
-						#units
-						hdul[0].header['BUNIT']=('counts', '')
-						hdul[1].header['BUNIT']=('', '')
-						hdul[2].header['BUNIT']=('', '')
-						hdul[3].header['BUNIT']=('counts', '')
-						hdul[4].header['BUNIT']=('', '')
-						hdul[5].header['BUNIT']=('counts', '')
-						hdul[6].header['BUNIT']=('counts', '')
-						hdul[7].header['BUNIT']=('angstroms', '')
-						#fix size of extension 7. No need for double precision here
-						hdul[7].data=np.array(hdul[7].data, dtype=np.dtype('f4'))
-						#fix meanra and meandec for extension 7
-						hdul[7].header['MEANRA']=hdul[0].header['MEANRA']
-						hdul[7].header['MEANDEC']=hdul[0].header['MEANDEC']
-
-						hdul.close()
-
-						iraf.flprcache()
-
-			#save combined spectra
-			for ap in range(1,393):
-				if fibre_table_dict[ap][8]=='P':
-					filename=str(date)+cob.split('/')[-1][-4:]+'01'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits'
-					#sum of all exposures
-					filenames=[]
-					for file in files:
-						filenames.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits[0]')
-					to_combine=','.join(filenames)
-					iraf.scombine(input=to_combine, output='reductions/results/%s/spectra/com/%s' % (date,filename), aperture='', group='all', combine='sum', reject='none', first='no', Stdout="/dev/null")
-					#normalised spectrum
-					filenames=[]
-					for file in files:
-						filenames.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits[1]')
-					to_combine=','.join(filenames)
-					iraf.scombine(input=to_combine, output='reductions/results/%s/spectra/com/%s[append]' % (date,filename), aperture='', group='all', combine='average', reject='avsigclip', first='no', scale='none', weight='!EXPOSED', lsigma=3.0, hsigma=3.0, Stdout="/dev/null")
-					#error spectrum
-					filenames=[]
-					filenames_del=[]
-					for file in files:
-						filenames.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'_tmp2.fits')
-						filenames_del.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'_tmp.fits')
-						filenames_del.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'_tmp2.fits')
-						iraf.sarith(input1='reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits[2]', op='*', input2='reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits[0]', output='reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'_tmp.fits')#convert relative error to absolute error
-						iraf.sarith(input1='reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'_tmp.fits', op='^', input2='2', output='reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'_tmp2.fits')#square absolute errors, because we will add them in quadrature
-					to_combine=','.join(filenames)
-					iraf.scombine(input=to_combine, output='reductions/results/%s/spectra/com/errors_tmp' % (date), aperture='', group='all', combine='sum', reject='none', first='no', scale='none', Stdout="/dev/null")
-					for file in filenames_del:#delete temporary absolute error files and squared files
-						os.remove(file)
-					iraf.sarith(input1='reductions/results/%s/spectra/com/errors_tmp' % (date), op='sqrt', input2='', output='reductions/results/%s/spectra/com/errors_abs_tmp' % (date))
-					iraf.sarith(input1='reductions/results/%s/spectra/com/errors_abs_tmp' % (date), op='/', input2='reductions/results/%s/spectra/com/%s[0]' % (date,filename), output='reductions/results/%s/spectra/com/errors_rel_tmp' % (date))
-					iraf.imcopy(input='reductions/results/%s/spectra/com/errors_rel_tmp' % (date), output='reductions/results/%s/spectra/com/%s[append]' % (date,filename), Stdout="/dev/null")
-					os.remove('reductions/results/%s/spectra/com/errors_abs_tmp.fits' % (date))
-					os.remove('reductions/results/%s/spectra/com/errors_rel_tmp.fits' % (date))
-					os.remove('reductions/results/%s/spectra/com/errors_tmp.fits' % (date))
-					iraf.hedit(images='reductions/results/%s/spectra/com/%s[2]' % (date,filename), fields="EXTNAME", value='relative_error', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
-					#sky
-					filenames=[]
-					for file in files:
-						filenames.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits[3]')
-					to_combine=','.join(filenames)
-					iraf.scombine(input=to_combine, output='reductions/results/%s/spectra/com/%s[append]' % (date,filename), aperture='', group='all', combine='sum', reject='none', first='no', scale='none', Stdout="/dev/null")
-					#teluric
-					filenames=[]
-					for file in files:
-						filenames.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits[4]')
-					to_combine=','.join(filenames)
-					iraf.scombine(input=to_combine, output='reductions/results/%s/spectra/com/%s[append]' % (date,filename), aperture='', group='all', combine='average', reject='none', first='no', scale='none', weight='!EXPOSED', Stdout="/dev/null")
-					#scattered light
-					filenames=[]
-					for file in files:
-						filenames.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits[5]')
-					to_combine=','.join(filenames)
-					iraf.scombine(input=to_combine, output='reductions/results/%s/spectra/com/%s[append]' % (date,filename), aperture='', group='all', combine='sum', reject='none', first='no', scale='none', Stdout="/dev/null")
-					#cross_talk
-					filenames=[]
-					for file in files:
-						filenames.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits[6]')
-					to_combine=','.join(filenames)
-					iraf.scombine(input=to_combine, output='reductions/results/%s/spectra/com/%s[append]' % (date,filename), aperture='', group='all', combine='sum', reject='none', first='no', scale='none', Stdout="/dev/null")
-					#resolution profile
-					filenames=[]
-					for file in files:
-						filenames.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits[7]')
-					to_combine=','.join(filenames)
-					iraf.scombine(input=to_combine, output='reductions/results/%s/spectra/com/%s[append]' % (date,filename), aperture='', group='all', combine='average', reject='none', first='no', scale='none', weight='!EXPOSED', Stdout="/dev/null")
-					#add data
-					filenames=[]
-					for file in files:
-						filenames.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits')
-					#open combined fits file
-					hdul=fits.open('reductions/results/%s/spectra/com/%s' % (date,filename), mode='update')
-					#open individual headers read only
-					headers_dict={}
-					for file in filenames:
-						hdul_comb=fits.open(file)
-						headers_dict[file]=hdul_comb[0].header
-						hdul_comb.close()
-					#
-					#write to fits
-					for extension in range(8):
-						#write into header which spectra were combined
-						for n,file in enumerate(filenames):
-							hdul[extension].header['COMB%s' % n]=(file.split('/')[-1][:15], 'Combined spectra')
-						#combine UTMJD
-						mjd=0
-						for file in filenames:
-							mjd+=float(headers_dict[file]['UTMJD'])
-						hdul[extension].header['UTMJD']=mjd/len(filenames)
-						#combine epoch
-						epoch=0
-						for file in filenames:
-							epoch+=float(headers_dict[file]['EPOCH'])
-						hdul[extension].header['EPOCH']=epoch/len(filenames)
-						#combine times
-						tm=Time(hdul[extension].header['UTMJD'], format='mjd')
-						hdul[extension].header['UTDATE']=(tm.iso, 'Mean UT date of all exposures in iso format')
-						#add exposure times
-						exposed=0
-						for file in filenames:
-							exposed+=float(headers_dict[file]['EXPOSED'])
-						hdul[extension].header['EXPOSED']=(exposed, 'Total exposure time of all combined spectra')
-						#trace_ok flag
-						traceok=[]
-						for file in filenames:
-							traceok.append(int(headers_dict[file]['TRACE_OK']))
-						if 0 in traceok: hdul[extension].header['TRACE_OK']=0
-						else: hdul[extension].header['TRACE_OK']=1
-						#combine BARYEFF
-						try:
-							baryeff=0
-							for file in filenames:
-								baryeff+=float(headers_dict[file]['BARYEFF'])
-							hdul[extension].header['BARYEFF']=baryeff/len(filenames)
-						except:
-							hdul[extension].header['BARYEFF']=('None', 'Barycentric velocity correction was not done.')
-						#correct HA, ZD
-						ha=[]
-						zd=[]
-						for file in filenames:
-							ha.append(float(headers_dict[file]['MEAN_HA']))
-							zd.append(float(headers_dict[file]['MEAN_ZD']))
-						hdul[extension].header['MEAN_HA']=(np.average(ha), 'Mean hour angle')
-						hdul[extension].header['MEAN_ZD']=(np.average(zd), 'Mean zenith distance')
-						#combine wavelength solution
-						wav_flag=[]
-						for file in filenames:
-							wav_flag.append(int(headers_dict[file]['WAV_OK']))
-						hdul[extension].header['WAV_OK']=(min(wav_flag), 'Is wav. solution OK? 1=yes, 0=no')
-						#combine resolution maps and B parameter
-						# There is only one resolution map for the whole COB. There is also only one wavelength sollution for the whole COB, so the resolution after combining should remain the same.
-						#fix origin
-						hdul[extension].header['ORIGIN']='IRAF reduction pipeline'
-						#edit combined SNR and resolution
-						hdul[extension].header['SNR']=(1.0/np.nanmedian(hdul[2].data), 'Average SNR of the final spectrum')
-						hdul[extension].header['RES']=(np.nanmean(hdul[7].data), 'Average resolution (FWHM in Angstroms)')
-
-					hdul.close()
-					iraf.flprcache()
 
 def create_database(date):
 	"""
@@ -2594,6 +2612,7 @@ def create_database(date):
 	cols.append(fits.Column(name='obj_name', format='A48', null=None))
 	cols.append(fits.Column(name='galah_id', format='K', null=None))
 	cols.append(fits.Column(name='snr', format='4E', null=None))
+	cols.append(fits.Column(name='fibre_throughput', format='4E', null=None))
 	cols.append(fits.Column(name='res', format='4E', null=None, unit='A'))
 	cols.append(fits.Column(name='b_par', format='4E', null=None))
 	cols.append(fits.Column(name='v_bary_eff', format='E', unit='km/s'))
@@ -2608,7 +2627,7 @@ def create_database(date):
 	cols.append(fits.Column(name='teff', format='E', unit='K', null=None))
 	cols.append(fits.Column(name='logg', format='E', unit='cm / s^-2', null=None))
 	cols.append(fits.Column(name='met', format='E', null=None))
-	cols.append(fits.Column(name='obs_comment', format='A32'))
+	cols.append(fits.Column(name='obs_comment', format='A56'))
 	cols.append(fits.Column(name='pipeline_version', format='A5'))
 	cols.append(fits.Column(name='reduction_flags', format='I'))
 	hdu=fits.BinTableHDU.from_columns(cols)
@@ -2674,6 +2693,8 @@ def create_database(date):
 		wav_n_lines=''.join([i.ljust(7, ' ') for i in wav_n_lines_arr])#weird formating because of astropy bugs
 		snr=[header1['SNR'], header2['SNR'], header3['SNR'], header4['SNR']]
 		snr=[None if i=='None' else i for i in snr]
+		fibre_throughput=[header1['FIB_THR'], header2['FIB_THR'], header3['FIB_THR'], header4['FIB_THR']]
+		fibre_throughput=[None if i=='None' else i for i in fibre_throughput]
 		res=[header1['RES'], header2['RES'], header3['RES'], header4['RES']]
 		res=[None if i=='None' else i for i in res]
 		b=[header1['B'], header2['B'], header3['B'], header4['B']]
@@ -2716,7 +2737,7 @@ def create_database(date):
 		if header1['PAR_OK']==0: flag+=8192#parameters are calculated over all arms, so this flag is the same for all 4 ccds
 
 		#add parameters into the table
-		table.add_row([sobject, ra, dec, mjd, utdate, epoch, aperture, pivot, fibre, fibre_x, fibre_y, fibre_theta, plate, aperture_position, mean_ra, mean_dec, mean_zd, mean_ha, cfg_file, cfg_field_name, obj_name, galah_id, snr, res, b, v_bary_eff, exposed, mag, wav_rms, wav_n_lines, rv, e_rv, rv_com, e_rv_com, teff, logg, met, obs_comment, pipeline_version, flag])
+		table.add_row([sobject, ra, dec, mjd, utdate, epoch, aperture, pivot, fibre, fibre_x, fibre_y, fibre_theta, plate, aperture_position, mean_ra, mean_dec, mean_zd, mean_ha, cfg_file, cfg_field_name, obj_name, galah_id, snr, fibre_throughput, res, b, v_bary_eff, exposed, mag, wav_rms, wav_n_lines, rv, e_rv, rv_com, e_rv_com, teff, logg, met, obs_comment, pipeline_version, flag])
 
 	#write table to hdu
 	hdu=fits.BinTableHDU(table)
@@ -2728,12 +2749,53 @@ def create_database(date):
 	hdul=fits.open('reductions/results/%s/db/%s.fits' % (date, date), mode='update')
 	header=hdul[1].header
 	header['TTYPE1']=(header['TTYPE1'], 'sobject_id is unique for each GALAH observation')
-	#header['TTYPE2']=(header['TTYPE2'], 'RA of object in deg')
-	#header['TTYPE3']=(header['TTYPE3'], 'dec of object in deg')
-	#header['TTYPE4']=(header['TTYPE4'], 'modified UT julian date, exposures weighted')
-	#fix bug in astropy (formating of string arrays)
-	header['TFORM30']='28A7'#this is wav_n_lines column
+	header['TTYPE2']=(header['TTYPE2'], 'RA of object in deg')
+	header['TTYPE3']=(header['TTYPE3'], 'dec of object in deg')
+	header['TTYPE4']=(header['TTYPE4'], 'modified UTC julian date, exposures weighted')
+	header['TTYPE5']=(header['TTYPE5'], 'UTC date in ISO 8601 format')
+	header['TTYPE6']=(header['TTYPE6'], 'epoch')
+	header['TTYPE7']=(header['TTYPE7'], 'aperture number (1-392)')
+	header['TTYPE8']=(header['TTYPE8'], 'pivot number (1-400)')
+	header['TTYPE9']=(header['TTYPE9'], 'fibre number (1-400)')
+	header['TTYPE10']=(header['TTYPE10'], 'x position on 2dF plate')
+	header['TTYPE11']=(header['TTYPE11'], 'y position on 2dF plate')
+	header['TTYPE12']=(header['TTYPE12'], 'fibre bent on 2dF plate')
+	header['TTYPE13']=(header['TTYPE13'], '2dF plate number (0-1)')
+	header['TTYPE14']=(header['TTYPE14'], 'aperture position in image (at x=2000)')
+	header['TTYPE15']=(header['TTYPE15'], 'RA of telescope position')
+	header['TTYPE16']=(header['TTYPE16'], 'dec of telescope position')
+	header['TTYPE17']=(header['TTYPE17'], 'zenith distance of telescope position')
+	header['TTYPE18']=(header['TTYPE18'], 'hour angle of telescope position')
+	header['TTYPE19']=(header['TTYPE19'], 'name of the fibre configuration file')
+	header['TTYPE20']=(header['TTYPE20'], 'name of the field in cfg_file')
+	header['TTYPE21']=(header['TTYPE21'], 'object name')
+	header['TTYPE22']=(header['TTYPE22'], 'galahic id')
+	header['TTYPE23']=(header['TTYPE23'], 'mean snr in 4 CCDs')
+	header['TTYPE24']=(header['TTYPE24'], 'fibre throughput in 4 CCDs')
+	header['TTYPE25']=(header['TTYPE25'], 'mean resolution (FWHM) in 4 CCDs')
+	header['TTYPE26']=(header['TTYPE26'], 'LSF B parameter in 4 CCDs')
+	header['TTYPE27']=(header['TTYPE27'], 'mean barycentric velocity (already corrected)')
+	header['TTYPE28']=(header['TTYPE28'], 'total exposure time')
+	header['TTYPE29']=(header['TTYPE29'], 'magnitude as given in cfg_file')
+	header['TTYPE30']=(header['TTYPE30'], 'RMS of wavlength calibr. in 4 CCDs')
+	header['TTYPE31']=(header['TTYPE31'], 'number of lines found/used for wav. cal.')
+	header['TTYPE32']=(header['TTYPE32'], 'radial velocity in 4 CCDs')
+	header['TTYPE33']=(header['TTYPE33'], 'rv uncertainty in 4 CCDs')
+	header['TTYPE34']=(header['TTYPE34'], 'rv combined from all arms')
+	header['TTYPE35']=(header['TTYPE35'], 'combined rv uncertainty')
+	header['TTYPE36']=(header['TTYPE36'], 'effective tmperature')
+	header['TTYPE37']=(header['TTYPE37'], 'log of surface gravitational acceleration')
+	header['TTYPE38']=(header['TTYPE38'], 'metallicity ([M/H])')
+	header['TTYPE39']=(header['TTYPE39'], 'comments by observer')
+	header['TTYPE40']=(header['TTYPE40'], 'pipeline evrsion')
+	header['TTYPE41']=(header['TTYPE41'], 'reduction flags given as a binary mask')
+
+	#fix bug in astropy (formating of string arrays. Last 7 is dropped when data is inserted)
+	header['TFORM31']='28A7'#this is wav_n_lines column
 	hdul.close()
+
+	#set table name
+	iraf.hedit(images='reductions/results/%s/db/%s.fits[1]' % (date, date), fields="EXTNAME", value='table', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
 
 	# convert table to ascii. add _1, _2, _3, _4 to fields in arrays (always representing four arms)
 	csv_db=open('reductions/results/%s/db/%s.csv' % (date, date), 'w')
@@ -2768,7 +2830,7 @@ def create_database(date):
 
 def analyze(date):
 	"""
-	Calculate radial velocity and atmospheric parameters
+	Calculate radial velocity and atmospheric parameters. Should be done after the data is combined and before the database is generated. Caculated parameters can be written into headers.
 
 	Parameters:
 		date (str): date string (e.g. 190210)
@@ -2845,15 +2907,15 @@ if __name__ == "__main__":
 		#extract_spectra(date)
 		#wav_calibration(date)
 		os.system('cp -r reductions-test reductions')
-		remove_sky(date, method='nearest3', thr_method='flat', ncpu=7)
+		#remove_sky(date, method='nearest3', thr_method='flat', ncpu=7)
 		#plot_spectra(190210, 1902100045, 3)
-		remove_telurics(date)
-		v_bary_correction(date, quick=False, ncpu=8)
+		#remove_telurics(date)
+		#v_bary_correction(date, quick=False, ncpu=8)
 		#os.system('cp -r reductions_bary reductions')
-		resolution_profile(date)
+		#resolution_profile(date)
 		#os.system('cp -r reductions-test reductions')
-		#create_final_spectra(date)
-		#create_database(date)
+		create_final_spectra(date, ncpu=8)
+		create_database(date)
 		
 	else:
 		logging.critical('Wrong number of command line arguments.')
