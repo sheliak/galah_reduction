@@ -60,4 +60,4 @@ Extension number	Extension name	Description
 6	cross_talk	Cross talk spectrum. This is the spectrum calculated in the cross talk reduction step. It was already subtracted from the spectrum that became extension 0.
 7	resolution_profile	Resolution profile gives FWHM of the line-spread-function for each pixel of the final spectrum. Functional form of the LSF is written in the header. 
 
-Fits databases have two extensions. Extension 0 (Primary) is empty and extension 1 (table) contains one fits binary table.
+Fits-format databases have two extensions. Extension 0 (Primary) is empty and extension 1 (table) contains one fits binary table described in db_description.txt.
