@@ -2603,10 +2603,8 @@ def create_final_spectra(date, ncpu=1):
 			files=glob.glob("%s/[1-31]*.ms.fits" % cob)
 			args.append([ccd,cob,files])
 
-	for arg in args:
-		create_final_spectra_proc(arg)
-	#pool = Pool(processes=ncpu)
-	#pool.map(create_final_spectra_proc, args)
+	pool = Pool(processes=ncpu)
+	pool.map(create_final_spectra_proc, args)
 
 
 def create_database(date):
