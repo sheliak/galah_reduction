@@ -102,20 +102,37 @@ def correct_ndfclass(hdul):
 	"""
 	return hdul[0].header['NDFCLASS']
 
-def inspect_dir(dir):
+def inspect_dir(dir, str_range='*'):
 	"""
 	Open spectra from one night and print exposure types and fields. Create a folder structure in which the reduction will take place
 
 	Parameters:
 		date (str): date string (e.g. 190210)
+		str_range (str): string with range of runs to be used (e.g.  "1,2,5-7,10")
 	
 	Returns:
 		none
 
 	To do:
 		Compose COBs more reliably.
+		Test option to only use some range of run_ids (1,2,3,4 or 15- or 12-16)
 
 	"""
+
+	def range_to_list(str_range):
+		"""
+		Gets string with ranges (e.g.  "1,2,5-7,10") and converts it into a lsit (e.g. [1,2,5,6,7,10]).
+		"""
+		return sum(((list(range(*[int(j) + k for k,j in enumerate(i.split('-'))])) if '-' in i else [int(i)]) for i in str_range.split(',')), [])
+
+	if str_range=='*':
+		runs=range(10000)
+	else:
+		try:
+			runs=range_to_list(str_range)
+			runs=np.array(runs, dtype=int)
+		except:
+			logging.critical('List of runs (%s) cannot be converted into a list. Check formatting.' % str_range)
 
 	logging.info('Checking contents of the given folder.')
 
@@ -138,7 +155,8 @@ def inspect_dir(dir):
 		files=[]
 		for file in files_all:
 			#accept file if obstatus is >0. Also add comment from comments.txt into the header
-			if obstatus_dict[int(file.split('/')[-1][6:10])][0]>0:
+			#also check if run is in the list of runs to be reduced
+			if obstatus_dict[int(file.split('/')[-1][6:10])][0]>0 and int(obstatus_dict[int(file.split('/')[-1][6:10])][0]) in runs:
 				files.append(file)
 				with fits.open(file, mode='update') as hdu_c:
 					hdu_c[0].header['COMM_OBS']=(obstatus_dict[int(file.split('/')[-1][6:10])][1], 'Comments by the observer')
@@ -1059,6 +1077,7 @@ def resolution_profile(date):
 	To do:
 		Make it pretty
 		Do diagnostics plots
+		Paralelize
 	"""
 
 	def peak_profile(a,x,y):
@@ -1322,7 +1341,6 @@ def v_bary_correction(date, quick=False, ncpu=1):
 		Sort out downloading UT1-UTC tables.
 		Make sure the header cleans OK for both (quick=True and False) cases.
 		Check with Tomaz whether vbary is the same as his
-		correct other files than main one in quick=True method
 
 	"""
 
@@ -1365,7 +1383,26 @@ def v_bary_correction(date, quick=False, ncpu=1):
 			hdul=fits.open(file, mode='update')
 			hdul[0].header['BARYEFF']=(v_bary_mean, 'Barycentric velocity correction in km/s')
 			hdul.close()
+			if os.path.exists('/'.join(file.split('/')[:-1])+'/sky_'+file.split('/')[-1]): 
+				hdul_sky=fits.open('/'.join(file.split('/')[:-1])+'/sky_'+file.split('/')[-1], mode='update')
+				hdul_sky[0].header['BARYEFF']=v_bary_mean
+				hdul_sky.close()
+			if os.path.exists('/'.join(file.split('/')[:-1])+'/telurics_'+file.split('/')[-1]): 
+				hdul_tel=fits.open('/'.join(file.split('/')[:-1])+'/telurics_'+file.split('/')[-1], mode='update')
+				hdul_tel[0].header['BARYEFF']=v_bary_mean
+				hdul_tel.close()
+			if os.path.exists('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1]): 
+				hdul_scat=fits.open('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1], mode='update')
+				hdul_scat[0].header['BARYEFF']=v_bary_mean
+				hdul_scat.close()
+
 			iraf.dopcor(input=file, output='', redshift='-%s' % v_bary_mean, isveloc='yes', add='yes', dispers='yes', apertures='', flux='no')
+			if os.path.exists('/'.join(file.split('/')[:-1])+'/sky_'+file.split('/')[-1]): 
+				iraf.dopcor(input='/'.join(file.split('/')[:-1])+'/sky_'+file.split('/')[-1], output='', redshift='-%s' % v_bary_mean, isveloc='yes', add='yes', dispers='yes', apertures='', flux='no')
+			if os.path.exists('/'.join(file.split('/')[:-1])+'/telurics_'+file.split('/')[-1]): 
+				iraf.dopcor(input='/'.join(file.split('/')[:-1])+'/telurics_'+file.split('/')[-1], output='', redshift='-%s' % v_bary_mean, isveloc='yes', add='yes', dispers='yes', apertures='', flux='no')
+			if os.path.exists('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1]): 
+				iraf.dopcor(input='/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1], output='', redshift='-%s' % v_bary_mean, isveloc='yes', add='yes', dispers='yes', apertures='', flux='no')
 		else:
 			# Otherwise do it aperture by aperture. Downloading is currently turned off. 
 			args.append([file, fibre_table, obstime, AAT])
@@ -1388,8 +1425,6 @@ def plot_spectra(date, cob_id, ccd):
 		none
 
 	To do:
-		Mark sky fibres if image is not sky subtracted
-		Do not plot sky fibres if image is sky subtracted (because a zero spectrum cannot be normalized)
 
 	"""
 	matplotlib_backend=matplotlib.get_backend()
@@ -1687,7 +1722,6 @@ def remove_sky(date, method='nearest', thr_method='flat', ncpu=1):
 	To do:
 		More options for different methods of sky removal
 		Urgent: separate magnitude based throughput for plate 0 and plate 1
-		Check if method='nearest3' works with paralelization
 
 	"""
 
@@ -2138,7 +2172,6 @@ def create_final_spectra_proc(args):
 		#return 0
 
 		for ap in range(1,393):
-			print 'producing individual spectra for file %s and aperture %s' % (file, ap)
 			if fibre_table_dict[ap][8]=='P':
 				filename=str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits'
 				iraf.scopy(input=file, output='reductions/results/%s/spectra/all/%s' % (date,filename), apertures=ap, Stdout="/dev/null")
@@ -2159,9 +2192,9 @@ def create_final_spectra_proc(args):
 					os.remove('reductions/results/%s/spectra/all/tmp_sky_%s.fits' % (date, filename))
 					iraf.hedit(images='reductions/results/%s/spectra/all/%s[3]' % (date,filename), fields="EXTNAME", value='sky', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
 				else:
-					hdul=fits.open('reductions/results/%s/spectra/all/%s' % (date,filename), mode='update')
-					hdul.append(fits.ImageHDU([0]))
-					hdul.close()
+					iraf.sarith(input1='reductions/results/%s/spectra/all/%s[0]' % (date,filename), op='*', input2='0', output='reductions/results/%s/spectra/all/tmp_sky_%s.fits' % (date, filename), apertures=ap, Stdout="/dev/null")
+					iraf.imcopy(input='reductions/results/%s/spectra/all/tmp_sky_%s.fits' % (date, filename), output='reductions/results/%s/spectra/all/%s[append]' % (date,filename), Stdout="/dev/null")
+					os.remove('reductions/results/%s/spectra/all/tmp_sky_%s.fits' % (date, filename))
 					iraf.hedit(images='reductions/results/%s/spectra/all/%s[3]' % (date,filename), fields="EXTNAME", value='sky', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
 				#add teluric correction
 				if os.path.exists('/'.join(file.split('/')[:-1])+'/telurics_'+file.split('/')[-1]):
@@ -2170,9 +2203,11 @@ def create_final_spectra_proc(args):
 					os.remove('reductions/results/%s/spectra/all/tmp_tel_%s.fits' % (date, filename))
 					iraf.hedit(images='reductions/results/%s/spectra/all/%s[4]' % (date,filename), fields="EXTNAME", value='teluric', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
 				else:
-					hdul=fits.open('reductions/results/%s/spectra/all/%s' % (date,filename), mode='update')
-					hdul.append(fits.ImageHDU([0]))
-					hdul.close()
+					iraf.sarith(input1='reductions/results/%s/spectra/all/%s[0]' % (date,filename), op='*', input2='0', output='reductions/results/%s/spectra/all/tmp_tel_%s.fits' % (date, filename), apertures=ap, Stdout="/dev/null")
+					iraf.sarith(input1='reductions/results/%s/spectra/all/tmp_tel_%s.fits' % (date, filename), op='+', input2='1.0', output='reductions/results/%s/spectra/all/tmp_tel2_%s.fits' % (date, filename), apertures='', Stdout="/dev/null")
+					iraf.imcopy(input='reductions/results/%s/spectra/all/tmp_tel2_%s.fits' % (date, filename), output='reductions/results/%s/spectra/all/%s[append]' % (date,filename), Stdout="/dev/null")
+					os.remove('reductions/results/%s/spectra/all/tmp_tel_%s.fits' % (date, filename))
+					os.remove('reductions/results/%s/spectra/all/tmp_tel2_%s.fits' % (date, filename))
 					iraf.hedit(images='reductions/results/%s/spectra/all/%s[4]' % (date,filename), fields="EXTNAME", value='teluric', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
 				#add scattered light
 				if os.path.exists('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1]):
@@ -2181,9 +2216,9 @@ def create_final_spectra_proc(args):
 					os.remove('reductions/results/%s/spectra/all/tmp_scat_%s.fits' % (date, filename))
 					iraf.hedit(images='reductions/results/%s/spectra/all/%s[5]' % (date,filename), fields="EXTNAME", value='scattered', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
 				else:
-					hdul=fits.open('reductions/results/%s/spectra/all/%s' % (date,filename), mode='update')
-					hdul.append(fits.ImageHDU([0]))
-					hdul.close()
+					iraf.sarith(input1='reductions/results/%s/spectra/all/%s[0]' % (date,filename), op='*', input2='0', output='reductions/results/%s/spectra/all/tmp_scat_%s.fits' % (date, filename), apertures=ap, Stdout="/dev/null")
+					iraf.imcopy(input='reductions/results/%s/spectra/all/tmp_scat_%s.fits' % (date, filename), output='reductions/results/%s/spectra/all/%s[append]' % (date,filename), Stdout="/dev/null")
+					os.remove('reductions/results/%s/spectra/all/tmp_scat_%s.fits' % (date, filename))
 					iraf.hedit(images='reductions/results/%s/spectra/all/%s[5]' % (date,filename), fields="EXTNAME", value='scattered', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
 				#add cross talk spectrum
 				if os.path.exists('/'.join(file.split('/')[:-1])+'/cross_'+file.split('/')[-1]):
@@ -2192,9 +2227,9 @@ def create_final_spectra_proc(args):
 					os.remove('reductions/results/%s/spectra/all/tmp_cross_%s.fits' % (date, filename))
 					iraf.hedit(images='reductions/results/%s/spectra/all/%s[6]' % (date,filename), fields="EXTNAME", value='cross_talk', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
 				else:
-					hdul=fits.open('reductions/results/%s/spectra/all/%s' % (date,filename), mode='update')
-					hdul.append(fits.ImageHDU([0]))
-					hdul.close()
+					iraf.sarith(input1='reductions/results/%s/spectra/all/%s[0]' % (date,filename), op='*', input2='0', output='reductions/results/%s/spectra/all/tmp_cross_%s.fits' % (date, filename), apertures=ap, Stdout="/dev/null")
+					iraf.imcopy(input='reductions/results/%s/spectra/all/tmp_cross_%s.fits' % (date, filename), output='reductions/results/%s/spectra/all/%s[append]' % (date,filename), Stdout="/dev/null")
+					os.remove('reductions/results/%s/spectra/all/tmp_cross_%s.fits' % (date, filename))
 					iraf.hedit(images='reductions/results/%s/spectra/all/%s[6]' % (date,filename), fields="EXTNAME", value='cross_talk', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
 				#add resolution profile
 				if os.path.exists('/'.join(file.split('/')[:-1])+'/res_'+file.split('/')[-1]):
@@ -2258,32 +2293,32 @@ def create_final_spectra_proc(args):
 					del hdul[extension].header['DC-FLAG*']
 					del hdul[extension].header['DCLOG*']
 					del hdul[extension].header['WAT1*']
-					del hdul[extension].header['CD1_1']
-					del hdul[extension].header['AAOPRGID']
-					del hdul[extension].header['RUN']
-					del hdul[extension].header['OBSNUM']
-					del hdul[extension].header['GRPNUM']
-					del hdul[extension].header['GRPMEM']
-					del hdul[extension].header['GRPMAX']
-					del hdul[extension].header['OBSTYPE']
-					del hdul[extension].header['NDFCLASS']
-					del hdul[extension].header['FILEORIG']
-					del hdul[extension].header['RO_GAIN1']
-					del hdul[extension].header['RO_NOIS1']
-					del hdul[extension].header['RO_GAIN']
-					del hdul[extension].header['RO_NOISE']
-					del hdul[extension].header['ELAPSED']
-					del hdul[extension].header['TOTALEXP']
-					del hdul[extension].header['UTSTART']
-					del hdul[extension].header['UTEND']
-					del hdul[extension].header['STSTART']
-					del hdul[extension].header['STEND']
-					del hdul[extension].header['APPRA']
-					del hdul[extension].header['APPDEC']
-					del hdul[extension].header['COMMENT']
+					if 'CD1_1' in hdul[extension].header: del hdul[extension].header['CD1_1']
+					if 'AAOPRGID' in hdul[extension].header: del hdul[extension].header['AAOPRGID']
+					if 'RUN' in hdul[extension].header: del hdul[extension].header['RUN']
+					if 'OBSNUM' in hdul[extension].header: del hdul[extension].header['OBSNUM']
+					if 'GPRNUM' in hdul[extension].header: del hdul[extension].header['GRPNUM']
+					if 'GPRMEM' in hdul[extension].header: del hdul[extension].header['GRPMEM']
+					if 'GPRMAX' in hdul[extension].header: del hdul[extension].header['GRPMAX']
+					if 'OBSTYPE' in hdul[extension].header: del hdul[extension].header['OBSTYPE']
+					if 'NDFCLASS' in hdul[extension].header: del hdul[extension].header['NDFCLASS']
+					if 'FILEORIG' in hdul[extension].header: del hdul[extension].header['FILEORIG']
+					if 'RO_GAIN1' in hdul[extension].header: del hdul[extension].header['RO_GAIN1']
+					if 'RO_NOIS1' in hdul[extension].header: del hdul[extension].header['RO_NOIS1']
+					if 'RO_GAIN' in hdul[extension].header: del hdul[extension].header['RO_GAIN']
+					if 'RO_NOISE' in hdul[extension].header: del hdul[extension].header['RO_NOISE']
+					if 'ELAPSED' in hdul[extension].header: del hdul[extension].header['ELAPSED']
+					if 'TOTALEXP' in hdul[extension].header: del hdul[extension].header['TOTALEXP']
+					if 'UTSTART' in hdul[extension].header: del hdul[extension].header['UTSTART']
+					if 'UTEND' in hdul[extension].header: del hdul[extension].header['UTEND']
+					if 'STSTART' in hdul[extension].header: del hdul[extension].header['STSTART']
+					if 'STEND' in hdul[extension].header: del hdul[extension].header['STEND']
+					if 'APPRA' in hdul[extension].header: del hdul[extension].header['APPRA']
+					if 'APPDEC' in hdul[extension].header: del hdul[extension].header['APPDEC']
+					if 'COMMENT' in hdul[extension].header: del hdul[extension].header['COMMENT']
 					#compatibility
 					hdul[extension].header['APNUM1']=('1 1   ', '')
-					hdul[extension].header['CD1_1']=(hdul[extension].header['CDELT1'], '')
+					hdul[extension].header['CD1_1']=(hdul[0].header['CDELT1'], '')
 					hdul[extension].header['CTYPE1']=('Wavelength', '')
 					hdul[extension].header['CUNIT1']=('angstroms', '')
 					#add galah_id (galahic number) if it exists
@@ -2352,17 +2387,17 @@ def create_final_spectra_proc(args):
 					hdul[extension].header['B']=(round(b_values[ap-1],3), 'Boxiness parameter for LSF')#2.5 is a placeholder
 					hdul[extension].header['COMMENT']=('Explanation of the LSF function: function is centred at 0. fwhm is full width at half maximum in angstroms and is given in extension 7, it is wavelength dependent and varies from fibre to fibre as well. It is advised to use the whole resolution profile from extension 7 rather than average resolution in RES keyword. B is a boxiness parameter. It is given in keyword B in the header. LSF_FULL includes B in the function.')
 					if extension>0:
-						del hdul[extension].header['HASTART']
-						del hdul[extension].header['HAEND']
-						del hdul[extension].header['ZDSTART']
-						del hdul[extension].header['ZDEND']
+						if 'HASTART' in hdul[extension].header: del hdul[extension].header['HASTART']
+						if 'HAEND' in hdul[extension].header: del hdul[extension].header['HAEND']
+						if 'ZDSTART' in hdul[extension].header: del hdul[extension].header['ZDSTART']
+						if 'ZDEND' in hdul[extension].header: del hdul[extension].header['ZDEND']
 
 				del hdul[0].header['HASTART']
 				del hdul[0].header['HAEND']
 				del hdul[0].header['ZDSTART']
 				del hdul[0].header['ZDEND']
 				for extension in range(8):
-					del hdul[extension].header['SOURCE']
+					if 'SOURCE' in hdul[extension].header: del hdul[extension].header['SOURCE']
 				#units
 				hdul[0].header['BUNIT']=('counts', '')
 				hdul[1].header['BUNIT']=('', '')
@@ -2568,8 +2603,10 @@ def create_final_spectra(date, ncpu=1):
 			files=glob.glob("%s/[1-31]*.ms.fits" % cob)
 			args.append([ccd,cob,files])
 
-	pool = Pool(processes=ncpu)
-	pool.map(create_final_spectra_proc, args)
+	for arg in args:
+		create_final_spectra_proc(arg)
+	#pool = Pool(processes=ncpu)
+	#pool.map(create_final_spectra_proc, args)
 
 
 def create_database(date):
@@ -2906,15 +2943,15 @@ if __name__ == "__main__":
 		#measure_cross_on_flat(date)
 		#extract_spectra(date)
 		#wav_calibration(date)
-		os.system('cp -r reductions-test reductions')
+		#os.system('cp -r reductions-test reductions')
 		#remove_sky(date, method='nearest3', thr_method='flat', ncpu=7)
 		#plot_spectra(190210, 1902100045, 3)
 		#remove_telurics(date)
-		#v_bary_correction(date, quick=False, ncpu=8)
+		#v_bary_correction(date, quick=True, ncpu=8)
 		#os.system('cp -r reductions_bary reductions')
 		#resolution_profile(date)
-		#os.system('cp -r reductions-test reductions')
-		create_final_spectra(date, ncpu=8)
+		os.system('cp -r reductions-test reductions')
+		#create_final_spectra(date, ncpu=8)
 		create_database(date)
 		
 	else:
