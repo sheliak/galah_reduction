@@ -2929,11 +2929,14 @@ if __name__ == "__main__":
 	"""
 
 	global start_folder
-	start_folder=os.getcwd()
+	start_folder = os.getcwd()
+
+	iraf.set(min_lenuserarea=64000)
 
 	iraf.set(min_lenuserarea=64000)
 
 	logging.basicConfig(level=logging.DEBUG)
+
 	if len(sys.argv)==2:
 		date,cobs=prepare_dir(sys.argv[1])
 		remove_bias(date)
@@ -2949,15 +2952,15 @@ if __name__ == "__main__":
 		extract_spectra(date)
 		wav_calibration(date)
 		#os.system('cp -r reductions-test reductions')
-		#remove_sky(date, method='nearest3', thr_method='flat', ncpu=7)
+		remove_sky(date, method='nearest3', thr_method='flat', ncpu=4)
 		#plot_spectra(190210, 1902100045, 3)
-		#remove_telurics(date)
-		#v_bary_correction(date, quick=True, ncpu=8)
+		remove_telurics(date)
+		v_bary_correction(date, quick=False, ncpu=4)
 		#os.system('cp -r reductions_bary reductions')
 		#resolution_profile(date)
 		#os.system('cp -r reductions-test reductions')
-		#create_final_spectra(date, ncpu=8)
-		#create_database(date)
+		create_final_spectra(date)
+		create_database(date)
 		
 	else:
 		logging.critical('Wrong number of command line arguments.')
