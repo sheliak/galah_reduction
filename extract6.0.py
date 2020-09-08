@@ -102,7 +102,7 @@ def correct_ndfclass(hdul):
 	"""
 	return hdul[0].header['NDFCLASS']
 
-def inspect_dir(dir, str_range='*'):
+def prepare_dir(dir, str_range='*'):
 	"""
 	Open spectra from one night and print exposure types and fields. Create a folder structure in which the reduction will take place
 
@@ -466,7 +466,7 @@ def prepare_flat_arc(date, cobs):
 
 	Parameters:
 		date (str): date string (e.g. 190210)
-		cobs (array): COB array from function inspect_dir
+		cobs (array): COB array from function prepare_dir
 	
 	Returns:
 		none
@@ -2899,7 +2899,7 @@ def min_red(dir):
 		Option to use whichever flat and arc are available, even, if they are from the previous field done with the same plate.
 	"""
 
-	date,cobs=inspect_dir(dir)
+	date,cobs=prepare_dir(dir)
 	remove_bias(date)
 	fix_gain(date)
 	fix_bad_pixels(date)
@@ -2919,7 +2919,7 @@ if __name__ == "__main__":
 	From the command line you can run the pipeline with $ python extract6.0.py /path/to/files/. The pipeline was tested with python 2.7. 
 
 	The reduction pipeline is very read/write intensive. Run it from a folder on an SSD disk or create a RAM filesystem and run it from there. The latter option is also the fastest, but you need a lot of RAM for it. Running the pipeline on HDDs is not advised. 
-	When testing, always create a copy of your data in case it gets damaged. First function in the pipeline (inspect_dir) will copy all the data into a local folder (./reductions), but it is best to be careful anyways.
+	When testing, always create a copy of your data in case it gets damaged. First function in the pipeline (prepare_dir) will copy all the data into a local folder (./reductions), but it is best to be careful anyways.
 	
 	Possible errors:
 	- Not enough space in image header: Find login.cl file and raise the min_lenuserarea parameter (also uncomment it, if commented before).
@@ -2935,19 +2935,19 @@ if __name__ == "__main__":
 
 	logging.basicConfig(level=logging.DEBUG)
 	if len(sys.argv)==2:
-		date,cobs=inspect_dir(sys.argv[1])
-		#remove_bias(date)
-		#fix_gain(date)
-		#fix_bad_pixels(date)
-		#prepare_flat_arc(date,cobs)
+		date,cobs=prepare_dir(sys.argv[1])
+		remove_bias(date)
+		fix_gain(date)
+		fix_bad_pixels(date)
+		prepare_flat_arc(date,cobs)
 		#date='190210'
-		#remove_cosmics(date, ncpu=4)
-		#find_apertures(date)
+		remove_cosmics(date, ncpu=6)
+		find_apertures(date)
 		#plot_apertures(190210, 1902100045, 3)
-		#remove_scattered(date, ncpu=4)
+		remove_scattered(date, ncpu=6)
 		#measure_cross_on_flat(date)
-		#extract_spectra(date)
-		#wav_calibration(date)
+		extract_spectra(date)
+		wav_calibration(date)
 		#os.system('cp -r reductions-test reductions')
 		#remove_sky(date, method='nearest3', thr_method='flat', ncpu=7)
 		#plot_spectra(190210, 1902100045, 3)
