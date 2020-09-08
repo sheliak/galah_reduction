@@ -121,9 +121,12 @@ def inspect_dir(dir, str_range='*'):
 
 	def range_to_list(str_range):
 		"""
-		Gets string with ranges (e.g.  "1,2,5-7,10") and converts it into a lsit (e.g. [1,2,5,6,7,10]).
+		Gets string with ranges (e.g.  "1,2,5-7,10") and converts it into a list (e.g. [1,2,5,6,7,10]).
 		"""
-		return sum(((list(range(*[int(j) + k for k,j in enumerate(i.split('-'))])) if '-' in i else [int(i)]) for i in str_range.split(',')), [])
+		#return sum(((list(range(*[int(j) + k for k,j in enumerate(i.split('-'))])) if '-' in i else [int(i)]) for i in str_range.split(',')), [])
+		#return sum(((list(range(*[int(b) + c for c, b in enumerate(a.split('-'))]))  if '-' in a else [int(a)]) for a in str_range.split(', ')), []) 
+		temp = [(lambda sub: range(sub[0], sub[-1] + 1))(map(int, ele.split('-'))) for ele in str_range.split(', ')]
+		return [b for a in temp for b in a]
 
 	if str_range=='*':
 		runs=range(10000)
@@ -132,7 +135,9 @@ def inspect_dir(dir, str_range='*'):
 			runs=range_to_list(str_range)
 			runs=np.array(runs, dtype=int)
 		except:
-			logging.critical('List of runs (%s) cannot be converted into a list. Check formatting.' % str_range)
+			logging.error('List of runs (%s) cannot be converted into a list. Check formatting.' % str_range)
+			runs=range(10000)
+
 
 	logging.info('Checking contents of the given folder.')
 
@@ -156,7 +161,7 @@ def inspect_dir(dir, str_range='*'):
 		for file in files_all:
 			#accept file if obstatus is >0. Also add comment from comments.txt into the header
 			#also check if run is in the list of runs to be reduced
-			if obstatus_dict[int(file.split('/')[-1][6:10])][0]>0 and int(obstatus_dict[int(file.split('/')[-1][6:10])][0]) in runs:
+			if obstatus_dict[int(file.split('/')[-1][6:10])][0]>0 and int(file.split('/')[-1][6:10]) in runs:
 				files.append(file)
 				with fits.open(file, mode='update') as hdu_c:
 					hdu_c[0].header['COMM_OBS']=(obstatus_dict[int(file.split('/')[-1][6:10])][1], 'Comments by the observer')
@@ -2926,14 +2931,16 @@ if __name__ == "__main__":
 	global start_folder
 	start_folder=os.getcwd()
 
+	iraf.set(min_lenuserarea=64000)
+
 	logging.basicConfig(level=logging.DEBUG)
 	if len(sys.argv)==2:
-		#date,cobs=inspect_dir(sys.argv[1])
+		date,cobs=inspect_dir(sys.argv[1])
 		#remove_bias(date)
 		#fix_gain(date)
 		#fix_bad_pixels(date)
 		#prepare_flat_arc(date,cobs)
-		date='190210'
+		#date='190210'
 		#remove_cosmics(date, ncpu=4)
 		#find_apertures(date)
 		#plot_apertures(190210, 1902100045, 3)
@@ -2948,9 +2955,9 @@ if __name__ == "__main__":
 		#v_bary_correction(date, quick=True, ncpu=8)
 		#os.system('cp -r reductions_bary reductions')
 		#resolution_profile(date)
-		os.system('cp -r reductions-test reductions')
+		#os.system('cp -r reductions-test reductions')
 		#create_final_spectra(date, ncpu=8)
-		create_database(date)
+		#create_database(date)
 		
 	else:
 		logging.critical('Wrong number of command line arguments.')
