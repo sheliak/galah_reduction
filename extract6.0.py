@@ -2829,15 +2829,17 @@ if __name__ == "__main__":
 	global start_folder
 	start_folder = os.getcwd()
 
+	iraf.set(min_lenuserarea=64000)
+
 	logging.basicConfig(level=logging.DEBUG)
-	if len(sys.argv)==2:
+	if len(sys.argv) == 2:
 		date, cobs = inspect_dir(sys.argv[1])
 		remove_bias(date)
 		fix_gain(date)
 		fix_bad_pixels(date)
 		prepare_flat_arc(date, cobs)
-		#date='190210'
-		remove_cosmics(date, ncpu=2)
+		#date='180620'
+		remove_cosmics(date, ncpu=1)
 		find_apertures(date)
 		#plot_apertures(190210, 1902100045, 3)
 		remove_scattered(date, ncpu=2)
