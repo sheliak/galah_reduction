@@ -1,4 +1,5 @@
-Description of reduction flags given in filed reduction_flags
+Description of reduction flags given in field ``reduction_flags''.
+
 Bit	Decimal value	Description
 0	+1	Trace/aperture/tramline in blue CCD failed to fit*
 1	+2	Trace/aperture/tramline in green CCD failed to fit*

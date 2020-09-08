@@ -1,3 +1,5 @@
+Database is available as a fits table or as a csv file. Fits table includes arrays, which are expanded in the csv file. For example, there is only one snr column in the fits table. Each entry is an array enclosing four values for four CCDs. In the csv database there are columns snr_1, snr_2, snr_3, snr_4 for blue, green, red, and IR CCDs. Csv file includes column names in the first line. Delimiter is a comma (,) and there are no commas in any strings in the table.
+
 sobject_id	This number identifies an individual GALAH observation. It might stand for a single observation, continous observations combined into one spectrum or spectra combined over different epochs. sobject_id has a format of yymmddxxxxyyzzz. yy designates the year, mm the month and dd the day. xxxx is the exposure number. yy designates how the spectra were combined; 00 means this is a single observation, 01 means only consecutive exposures were combined, and 02 means all spectra from all epochs before and including yymmdd were combined, regardles which fibre they were observed with. zzz is the pivot designated to the observed star (pivot of the last observation if observations made with different fibre arangements were observed).
 ra	Right ascension in decimal degrees as given in the .fld file (file used to configure fibres).
 dec	Declination in decimal degrees as given in the .fld file (file used to configure fibres).
@@ -9,7 +11,7 @@ pivot	Number given to a fibre at the 2dF fibre positioner end of the fibre line.
 fibre	Number given to a fibre at the spectrograph end of the fibre line. There are 400 fibres.
 fibre_x	Position of the fibre on a 2dF fibre positioner plate in um.
 fibre_y	Position of the fibre on a 2dF fibre positioner plate in um.
-fibre_theta	Bent of the fibre away from the radial direction on a 2dF fibre positioner plate in decimal degrees.
+fibre_theta	Bending of the fibre away from the radial direction on a 2dF fibre positioner plate in decimal degrees.
 plate	Plate in the primary focus of the 2dF fibre positioner.
 aperture_position	Centre of the aperture in an image at column x=2000. If spectra from different epochs are combined the aperture_position is measured in the most recent image.
 mean_ra	Right ascension of the telescope pointing in decimal degrees.
@@ -19,8 +21,9 @@ mean_ha	Hour angle of the telescope pointing in decimal degrees.
 cfg_file	Name of the file used to configure the observed field (a .fld file).
 cfg_field_name	Name of the field as given in the cfg_file.
 obj_name	Name of the object as given in the cfg_file (in the .fld file).
-galah_id	Identifier unique to a star used internally in GALAH. Must be given as an obj_name in the cfg_file in a format galahic_xxxxxxxxxxxxx .
+galah_id	Identifier unique to a star used internally in GALAH. Must be given as an obj_name in the cfg_file in a format galahic_xxxxxxxxx.
 snr	Mean signal to noise ratio. Is an array with four numbers for blue, green, red and IR ccds.
+fibre_throughput	Fibre throughput measured relative to the most transparent fibre in each COB. Most transparent fibre has throughput=1.
 res	Mean resolution given as FWHM of the LSF in Angstroms.  Is an array with four numbers for blue, green, red and IR ccds.
 b_par	B parameter used to define the LSF. Is an array with four numbers for blue, green, red and IR ccds. B parameter is a constant for each spectrum in each ccd.
 v_bary_eff	Effective barycentric velocity correction in km/s. This correction is already applied to all spectra. It is calculated for time mjd.
@@ -28,13 +31,13 @@ exposed	Total exposure time of all combined spectra in seconds.
 mag	Magnitude as given in the cfg_file.
 wav_rms	RMS of the wavelength calibration. Is an array with four numbers for blue, green, red and IR ccds. If spectra from different epochs are combined, only the worst RMS is given.
 wav_n_lines	Number of arc lines used for wavelength calibration in format xx/yy. xx is the number of found lines and yy is the number of lines used in the calibration.
-rv	Radial velocity
-e_rv
-rv_com
-e_rv_com
-teff
-logg
-met
-obs_comment	A comment the observer might had left in the comments.txt file.
-pipeline_version	Version of the data reduction pipeline.
-reduction_flags	Flags in a binary mask format. See flags_description.txt
+rv	Radial velocity measured for individual arms in km/s. Is an array with four numbers for blue, green, red and IR ccds.
+e_rv	Radial velocity uncertainty in km/s. Is an array with four numbers for blue, green, red and IR ccds.
+rv_com	Combined radial velocity in km/s. This is not a combination of radial velocities from four arms, but is measured again from combined likelihoods for rvs in four arms. 
+e_rv_com	Uncertainty of the combined radial velocity in km/s.
+teff	Effective temperature in K obtained by a neural network.
+logg	Gravity in log(cm/s^2) obtained by a neural network.
+met	Metallicity ([M/H]) obtained by a neural network.
+obs_comment	A comment the observer might had left in the comments.txt file. For combined spectra the comments are concatenated. If they are longer than 56 characters, they are truncated.
+pipeline_version	Version of the data reduction pipeline. This is a string.
+reduction_flags	Flags in a binary mask format. See flags_description.txt for explanation.
