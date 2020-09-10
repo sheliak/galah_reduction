@@ -22,8 +22,10 @@ from scipy.interpolate import griddata
 from astropy.convolution import Gaussian1DKernel, convolve, CustomKernel
 from lmfit import Minimizer, Parameters, report_fit
 from multiprocessing import Pool
+from datetime import datetime
 import cosmics
 import time
+import ephem
 
 # possible NDFCLASS values in human readable form
 ndfclass_types={'MFFFF':'fibre flat', 'MFARC':'arc', 'MFOBJECT':'object', 'BIAS':'bias'}
@@ -100,7 +102,56 @@ def correct_ndfclass(hdul):
 		ndfclass (str)
 
 	"""
-	return hdul[0].header['NDFCLASS']
+	h_head = hdul[0].header
+	orig_class = h_head['NDFCLASS']
+
+	# bias should always be determined correctly
+	if orig_class == 'BIAS':
+		return orig_class
+
+	# check should always be determined correctly
+	if orig_class == 'MFARC':
+		return orig_class
+
+	# get essential parameters on which the decision about a class will be based on
+	ex_time = h_head['EXPOSED']
+	flaps = h_head['FLAPS']
+	tracking = h_head['TRACKING']
+	t_ra = h_head['MEANRA']
+	t_dec = h_head['MEANDEC']
+	f_data = Table(hdul['STRUCT.MORE.FIBRES'].data)
+	f_ra = np.rad2deg(np.median(f_data['RA']))
+	f_dec = np.rad2deg(np.median(f_data['DEC']))
+	t_coord = SkyCoord(ra=t_ra*u.deg, dec=t_dec*u.deg)
+	f_coord = SkyCoord(ra=f_ra*u.deg, dec=f_dec*u.deg)
+
+	# compute height of the sun above/bellow the horizon
+	sun = ephem.Sun()
+	obs = ephem.Observer()
+	# lat and long must be string if you do not want troubles
+	obs.lon, obs.lat, obs.elevation = str(h_head['LONG_OBS']), str(h_head['LAT_OBS']), h_head['ALT_OBS']
+	obs.date = h_head['UTDATE'].replace(':', '/') + ' ' + h_head['UTSTART']
+	# ephem assumes input time to in UTC
+	sun.compute(obs)
+	sun_alt = sun.alt
+
+	# check other science types - object and flats
+	new_class = 'UNKNOWN'
+
+	if flaps == 'OPEN':
+		if tracking != 'TRACKING':
+			# TODO: delineate between sflat or dflat
+			new_class = 'DFLAT'
+		else:
+			if t_coord.separation(f_coord) < 0.5*u.deg:
+				new_class = 'MFOBJECT'
+			else:
+				new_class = 'SFLAT'
+	else:
+		new_class = 'MFFFF'
+
+	return new_class
+
 
 def prepare_dir(dir, str_range='*'):
 	"""
@@ -159,7 +210,7 @@ def prepare_dir(dir, str_range='*'):
 		obstatus_dict=defaultdict(lambda:[1, ''], obstatus_dict)
 		files=[]
 
-		for file in files_all:
+		for file in np.sort(files_all):
 
 			fits_name = file.split('/')[-1]
 			try:
@@ -187,9 +238,11 @@ def prepare_dir(dir, str_range='*'):
 			list_of_biases=[]
 			for f in files:
 				hdul=fits.open(f)
-				if correct_ndfclass(hdul) in ['MFFFF', 'MFARC', 'MFOBJECT']: list_of_fits.append([f, correct_ndfclass(hdul), hdul[0].header['UTMJD'], hdul[0].header['CFG_FILE'], hdul[0].header['SOURCE']])
-				if correct_ndfclass(hdul)=='BIAS': list_of_biases.append([f, correct_ndfclass(hdul), hdul[0].header['UTMJD'], hdul[0].header['CFG_FILE'], hdul[0].header['SOURCE']])
+				hdul_ndfclass = correct_ndfclass(hdul)
+				print f.split('/')[-1], hdul[0].header['NDFCLASS'], '->', hdul_ndfclass
 				hdul.close()
+				if hdul_ndfclass in ['MFFFF', 'MFARC', 'MFOBJECT']: list_of_fits.append([f, hdul_ndfclass, hdul[0].header['UTMJD'], hdul[0].header['CFG_FILE'], hdul[0].header['SOURCE']])
+				if hdul_ndfclass == 'BIAS': list_of_biases.append([f, hdul_ndfclass, hdul[0].header['UTMJD'], hdul[0].header['CFG_FILE'], hdul[0].header['SOURCE']])
 
 			# determine date from folder name
 			date = dir.split('/')[-1]
@@ -923,7 +976,7 @@ def remove_scattered(date, ncpu=1):
 				iraf.imcopy(input='masterarc.fits[1:4096,*]', output='crop.tmp', verbose='no')
 				shutil.move('crop.tmp.fits', 'masterarc.fits')
 			except:
-				logging.warning('Masterarc was not found in CCD %d of COB %s' % (ccd, cob))
+				logging.warning('Masterarc was not found in CCD %d of COB %s' % (ccd, cob.split('/')[-1]))
 
 			files=glob.glob("./[1-31]*.fits")
 			for f in files:
@@ -1048,6 +1101,10 @@ def wav_calibration(date):
 	for ccd in [1,2,3,4]:
 		cobs=glob.glob("reductions/%s/ccd%s/*" % (date,ccd))
 		for cob in cobs:
+			if not os.path.isfile(cob+'/masterarc.ms.fits'):
+				logging.warning('Masterarc was not found in ccd %d of COB %s, wavelength calibration will be skipped for this ccd-COB combination' % (ccd, cob.split('/')[-1]))
+				continue
+
 			hdul=fits.open(cob+'/masterarc.ms.fits')
 			plate= hdul[0].header['SOURCE']
 			hdul.close()
@@ -1784,6 +1841,10 @@ def remove_sky(date, method='nearest', thr_method='flat', ncpu=1):
 		fibre_throughputs_dict_mags={}
 		cobs=glob.glob("reductions/%s/ccd%s/*" % (date,ccd))
 		for cob in cobs:
+			if not os.path.isfile(cob+'/masterarc.ms.fits'):
+				logging.warning('Masterarc was not found in ccd %d of COB %s, fibre throughput will not be estimated for this ccd-COB combination' % (ccd, cob.split('/')[-1]))
+				continue
+
 			files=glob.glob("%s/[1-31]*.fits" % cob)
 			valid_files=[]
 			for f in files:
@@ -1835,8 +1896,14 @@ def remove_sky(date, method='nearest', thr_method='flat', ncpu=1):
 			files=glob.glob("%s/[1-31]*.fits" % cob)
 			valid_files=[]
 			for f in files:
-				if '.ms' not in f: valid_files.append(f)
-			
+				if '.ms' not in f:
+					valid_files.append(f)
+
+			if len(valid_files) == 0:
+				error_str = 'No spectra files found for sky removal in ccd %d of COB %s' % (ccd, cob.split('/')[-1])
+				logging.error(error_str)
+				continue
+
 			#create a dict from fibre table
 			table_name='fibre_table_'+valid_files[0].split('/')[-1]
 			hdul=fits.open('/'.join(valid_files[0].split('/')[:-1])+'/'+table_name)
@@ -2979,15 +3046,16 @@ if __name__ == "__main__":
 	global start_folder
 	start_folder = os.getcwd()
 
-	# Set iraf variables that are otherwise defined in login.cl. Will probably overwrite those settings
+	# Set iraf variables that are otherwise defined in local login.cl. Will probably overwrite those settings
 	iraf.set(min_lenuserarea=128000)
 	iraf.set(uparm=start_folder + '/uparm')
 
 	logging.basicConfig(level=logging.DEBUG)
 
 	if len(sys.argv)==2:
-		# date='150411'
+		# date='181221'
 		date,cobs=prepare_dir(sys.argv[1])
+		raise SystemExit
 		remove_bias(date)
 		fix_gain(date)
 		fix_bad_pixels(date)
