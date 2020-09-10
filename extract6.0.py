@@ -158,14 +158,25 @@ def prepare_dir(dir, str_range='*'):
 				obstatus_dict[int(l[0])]=[int(l[1]),l[-1].replace('\n','')]
 		obstatus_dict=defaultdict(lambda:[1, ''], obstatus_dict)
 		files=[]
+
 		for file in files_all:
-			#accept file if obstatus is >0. Also add comment from comments.txt into the header
-			#also check if run is in the list of runs to be reduced
-			if obstatus_dict[int(file.split('/')[-1][6:10])][0]>0 and int(file.split('/')[-1][6:10]) in runs:
+
+			fits_name = file.split('/')[-1]
+			try:
+				run_num = int(fits_name[6:10])
+			except ValueError as err:
+				logging.warning('Skipping file %s as it has no valid run number in filename' % fits_name)
+				continue
+
+			# accept file if obstatus is >0. Also add comment from comments.txt into the header
+			# also check if run is in the list of runs to be reduced
+			if obstatus_dict[run_num][0]>0 and int(fits_name[6:10]) in runs:
 				files.append(file)
 				with fits.open(file, mode='update') as hdu_c:
-					hdu_c[0].header['COMM_OBS']=(obstatus_dict[int(file.split('/')[-1][6:10])][1], 'Comments by the observer')
+					obs_comment = obstatus_dict[run_num][1].rstrip()  # rstrip will remove trailing whitespaces and \r characters
+					hdu_c[0].header['COMM_OBS']=(obs_comment, 'Comments by the observer')
 					hdu_c.flush()
+
 		files=np.array(files)
 
 		if len(files)==0:
@@ -180,12 +191,33 @@ def prepare_dir(dir, str_range='*'):
 				if correct_ndfclass(hdul)=='BIAS': list_of_biases.append([f, correct_ndfclass(hdul), hdul[0].header['UTMJD'], hdul[0].header['CFG_FILE'], hdul[0].header['SOURCE']])
 				hdul.close()
 
+			# determine date from folder name
+			date = dir.split('/')[-1]
+
+			# check if we found any science image
+			if len(list_of_fits) == 0:
+				error_str = 'No science data found for night ' + date
+				logging.error(error_str)
+				raise RuntimeError(error_str)
+
 			# order list of files in timely order
 			list_of_fits=np.array(list_of_fits)
 			list_of_fits=list_of_fits[list_of_fits[:,2].argsort()]
 
+			# function that checks if cob has all three types of science frames
+			# TODO: move function to a nicer place
+			def _has_cob_all_frames(cob_files, cob_str, ccd_i):
+				types_in_cob = list([])
+				for cob_exp in cob_files:
+					types_in_cob.append(cob_exp[1])
+				if len(np.unique(types_in_cob)) == 3:
+					return True
+				else:
+					logging.warning(
+						'CCD %d of COB %s is missing some science frames and will be skipped' % (ccd_i, cob_str))
+					return False
+
 			# iterate over the list of files and break it into cobs
-			date=dir.split('/')[-1]
 			cob_id=date+list_of_fits[0][0].split('/')[-1][6:10]
 			list_of_cob_ids.append(cob_id)
 			current_cob=cob_id
@@ -195,7 +227,8 @@ def prepare_dir(dir, str_range='*'):
 			cob_content=[]
 			for f in list_of_fits:
 				if f[3]!=current_field or f[4]!=current_plate:
-					cobs.append([current_cob,cob_content])
+					if _has_cob_all_frames(cob_content, current_cob, ccd):
+						cobs.append([current_cob,cob_content])
 					date=dir.split('/')[-1]
 					cob_id=date+f[0].split('/')[-1][6:10]
 					list_of_cob_ids.append(cob_id)
@@ -207,7 +240,8 @@ def prepare_dir(dir, str_range='*'):
 				else:
 					cob_content.append(f)
 
-			cobs.append([current_cob,cob_content])
+			if _has_cob_all_frames(cob_content, current_cob, ccd):
+				cobs.append([current_cob,cob_content])
 
 			cobs_all.append(cobs)
 			biases_all.append(list_of_biases)
@@ -266,14 +300,12 @@ def prepare_dir(dir, str_range='*'):
 
 	# copy fits files into correct folders
 	logging.info('Copying files into correct folders for the reduction.')
-	for i in biases_all[0]:
-		shutil.copyfile(i[0], 'reductions/%s/ccd1/biases/%s' % (date, i[0].split('/')[-1]))
-	for i in biases_all[1]:
-		shutil.copyfile(i[0], 'reductions/%s/ccd2/biases/%s' % (date, i[0].split('/')[-1]))
-	for i in biases_all[2]:
-		shutil.copyfile(i[0], 'reductions/%s/ccd3/biases/%s' % (date, i[0].split('/')[-1]))
-	for i in biases_all[3]:
-		shutil.copyfile(i[0], 'reductions/%s/ccd4/biases/%s' % (date, i[0].split('/')[-1]))
+
+	for biases_all_ccd in biases_all:
+		for bias_info in biases_all_ccd:
+			bias_ccd = ''.join((bias_info[0].split('/')[-2]).split('_'))
+			bias_filename = bias_info[0].split('/')[-1]
+			shutil.copyfile(bias_info[0], 'reductions/%s/%s/biases/%s' % (date, bias_ccd, bias_filename))
 
 	for i in cobs_all[0]:
 		for j in i[1]:
@@ -458,6 +490,7 @@ def remove_cosmics(date, ncpu=1):
 
 	pool = Pool(processes=ncpu)
 	pool.map(remove_cosmics_proc, args)
+	pool.close()
 
 
 def prepare_flat_arc(date, cobs):
@@ -589,13 +622,17 @@ def find_apertures(date):
 	iraf.unlearn('apall')
 	iraf.apextract.dispaxis=1
 
-
 	for ccd in [1,2,3,4]:
 		cobs=glob.glob("reductions/%s/ccd%s/*" % (date,ccd))
 		for cob in cobs:
 			print cob
 			# shift reference flat, so the apertures will be found correctly and will always be in the same order
-			hdul=fits.open(cob+'/masterflat.fits')
+			try:
+				hdul=fits.open(cob+'/masterflat.fits')
+			except IOError as err:
+				logging.warning('Masterflat was not found in CCD %d of COB %s' % (ccd, cob.split('/')[-1]))
+				continue
+
 			plate= hdul[0].header['SOURCE']
 			hdul.close()
 			shift_ref(date, plate, ccd, cob+'/masterflat.fits')
@@ -864,7 +901,6 @@ def remove_scattered(date, ncpu=1):
 				z+=m[n]*x**i*y**j
 				n+=1
 		return z
-		
 
 	def eval_diff(m, image):
 		xx, yy = np.meshgrid(np.arange(0,image.shape[1],1), np.arange(0,image.shape[0],1), sparse=True)
@@ -883,8 +919,12 @@ def remove_scattered(date, ncpu=1):
 		cobs=glob.glob("reductions/%s/ccd%s/*" % (date,ccd))
 		for cob in cobs:
 			os.chdir(cob)
-			iraf.imcopy(input='masterarc.fits[1:4096,*]', output='crop.tmp', verbose='no')
-			shutil.move('crop.tmp.fits', 'masterarc.fits')
+			try:
+				iraf.imcopy(input='masterarc.fits[1:4096,*]', output='crop.tmp', verbose='no')
+				shutil.move('crop.tmp.fits', 'masterarc.fits')
+			except:
+				logging.warning('Masterarc was not found in CCD %d of COB %s' % (ccd, cob))
+
 			files=glob.glob("./[1-31]*.fits")
 			for f in files:
 				iraf.imcopy(input=f+'[1:4096,*]', output='crop.tmp', verbose='no')
@@ -903,6 +943,7 @@ def remove_scattered(date, ncpu=1):
 
 	pool = Pool(processes=ncpu)
 	pool.map(remove_scattered_proc, args)
+	pool.close()
 
 	iraf.flprcache()
 
@@ -944,8 +985,12 @@ def extract_spectra(date):
 		cobs=glob.glob("reductions/%s/ccd%s/*" % (date,ccd))
 		for cob in cobs:
 			os.chdir(cob)
-			iraf.imcopy(input='masterarc.fits[1:4096,*]', output='crop.tmp', verbose='no')
-			shutil.move('crop.tmp.fits', 'masterarc.fits')
+			try:
+				iraf.imcopy(input='masterarc.fits[1:4096,*]', output='crop.tmp', verbose='no')
+				shutil.move('crop.tmp.fits', 'masterarc.fits')
+			except:
+				logging.warning('Masterarc was not found in CCD %d of COB %s' % (ccd, cob))
+
 			files=glob.glob("./[1-31]*.fits")
 			for f in files:
 				iraf.imcopy(input=f+'[1:4096,*]', output='crop.tmp', verbose='no')
@@ -955,7 +1000,6 @@ def extract_spectra(date):
 					shutil.move('crop.tmp.fits', 'scat_'+f)
 				iraf.flprcache()
 			os.chdir('../../../..')
-
 
 	for ccd in [1,2,3,4]:
 		cobs=glob.glob("reductions/%s/ccd%s/*" % (date,ccd))
@@ -1415,6 +1459,7 @@ def v_bary_correction(date, quick=False, ncpu=1):
 	if quick==False:
 		pool = Pool(processes=ncpu)
 		pool.map(v_bary_correction_proc, args)
+		pool.close()
 
 
 def plot_spectra(date, cob_id, ccd):
@@ -1861,6 +1906,7 @@ def remove_sky(date, method='nearest', thr_method='flat', ncpu=1):
 			# First method is where we use the nearest sky fibre to remove sky from object spectra. This is good, because the resolutions of the sky and object spectra are as close as possible.
 			pool = Pool(processes=ncpu)
 			pool.map(remove_sky_nearest, args)
+			pool.close()
 			#for arg in args:
 			#	remove_sky_nearest(arg)
 
@@ -1868,6 +1914,7 @@ def remove_sky(date, method='nearest', thr_method='flat', ncpu=1):
 			# Second method is where we use three nearest sky spectra. Resolution is still somewhat similar, but we can take a median of three sky spectra and thus remove any remaining cosmics
 			pool = Pool(processes=ncpu)
 			pool.map(remove_sky_nearest3, args)
+			pool.close()
 			#for arg in args:
 			#	remove_sky_nearest3(arg)
 					
@@ -2610,6 +2657,7 @@ def create_final_spectra(date, ncpu=1):
 
 	pool = Pool(processes=ncpu)
 	pool.map(create_final_spectra_proc, args)
+	pool.close()
 
 
 def create_database(date):
@@ -2931,33 +2979,33 @@ if __name__ == "__main__":
 	global start_folder
 	start_folder = os.getcwd()
 
-	iraf.set(min_lenuserarea=64000)
-
-	iraf.set(min_lenuserarea=64000)
+	# Set iraf variables that are otherwise defined in login.cl. Will probably overwrite those settings
+	iraf.set(min_lenuserarea=128000)
+	iraf.set(uparm=start_folder + '/uparm')
 
 	logging.basicConfig(level=logging.DEBUG)
 
 	if len(sys.argv)==2:
+		# date='150411'
 		date,cobs=prepare_dir(sys.argv[1])
 		remove_bias(date)
 		fix_gain(date)
 		fix_bad_pixels(date)
 		prepare_flat_arc(date,cobs)
-		#date='190210'
-		remove_cosmics(date, ncpu=6)
+		remove_cosmics(date, ncpu=10)
 		find_apertures(date)
 		#plot_apertures(190210, 1902100045, 3)
-		remove_scattered(date, ncpu=6)
+		remove_scattered(date, ncpu=10)
 		#measure_cross_on_flat(date)
 		extract_spectra(date)
 		wav_calibration(date)
 		#os.system('cp -r reductions-test reductions')
-		remove_sky(date, method='nearest3', thr_method='flat', ncpu=4)
+		remove_sky(date, method='nearest3', thr_method='flat', ncpu=10)
 		#plot_spectra(190210, 1902100045, 3)
 		remove_telurics(date)
-		v_bary_correction(date, quick=False, ncpu=4)
+		v_bary_correction(date, quick=False, ncpu=10)
 		#os.system('cp -r reductions_bary reductions')
-		#resolution_profile(date)
+		resolution_profile(date)
 		#os.system('cp -r reductions-test reductions')
 		create_final_spectra(date)
 		create_database(date)
