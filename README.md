@@ -13,6 +13,7 @@
  - matplotlib
  - pylab
  - lmfit
+ - ephem
 
 **Iraf installation**
 
