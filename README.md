@@ -8,7 +8,6 @@
  - iraf
  - scipy
  - numpy
- - pyfits
  - astropy
  - matplotlib
  - pylab
