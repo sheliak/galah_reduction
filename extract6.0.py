@@ -1018,7 +1018,9 @@ def remove_scattered(date, ncpu=1):
 			os.chdir(cob)
 			try:
 				iraf.imcopy(input='masterarc.fits[1:4096,*]', output='crop.tmp', verbose='no',Stdout="/dev/null")
-				time.sleep(5)
+				for t in range(20):#wait for max 10 sec for the file to be created
+					if os.path.exists('crop.tmp')==False: time.sleep(0.5)
+					else: break
 				shutil.move('crop.tmp.fits', 'masterarc.fits')
 				iraf.flprcache()
 			except:
@@ -1086,7 +1088,9 @@ def extract_spectra(date):
 			os.chdir(cob)
 			try:
 				iraf.imcopy(input='masterarc.fits[1:4096,*]', output='crop.tmp', verbose='no',Stdout="/dev/null")
-				time.sleep(5)
+				for t in range(20):#wait for max 10 sec for the file to be created
+					if os.path.exists('crop.tmp')==False: time.sleep(0.5)
+					else: break
 				shutil.move('crop.tmp.fits', 'masterarc.fits')
 				iraf.flprcache()
 			except:
@@ -2124,6 +2128,7 @@ def remove_telurics(date):
 
 	iraf.noao(_doprint=0,Stdout="/dev/null")
 	iraf.onedspec(_doprint=0,Stdout="/dev/null")
+	iraf.dataio(_doprint=0,Stdout="/dev/null")
 
 	# create a dictionary of fitted parameters
 	trans_params={}
