@@ -193,8 +193,6 @@ def prepare_dir(dir, str_range='*'):
 		"""
 		Gets string with ranges (e.g.  "1,2,5-7,10") and converts it into a list (e.g. [1,2,5,6,7,10]).
 		"""
-		#return sum(((list(range(*[int(j) + k for k,j in enumerate(i.split('-'))])) if '-' in i else [int(i)]) for i in str_range.split(',')), [])
-		#return sum(((list(range(*[int(b) + c for c, b in enumerate(a.split('-'))]))  if '-' in a else [int(a)]) for a in str_range.split(', ')), []) 
 		temp = [(lambda sub: range(sub[0], sub[-1] + 1))(map(int, ele.split('-'))) for ele in str_range.split(', ')]
 		return [b for a in temp for b in a]
 
@@ -226,6 +224,7 @@ def prepare_dir(dir, str_range='*'):
 	cobs_all=[]
 	list_of_cob_ids=[]
 	biases_all=[]
+	comments_dict={}
 	for ccd in [1,2,3,4]:
 		# read list of all files
 		cobs_ccd=[]
@@ -252,10 +251,8 @@ def prepare_dir(dir, str_range='*'):
 			# also check if run is in the list of runs to be reduced
 			if obstatus_dict[run_num][0]>0 and int(fits_name[6:10]) in runs:
 				files.append(file)
-				with fits.open(file, mode='update') as hdu_c:
-					obs_comment = obstatus_dict[run_num][1].rstrip()  # rstrip will remove trailing whitespaces and \r characters
-					hdu_c[0].header['COMM_OBS']=(obs_comment, 'Comments by the observer')
-					hdu_c.flush()
+				obs_comment = obstatus_dict[run_num][1].rstrip()  # rstrip will remove trailing whitespaces and \r characters
+				comments_dict[run_num]=obs_comment
 
 		files=np.array(files)
 
@@ -408,6 +405,15 @@ def prepare_dir(dir, str_range='*'):
 	for i in cobs_all[3]:
 		for j in i[1]:
 			shutil.copyfile(j[0], 'reductions/%s/ccd4/%s/%s' % (date, i[0], j[0].split('/')[-1]))
+
+	# add comment from comments file into headers
+	files=glob.glob("reductions/%s/*/*/*.fits" % (date))
+	comments_dict=defaultdict(lambda:'', comments_dict)
+	for file in files:
+		run_num=int(file.split('/')[-1][6:10])
+		with fits.open(file, mode='update') as hdu_c:
+			hdu_c[0].header['COMM_OBS']=(comments_dict[run_num], 'Comments by the observer')
+			hdu_c.flush()
 
 	# a list of files in the new destination must be returned
 	cobs_out=cobs_all
@@ -635,7 +641,7 @@ def prepare_flat_arc(date, cobs):
 				if os.path.exists(a):
 					os.remove(a)
 
-def shift_ref(date, plate, ccd, flat):
+def shift_ref(date, plate, ccd, cob, flat):
 	"""
 	To guaranty the correct order of apertures, we use a list of predefined apertures. The image, however, is not necessarly aligned with the list of apertures. List is shifted, so the order of apertures remains the same, but the apertures are at the same place as in the image.
 
@@ -643,12 +649,14 @@ def shift_ref(date, plate, ccd, flat):
 		date (str): date string (e.g. 190210)
 		plate (str): either 'Plate 0' or 'Plate 1'
 		ccd (int): CCD number (1=Blue, .., 4=IR)
+		cob (str): path to current cob
 		flat (str): image name of the flat on which the apertures are to be found
 	
 	Returns:
 		none
 
 	"""
+
 	if int(date)>=140601:
 		if plate=='Plate 0':
 			ap_ref={1: 'aux/masterflat_blue0.fits', 2: 'aux/masterflat_green0.fits', 3: 'aux/masterflat_red20.fits', 4: 'aux/masterflat_ir20.fits'}
@@ -660,8 +668,8 @@ def shift_ref(date, plate, ccd, flat):
 		if plate=='Plate 1':
 			ap_ref={1: 'aux/masterflat_blue.fits', 2: 'aux/masterflat_green.fits', 3: 'aux/masterflat_red.fits', 4: 'aux/masterflat_ir.fits'}
 
-	shift=iraf.xregister(input=ap_ref[ccd]+'[1990:2010,*],'+flat+'[1990:2010,*]', reference=ap_ref[ccd]+'[1990:2010,*]', regions='[*,*]', shifts="shifts", output="", databasefmt="no", correlation="fourier", xwindow=3, ywindow=51, xcbox=21, ycbox=21, Stdout=1)
-	os.remove('shifts')
+	shift=iraf.xregister(input=ap_ref[ccd]+'[1990:2010,*],'+flat+'[1990:2010,*]', reference=ap_ref[ccd]+'[1990:2010,*]', regions='[*,*]', shifts=cob+"/shifts", output="", databasefmt="no", correlation="fourier", xwindow=3, ywindow=51, xcbox=21, ycbox=21, Stdout=1)
+	os.remove(cob+'/shifts')
 	shift=float(shift[-2].split()[-2])
 
 	ap_file=ap_ref[ccd][:-5].replace('/','/ap')
@@ -724,7 +732,7 @@ def find_apertures(date):
 
 			plate= hdul[0].header['SOURCE']
 			hdul.close()
-			shift_ref(date, plate, ccd, cob+'/masterflat.fits')
+			shift_ref(date, plate, ccd, cob, cob+'/masterflat.fits')
 
 			# trace apertures on masterflat
 			iraf.apextract.database=start_folder+'/'+cob
@@ -1009,7 +1017,7 @@ def remove_scattered(date, ncpu=1):
 		for cob in cobs:
 			os.chdir(cob)
 			try:
-				iraf.imcopy(input='masterarc.fits[1:4096,*]', output='crop.tmp', verbose='no')
+				iraf.imcopy(input='masterarc.fits[1:4096,*]', output='crop.tmp', verbose='no',Stdout="/dev/null")
 				time.sleep(5)
 				shutil.move('crop.tmp.fits', 'masterarc.fits')
 				iraf.flprcache()
@@ -1018,7 +1026,7 @@ def remove_scattered(date, ncpu=1):
 
 			files=glob.glob("./[01-31]*.fits")
 			for f in files:
-				iraf.imcopy(input=f+'[1:4096,*]', output='crop.tmp', verbose='no')
+				iraf.imcopy(input=f+'[1:4096,*]', output='crop.tmp', verbose='no',Stdout="/dev/null")
 				shutil.move('crop.tmp.fits', f)
 			os.chdir('../../../..')
 			iraf.flprcache()
@@ -1077,7 +1085,7 @@ def extract_spectra(date):
 		for cob in cobs:
 			os.chdir(cob)
 			try:
-				iraf.imcopy(input='masterarc.fits[1:4096,*]', output='crop.tmp', verbose='no')
+				iraf.imcopy(input='masterarc.fits[1:4096,*]', output='crop.tmp', verbose='no',Stdout="/dev/null")
 				time.sleep(5)
 				shutil.move('crop.tmp.fits', 'masterarc.fits')
 				iraf.flprcache()
@@ -1086,10 +1094,10 @@ def extract_spectra(date):
 
 			files=glob.glob("./[01-31]*.fits")
 			for f in files:
-				iraf.imcopy(input=f+'[1:4096,*]', output='crop.tmp', verbose='no')
+				iraf.imcopy(input=f+'[1:4096,*]', output='crop.tmp', verbose='no',Stdout="/dev/null")
 				shutil.move('crop.tmp.fits', f)
 				if os.path.exists('scat_'+f):# at this point we should have a scattered light file somewhere which will also be extracted, so do the same for it
-					iraf.imcopy(input='scat_'+f+'[1:4096,*]', output='crop.tmp', verbose='no')
+					iraf.imcopy(input='scat_'+f+'[1:4096,*]', output='crop.tmp', verbose='no',Stdout="/dev/null")
 					shutil.move('crop.tmp.fits', 'scat_'+f)
 				iraf.flprcache()
 			os.chdir('../../../..')
@@ -2325,7 +2333,7 @@ def create_final_spectra_proc(args):
 		if os.path.exists('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1]): iraf.disptrans(input='/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1], output='', linearize='yes', units='angstroms', Stdout="/dev/null")
 		if os.path.exists('/'.join(file.split('/')[:-1])+'/cross_'+file.split('/')[-1]): iraf.disptrans(input='/'.join(file.split('/')[:-1])+'/cross_'+file.split('/')[-1], output='', linearize='yes', units='angstroms', Stdout="/dev/null")
 		if os.path.exists('/'.join(file.split('/')[:-1])+'/res_'+file.split('/')[-1]): iraf.disptrans(input='/'.join(file.split('/')[:-1])+'/res_'+file.split('/')[-1], output='', linearize='yes', units='angstroms', Stdout="/dev/null")
-		#return 0
+		
 
 		for ap in range(1,393):
 			if fibre_table_dict[ap][8]=='P':
@@ -2901,7 +2909,7 @@ def create_database(date):
 		e_rv=[None if i=='None' else i for i in e_rv]
 		rv_com=header1['rvcom']
 		if rv_com=='None': rv_com=None
-		e_rv_com=header1['rvcom']
+		e_rv_com=header1['e_rvcom']
 		if e_rv_com=='None': e_rv_com=None
 		teff=header1['TEFF']
 		if teff=='None': teff=None
@@ -3020,6 +3028,224 @@ def create_database(date):
 	csv_db.close()
 					
 
+def analyze_rv(args):
+	"""
+	Calculate radial velocity and write it into headers
+	"""
+
+	def residual(pars, x, data=None):
+		model=pars['amp']*np.exp(-(x-pars['shift'])**2/(2*pars['sigma']**2))+pars['offset']
+		#model=gaussian(x, pars['amp'], pars['shift'], pars['sigma'])
+		if data is None:
+			return model
+		return model-data
+
+	#hipass filter in km/s
+	filter_limit={3500:250.0, 4000:250.0, 4750:280.0, 5000:300.0, 6000:450.0, 7000:550.0, 9000:800.0, 12000:1500.0, 25000:2500.0, 40000:2500.0}
+
+	#rvs=np.linspace(-3000,3000,3001)
+	#rvs=np.linspace(-1500,1500,1501)
+	rvs=np.linspace(-1010,1010,506)
+	dd=2.0*1010/506.0#step in rv
+
+	sobject, templates=args
+
+	ccf_global=np.zeros(len(rvs))
+	ccfs=[]
+	specs=[]
+	best_template=[]
+	for ccd in [1,2,3,4]:
+		# open spectrum
+		hdulist = fits.open('reductions/results/%s/spectra/com/%s%s.fits' % (date, sobject,ccd))
+		crval=hdulist[1].header['CRVAL1']
+		crdel=hdulist[1].header['CDELT1']
+		f=hdulist[1].data
+		hdulist.close()
+		l=np.linspace(crval, crval+crdel*(len(f)-1), len(f))
+		# ignore first 10 and last 10 pixels, just in case there are problems with normalisation. In CCD 4 ignore more because of telurics.
+		if ccd==4:
+			f=f[1500:-10]
+			l=l[1500:-10]
+		else:
+			f=f[10:-10]
+			l=l[10:-10]
+		spec=np.array(zip(l,f), dtype=[('l', 'f8'), ('f', 'f8')])
+
+		# Cross correlate
+		# Following S. Zucker, MNRAS, Volume 342, Issue 4, July 2003
+		max_ccv=0
+		max_ccf=[]
+		best_template_tmp=0
+		for t,template in enumerate(templates[ccd-1]):
+			ccf=[]
+			for rv in rvs:
+				# convert shift in rv to shift in wavelength
+				l=spec['l']*(1-rv/299792.458)
+				# normalize spectrum and template so their average is zero
+				f_spec=spec['f']-np.average(spec['f'])
+				f_temp=np.interp(l,template[4]['l'],template[4]['f'])-np.average(np.interp(l,template[4]['l'],template[4]['f']))
+				# calculate cross covariance
+				if np.all(f_spec==0): f_spec=f_spec+1
+				R=sum(f_temp*f_spec)/len(l)
+				# calculate cross corelation
+				sf2=np.sum(f_spec*f_spec)/len(f_spec)
+				st2=np.sum(f_temp*f_temp)/len(f_temp)
+				if sf2==0: sf2=1e-16
+				if st2==0: st2=1e-16
+				C=R/(np.sqrt(sf2)*np.sqrt(st2))
+				ccf.append(C)
+
+			# filter ccf of large trends
+			# there should be a separate filter limit for each template.
+			# watch out for units if you change rvs array.
+			b,a = signal.butter(3,1./filter_limit[template[2]]/2.,'hp', fs=0.5*2.)
+			ccf_filtered=signal.filtfilt(b, a, ccf)
+			ccf=ccf_filtered+np.average(ccf)-np.average(ccf_filtered)
+
+			#fig=figure(0)
+			#ax=fig.add_subplot(111)
+			#ax.plot(rvs,ccf,'r-')
+			#ax.plot(rvs,ccf_filtered,'g-')
+			#show()
+
+			#check if this template produces a better correlation peak
+			if max(ccf[50:-50])>max_ccv:
+				max_ccv=max(ccf[50:-50])
+				max_ccf=ccf
+				best_template_tmp=t
+
+		# only use CCF of the template with best correlation
+		ccfs.append(max_ccf)
+		best_template.append(best_template_tmp)
+
+		#fig=figure(0)
+		#ax=fig.add_subplot(211)
+		#ax.plot(spec['l'], spec['f'], 'k-')
+		#ax.plot(templates[ccd-1][best_template_tmp][4]['l'],templates[ccd-1][best_template_tmp][4]['f'], 'r-')
+		#ax=fig.add_subplot(212)
+		#ax.plot(rvs, max_ccf, 'k-')
+		#show()
+
+	# combine ccfs from all ccds into one ccf
+	ccf_global2=1-np.power(np.product(1-np.square(ccfs), axis=0),1.0/4.0)
+	ccf_global=np.sqrt(ccf_global2)
+	ccf_sgn=np.sign(np.sum(ccfs,axis=0))#FIX THIS. sign first, sum later
+
+	# find peaks
+	peaks,other_info=signal.find_peaks(ccf_global, width=5, distance=10, height=0.15, prominence=0.1)
+
+	# filter out valid peaks
+	peaks_ok=[]
+	if len(peaks)>0:
+		for peak,width,power,sgn in zip(peaks, other_info['widths'], other_info['peak_heights'],ccf_sgn[peaks]):
+			# valid peak has sgn>=0 (at least two CCDs produce correlation peak)
+			# valid peak is significantly stronger than any other peaks
+			if sgn>=0 and power/max(ccf_global)>0.5:
+				peaks_ok.append([peak,width,power])
+	
+	# fit only the main peak to get radial velocity
+	rv_ind_ar=[]
+	sigma_ind_ar=[]
+	flag_ind_ar=[]
+	if len(peaks_ok)>0:
+		# sort peaks by height
+		peaks_ok=np.array(peaks_ok)
+		peaks_ok=peaks_ok[peaks_ok[:,2].argsort()]
+		# fit
+		peak_prime=int(peaks_ok[0][0]) # index of peak
+		peak_max=peaks_ok[0][2] # height of peak
+		peak_width=int(peaks_ok[0][1]) # width of peak
+		if len(peaks_ok)>1: min_dist=min(np.diff(np.sort(peaks_ok[:,0]))) # region to fit (if there are two peaks close by, only one must be in the region)
+		else: min_dist=3000
+		if min_dist<peak_width*0.33: dist=min_dist*0.5
+		else: dist=peak_width*0.33
+		if dist<3: dist=3
+		fit_params = Parameters()
+		fit_params.add('amp', value=peak_max-np.median(ccf_global), max=(peak_max-np.median(ccf_global))*1.3, min=(peak_max-np.median(ccf_global))*0.7)
+		fit_params.add('sigma', value=peak_width*0.75)
+		fit_params.add('shift', value=rvs[peak_prime], max=rvs[peak_prime]+3.0, min=rvs[peak_prime]-3.0)
+		fit_params.add('offset', value=np.median(ccf_global))
+		out = minimize(residual, fit_params, args=(rvs[peak_prime-int(dist):peak_prime+int(dist)],), kws={'data': ccf_global[peak_prime-int(dist):peak_prime+int(dist)]})
+		rv_com=out.params['shift'].value
+		# calculate error around the main peak (following S. Zucker, MNRAS, Volume 342, Issue 4, July 2003)
+		#second derivative of the fitted gaussian
+		fit_second_derivative=np.diff(residual(out.params, rvs),2)
+		#ccf_second_derivative=np.diff(ccf_global, 2)
+		# factor MN (number of bins) is 4 times 4096 minus edge (10) we cut out minus 1500 for the IR arm = 14814
+		sigma2=-1.0/(14814*(fit_second_derivative[peak_prime-1]/dd/dd/dd)/ccf_global[peak_prime]*(ccf_global2[peak_prime])/(1.0-ccf_global2[peak_prime]))# watch derivative units if you change rvs
+		sigma_com=np.sqrt(sigma2)
+		if sigma_com>25: flag_com=0
+		else: flag_com=1
+		#report_fit(out)
+		#print 'com', rv_com, sigma_com
+		fit = residual(out.params, rvs[peak_prime-int(dist):peak_prime+int(dist)])
+
+		# fit individual CCDs
+		for ccd in [1,2,3,4]:
+			peak_max=ccfs[ccd-1][peak_prime] # height of peak
+			fit_params = Parameters()
+			fit_params.add('amp', value=peak_max-np.median(ccfs[ccd-1]), max=(peak_max-np.median(ccfs[ccd-1]))*2.0, min=0.0)
+			fit_params.add('sigma', value=peak_width*0.75)
+			fit_params.add('shift', value=rvs[peak_prime], max=rvs[peak_prime]+12.0, min=rvs[peak_prime]-12.0)
+			fit_params.add('offset', value=np.median(ccfs[ccd-1]))
+			out = minimize(residual, fit_params, args=(rvs[peak_prime-int(dist):peak_prime+int(dist)],), kws={'data': ccfs[ccd-1][peak_prime-int(dist):peak_prime+int(dist)]})
+			rv_ind=out.params['shift'].value
+			## calculate error
+			fit_second_derivative=np.diff(residual(out.params, rvs),2)
+			#ccf_second_derivative=np.diff(ccf_global, 2)
+			if ccd<4: sigma2=-1.0/(4076*(fit_second_derivative[peak_prime-1]/dd/dd/dd)/ccfs[ccd-1][peak_prime]*(ccfs[ccd-1][peak_prime])/(1.0-ccfs[ccd-1][peak_prime]))# watch derivative units if you change rvs
+			else: sigma2=-1.0/(2586*(fit_second_derivative[peak_prime-1]/dd/dd/dd)/ccfs[ccd-1][peak_prime]*(ccfs[ccd-1][peak_prime])/(1.0-ccfs[ccd-1][peak_prime]))# watch derivative units if you change rvs
+			sigma_ind=np.sqrt(sigma2)
+			if np.isnan(sigma_ind): sigma_ind='None'
+			#report_fit(out)
+			rv_ind_ar.append(rv_ind)
+			sigma_ind_ar.append(sigma_ind)
+			if ccfs[ccd-1][peak_prime]<0.15 or sigma_ind=='None' or np.isnan(sigma_ind) or sigma_ind>25: flag_ind_ar.append(0)
+			else: flag_ind_ar.append(1)
+
+	else:#if there are no peaks in the ccf
+		rv_com='None'
+		sigma_com='None'
+		flag_com=0
+		rv_ind_ar=['None', 'None', 'None', 'None']
+		sigma_ind_ar=['None', 'None', 'None', 'None']
+		flag_ind_ar=[0, 0, 0, 0]
+
+	#print rv_com, sigma_com, flag_com
+	#print rv_ind_ar, sigma_ind_ar, flag_ind_ar
+
+	for ccd in [1,2,3,4]:
+		# open fits file and write rvs into header
+		hdulist = fits.open('reductions/results/%s/spectra/com/%s%s.fits' % (date, sobject,ccd), mode='update')
+		for extension in range(8):
+			hdulist[extension].header['RV']=rv_ind_ar[ccd-1]
+			hdulist[extension].header['E_RV']=sigma_ind_ar[ccd-1]
+			hdulist[extension].header['RV_OK']=flag_ind_ar[ccd-1]
+			hdulist[extension].header['RVCOM']=rv_com
+			hdulist[extension].header['E_RVCOM']=sigma_com
+			hdulist[extension].header['RVCOM_OK']=flag_com
+		hdulist.close()
+	
+
+
+
+	"""
+	print rv_com, sigma_com
+	print rv_ind_ar, sigma_ind_ar
+	fig=figure(0)
+	ax=fig.add_subplot(111)
+	ax.plot(rvs, ccfs[0], 'b-')
+	ax.plot(rvs, ccfs[1], 'g-')
+	ax.plot(rvs, ccfs[2], 'r-')
+	ax.plot(rvs, ccfs[3], 'k-')
+	ax.plot(rvs, ccf_global, 'y')
+	#ax.plot(rvs, ccf_sgn)
+	if len(peaks_ok)>0:
+		ax.plot(rvs[peak_prime-int(dist):peak_prime+int(dist)], fit, 'm-')
+	#if rv_com!='None': ax.set_xlim(rv_com-100,rv_com+100)
+	show()
+	"""
+	
 def analyze(date):
 	"""
 	Calculate radial velocity and atmospheric parameters. Should be done after the data is combined and before the database is generated. Caculated parameters can be written into headers.
@@ -3031,37 +3257,51 @@ def analyze(date):
 		none
 
 	To do:
-		Everything
+		Make rv calculations faster
+		Detect multiple rv peaks and create flag
 
 	"""
-	pass
 
+	# calculate radial velocity
 
-def min_red(dir):
-	"""
-	Make a minimal reduction to get 1D spectra. This is useful for a quick check during observations.
+	logging.info('Loading radial velocity template spectra.')
+	#load file with wavelengths for templates
+	w_file='rv_templates/LAMBDA_R20.DAT'
+	w=np.loadtxt(w_file, dtype=float)
 
-	Parameters:
-		dir (str): path to raw data. Must end with date number-code
+	#GALAH wavelength ranges (as line numbers in w_file)
+	ranges={1:[30814,34458], 2:[39876,43524], 3:[46293,50326], 4:[56018,57630]}
 
-	Returns:
-		none
+	#templates
+	templates=[]
 
-	ToDo:
-		Option to reduce just one COB or one image
-		Option to use whichever flat and arc are available, even, if they are from the previous field done with the same plate.
-	"""
+	#create templates
+	for ccd in [1, 2, 3, 4]:
+		templates_tmp=[]
+		for t,template_file in enumerate(['rv_templates/T03500G00P00V000K2ANWNVR20N.ASC','rv_templates/T03500G45P00V000K2ANWNVR20N.ASC','rv_templates/T04000G15P00V000K2ANWNVR20N.ASC','rv_templates/T04000G45P00V000K2ANWNVR20N.ASC','rv_templates/T04750G25P00V000K2ANWNVR20N.ASC','rv_templates/T05000G35P00V000K2ANWNVR20N.ASC','rv_templates/T05000G45P00V000K2ANWNVR20N.ASC','rv_templates/T06000G40P00V000K2ANWNVR20N.ASC','rv_templates/T07000G40P00V000K2ANWNVR20N.ASC','rv_templates/T09000G40P00V000K2ANWNVR20N.ASC','rv_templates/T12000G35P00V000K2SODNVR20N.ASC','rv_templates/T25000G35P00V000K2SODNVR20N.ASC','rv_templates/T40000G45P00V000K2SODNVR20N.ASC']):
+			template_raw=np.loadtxt(template_file, dtype=float)
+			template_ar=np.array(zip(w[ranges[ccd][0]:ranges[ccd][1]],template_raw[ranges[ccd][0]:ranges[ccd][1]]), dtype=[('l', 'f8'), ('f', 'f8')])
+			template_teff=float(template_file[14:19])
+			template_logg=float(template_file[20:22])/10.0
+			templates_tmp.append([t, template_file, template_teff, template_logg, template_ar])
 
-	date,cobs=prepare_dir(dir)
-	remove_bias(date)
-	fix_gain(date)
-	fix_bad_pixels(date)
-	prepare_flat_arc(date,cobs)
-	find_apertures(date)
-	#plot_apertures(190210, 1902100040, 4)
-	extract_spectra(date)
-	wav_calibration(date)
-	#plot_spectra(190210, 1902100016, 4)
+		templates.append(templates_tmp)
+
+	files=glob.glob('reductions/results/%s/spectra/com/*.fits' % date)
+	sobjects=[file.split('/')[-1][:15] for file in files]
+	sobjects=set(sobjects)
+
+	logging.info('Calculating radial velocities.')
+
+	args=[]
+	for sobject in sobjects:
+		args.append([sobject, templates])
+
+	pool = Pool(processes=12)
+	pool.map(analyze_rv, args)
+	pool.close()
+
+	# calculate stellar parameters
 
 
 if __name__ == "__main__":
@@ -3089,29 +3329,30 @@ if __name__ == "__main__":
 	logging.basicConfig(level=logging.DEBUG)
 
 	if len(sys.argv) == 2:
-		# date='171104'
+		# date='170711'
 		date, cobs = prepare_dir(sys.argv[1])
-		remove_bias(date)
-		fix_gain(date)
-		fix_bad_pixels(date)
-		prepare_flat_arc(date, cobs)
-		remove_cosmics(date, ncpu=10)
-		find_apertures(date)
+		#remove_bias(date)
+		#fix_gain(date)
+		#fix_bad_pixels(date)
+		#prepare_flat_arc(date, cobs)
+		#remove_cosmics(date, ncpu=8)
+		#find_apertures(date)
 		#plot_apertures(190210, 1902100045, 3)
-		remove_scattered(date, ncpu=10)
+		#remove_scattered(date, ncpu=6)
 		#measure_cross_on_flat(date)
-		extract_spectra(date)
-		wav_calibration(date)
+		#extract_spectra(date)
+		#wav_calibration(date)
 		#os.system('cp -r reductions-test reductions')
-		remove_sky(date, method='nearest3', thr_method='flat', ncpu=15)
+		#remove_sky(date, method='nearest3', thr_method='flat', ncpu=8)
 		#plot_spectra(190210, 1902100045, 3)
-		remove_telurics(date)
-		v_bary_correction(date, quick=False, ncpu=10)
+		#remove_telurics(date)
+		#v_bary_correction(date, quick=False, ncpu=8)
 		#os.system('cp -r reductions_bary reductions')
 		#resolution_profile(date)
 		#os.system('cp -r reductions-test reductions')
-		create_final_spectra(date)
-		create_database(date)
+		#create_final_spectra(date)
+		#analyze(date)
+		#create_database(date)
 		
 	else:
 		logging.critical('Wrong number of command line arguments.')
