@@ -10,8 +10,6 @@ U{http://www.astro.yale.edu/dokkum/lacosmic/}
 
 (article : U{http://arxiv.org/abs/astro-ph/0108003})
 
-The original code was modified by Janez Kos and is optimised for GALAH.
-
 
 Additional features
 ===================
@@ -36,7 +34,7 @@ No surprise, this python module is much faster then the IRAF implementation, as 
 Usage
 =====
 
-Everything is in the file cosmics.py, all you need to do is to import it. You need pyfits, numpy and scipy.
+Everything is in the file cosmics.py, all you need to do is to import it. You need astropy, numpy and scipy.
 See the demo scripts for example usages (the second demo uses f2n.py to make pngs, and thus also needs PIL).
 
 Your image should have clean borders, cut away prescan/overscan etc.
@@ -63,7 +61,7 @@ import numpy as np
 import math
 import scipy.signal as signal
 import scipy.ndimage as ndimage
-import pyfits
+from astropy.io import fits
 
 
 
@@ -643,7 +641,7 @@ def fromfits(infilename, hdu = 0, verbose = True):
 	Use hdu to specify which HDU you want (default = primary = 0)
 	"""
 	
-	pixelarray, hdr = pyfits.getdata(infilename, hdu, header=True)
+	pixelarray, hdr = fits.getdata(infilename, hdu, header=True)
 	pixelarray = np.asarray(pixelarray).transpose()
 	
 	pixelarrayshape = pixelarray.shape
@@ -671,9 +669,9 @@ def tofits(outfilename, pixelarray, hdr = None, verbose = True):
 		os.remove(outfilename)
 	
 	if hdr == None: # then a minimal header will be created 
-		hdu = pyfits.PrimaryHDU(pixelarray.transpose())
+		hdu = fits.PrimaryHDU(pixelarray.transpose())
 	else: # this if else is probably not needed but anyway ...
-		hdu = pyfits.PrimaryHDU(pixelarray.transpose(), hdr)
+		hdu = fits.PrimaryHDU(pixelarray.transpose(), hdr)
 
 	hdu.writeto(outfilename)
 	
