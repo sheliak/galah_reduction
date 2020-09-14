@@ -32,11 +32,11 @@ $ conda install iraf-all pyraf-all
 
 # Before running - optional
 
-Move to the folder from which you will run the reduction procedure. To create an ifraf login.cl file with settings run the following command:
+Iraf needs to know which configuration file to use. If you want to set some custom parameters, create a login.cl file in the folder from which you will run the reduction procedure. To create an ifraf login.cl file with default setting run the following command:
 ```
 $ mkiraf
 ```
-This step is optional as iraf will instead use settings from the default login.cl file.
+This step is optional as iraf will instead use settings from the default login.cl file. Which login.cl file is used is displayed when pyraf is run. 
 
 # How to run the pipeline
 
