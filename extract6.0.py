@@ -36,12 +36,13 @@ fibre_types={'S':'sky fibre', 'P':'positioned fibre', 'U':'parked fibre', 'N':'f
 start_folder=''
 
 
-def print_cobs(cobs):
+def print_cobs(cobs, date):
 	"""
 	Print COBs for a given night
 
 	Parameters:
 		cobs (array): numpy array of cobs
+		date (str): date string (e.g. 190210)
 	
 	Returns:
 		none
@@ -51,6 +52,11 @@ def print_cobs(cobs):
 	print 'The following images and COBs (continous observing blocks) will be reduced.\n'
 
 	print "\033[1m"+'CCD 1:'+"\033[0;0m"+'\n' # weird strings are the beginning and end of the bold text (will not work outside linux/unix)
+	print "    Biases:   ",
+	for b in sorted([i.split('/')[-1] for i in glob.glob('reductions/%s/ccd1/biases/*.fits' % date)]):
+		print b,
+	print ''
+	print ''
 	for i in cobs[0]:
 		for n,j in enumerate(i[1]):
 			if n==0:
@@ -61,6 +67,11 @@ def print_cobs(cobs):
 		print ''
 
 	print '\n'+"\033[1m"+'CCD 2:'+"\033[0;0m"+'\n'
+	print "    Biases:   ",
+	for b in sorted([i.split('/')[-1] for i in glob.glob('reductions/%s/ccd2/biases/*.fits' % date)]):
+		print b,
+	print ''
+	print ''
 	for i in cobs[1]:
 		for n,j in enumerate(i[1]):
 			if n==0:
@@ -71,6 +82,11 @@ def print_cobs(cobs):
 		print ''
 
 	print '\n'+"\033[1m"+'CCD 3:'+"\033[0;0m"+'\n'
+	print "    Biases:   ",
+	for b in sorted([i.split('/')[-1] for i in glob.glob('reductions/%s/ccd3/biases/*.fits' % date)]):
+		print b,
+	print ''
+	print ''
 	for i in cobs[2]:
 		for n,j in enumerate(i[1]):
 			if n==0:
@@ -81,6 +97,11 @@ def print_cobs(cobs):
 		print ''
 
 	print '\n'+"\033[1m"+'CCD 4:'+"\033[0;0m"+'\n'
+	print "    Biases:   ",
+	for b in sorted([i.split('/')[-1] for i in glob.glob('reductions/%s/ccd4/biases/*.fits' % date)]):
+		print b,
+	print ''
+	print ''
 	for i in cobs[3]:
 		for n,j in enumerate(i[1]):
 			if n==0:
@@ -381,9 +402,6 @@ def prepare_dir(dir, str_range='*'):
 		if not os.path.exists('reductions/%s/ccd4/%s' % (date,i)):
 			os.makedirs('reductions/%s/ccd4/%s' % (date,i))
 
-	# print the resulting structure
-	print_cobs(cobs_all)
-
 	# copy fits files into correct folders
 	logging.info('Copying files into correct folders for the reduction.')
 
@@ -414,6 +432,9 @@ def prepare_dir(dir, str_range='*'):
 		with fits.open(file, mode='update') as hdu_c:
 			hdu_c[0].header['COMM_OBS']=(comments_dict[run_num], 'Comments by the observer')
 			hdu_c.flush()
+
+	# print the resulting structure
+	print_cobs(cobs_all, date)
 
 	# a list of files in the new destination must be returned
 	cobs_out=cobs_all
