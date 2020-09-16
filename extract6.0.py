@@ -20,7 +20,7 @@ import csv
 from scipy import optimize, signal, ndimage
 from scipy.interpolate import griddata
 from astropy.convolution import Gaussian1DKernel, convolve, CustomKernel
-from lmfit import Minimizer, Parameters, report_fit
+from lmfit import Minimizer, Parameters, report_fit, minimize
 from multiprocessing import Pool
 from datetime import datetime
 import cosmics
@@ -214,6 +214,8 @@ def prepare_dir(dir, str_range='*'):
 		"""
 		Gets string with ranges (e.g.  "1,2,5-7,10") and converts it into a list (e.g. [1,2,5,6,7,10]).
 		"""
+		str_range=str_range.replace(',', ', ')
+		str_range=str_range.replace('  ', ' ')
 		temp = [(lambda sub: range(sub[0], sub[-1] + 1))(map(int, ele.split('-'))) for ele in str_range.split(', ')]
 		return [b for a in temp for b in a]
 
@@ -312,8 +314,7 @@ def prepare_dir(dir, str_range='*'):
 			current_plate=list_of_fits[0][4]
 
 			hdul = fits.open(list_of_fits[0][0])
-			current_t_coord = SkyCoord(ra=hdul[0].header['MEANRA'] * u.deg,
-									   dec=hdul[0].header['MEANDEC'] * u.deg)
+			current_t_coord = SkyCoord(ra=hdul[0].header['MEANRA'] * u.deg, dec=hdul[0].header['MEANDEC'] * u.deg)
 			hdul.close()
 
 			# t_ra =
@@ -328,8 +329,7 @@ def prepare_dir(dir, str_range='*'):
 			for f in list_of_fits:
 
 				hdul = fits.open(f[0])
-				new_t_coord = SkyCoord(ra=hdul[0].header['MEANRA'] * u.deg,
-									   dec=hdul[0].header['MEANDEC'] * u.deg)
+				new_t_coord = SkyCoord(ra=hdul[0].header['MEANRA'] * u.deg, dec=hdul[0].header['MEANDEC'] * u.deg)
 				hdul.close()
 
 				if f[3]!=current_field or f[4]!=current_plate or current_t_coord.separation(new_t_coord) > 1 * u.deg:
@@ -1040,7 +1040,7 @@ def remove_scattered(date, ncpu=1):
 			try:
 				iraf.imcopy(input='masterarc.fits[1:4096,*]', output='crop.tmp', verbose='no',Stdout="/dev/null")
 				for t in range(20):#wait for max 10 sec for the file to be created
-					if os.path.exists('crop.tmp')==False: time.sleep(0.5)
+					if os.path.isfile('crop.tmp')==False: time.sleep(0.5)
 					else: break
 				shutil.move('crop.tmp.fits', 'masterarc.fits')
 				iraf.flprcache()
@@ -1110,7 +1110,7 @@ def extract_spectra(date):
 			try:
 				iraf.imcopy(input='masterarc.fits[1:4096,*]', output='crop.tmp', verbose='no',Stdout="/dev/null")
 				for t in range(20):#wait for max 10 sec for the file to be created
-					if os.path.exists('crop.tmp')==False: time.sleep(0.5)
+					if os.path.isfile('crop.tmp')==False: time.sleep(0.5)
 					else: break
 				shutil.move('crop.tmp.fits', 'masterarc.fits')
 				iraf.flprcache()
@@ -1441,13 +1441,13 @@ def resolution_profile(date):
 			#xx,yy=np.meshgrid(x,y)	
 
 			#ax2=fig.add_subplot(142)
-			#ax2.pcolor(xx, yy, p(xx,yy))
+			#ax2.pcolormesh(xx, yy, p(xx,yy))
 
 			#ax3=fig.add_subplot(143)
-			#ax3.pcolor(xx,yy,f)
+			#ax3.pcolormesh(xx,yy,f)
 
 			#ax4=fig.add_subplot(144)
-			#ax4.pcolor(xx,yy,p(xx,yy)+f, vmin=4.0,vmax=6.5)
+			#ax4.pcolormesh(xx,yy,p(xx,yy)+f, vmin=4.0,vmax=6.5)
 
 			#ax4.set_title('Combined model')
 			#ax3.set_title('Fibre model')
@@ -2519,7 +2519,9 @@ def create_final_spectra_proc(args):
 					#add object name (first column in fibre table)
 					hdul[extension].header['OBJ_NAME']=(object_name, 'Object name from the .fld file')
 					#add average snr and average resolution
-					hdul[extension].header['SNR']=(1.0/np.nanmedian(hdul[2].data), 'Average SNR of the final spectrum')
+					snr=1.0/np.nanmedian(hdul[2].data)
+					if np.isnan(snr) or np.isinf(snr): snr=0.0
+					hdul[extension].header['SNR']=(snr, 'Average SNR of the final spectrum')
 					hdul[extension].header['RES']=(np.nanmean(hdul[7].data), 'Average resolution (FWHM in angstroms)')
 					#add ra and dec of object
 					hdul[extension].header['RA_OBJ']=(ra, 'RA of object in degrees')
@@ -2574,7 +2576,7 @@ def create_final_spectra_proc(args):
 					#write down the LSF 
 					hdul[extension].header['LSF']=('exp(-0.693147|2x/fwhm|^B)', 'Line spread function')
 					hdul[extension].header['LSF_FULL']=('exp(-0.693147|2x/fwhm|^%s)' % round(b_values[ap-1],3), 'Line spread function')
-					hdul[extension].header['B']=(round(b_values[ap-1],3), 'Boxiness parameter for LSF')#2.5 is a placeholder
+					hdul[extension].header['B']=(round(b_values[ap-1],3), 'Boxiness parameter for LSF')
 					hdul[extension].header['COMMENT']=('Explanation of the LSF function: function is centred at 0. fwhm is full width at half maximum in angstroms and is given in extension 7, it is wavelength dependent and varies from fibre to fibre as well. It is advised to use the whole resolution profile from extension 7 rather than average resolution in RES keyword. B is a boxiness parameter. It is given in keyword B in the header. LSF_FULL includes B in the function.')
 					if extension>0:
 						if 'HASTART' in hdul[extension].header: del hdul[extension].header['HASTART']
@@ -2741,7 +2743,9 @@ def create_final_spectra_proc(args):
 				#fix origin
 				hdul[extension].header['ORIGIN']='IRAF reduction pipeline'
 				#edit combined SNR and resolution
-				hdul[extension].header['SNR']=(1.0/np.nanmedian(hdul[2].data), 'Average SNR of the final spectrum')
+				snr=1.0/np.nanmedian(hdul[2].data)
+				if np.isnan(snr) or np.isinf(snr): snr=0.0
+				hdul[extension].header['SNR']=(snr, 'Average SNR of the final spectrum')
 				hdul[extension].header['RES']=(np.nanmean(hdul[7].data), 'Average resolution (FWHM in Angstroms)')
 
 			hdul.close()
@@ -2784,6 +2788,9 @@ def create_final_spectra(date, ncpu=1):
 		os.makedirs('reductions/results/%s/spectra/all' % date)
 	if not os.path.exists('reductions/results/%s/spectra/com' % date):
 		os.makedirs('reductions/results/%s/spectra/com' % date)
+
+	iraf.noao(_doprint=0,Stdout="/dev/null")
+	iraf.onedspec(_doprint=0,Stdout="/dev/null")
 	
 	args=[]
 
@@ -3355,8 +3362,8 @@ if __name__ == "__main__":
 	logging.basicConfig(level=logging.DEBUG)
 
 	if len(sys.argv) == 2:
-		# date='170711'
-		date, cobs = prepare_dir(sys.argv[1])
+		date='190210'
+		#date, cobs = prepare_dir(sys.argv[1])
 		#remove_bias(date)
 		#fix_gain(date)
 		#fix_bad_pixels(date)
@@ -3368,7 +3375,7 @@ if __name__ == "__main__":
 		#measure_cross_on_flat(date)
 		#extract_spectra(date)
 		#wav_calibration(date)
-		#os.system('cp -r reductions-test reductions')
+		os.system('cp -r reductions-test reductions')
 		#remove_sky(date, method='nearest3', thr_method='flat', ncpu=8)
 		#plot_spectra(190210, 1902100045, 3)
 		#remove_telurics(date)
@@ -3376,9 +3383,9 @@ if __name__ == "__main__":
 		#os.system('cp -r reductions_bary reductions')
 		#resolution_profile(date)
 		#os.system('cp -r reductions-test reductions')
-		#create_final_spectra(date)
-		#analyze(date)
-		#create_database(date)
+		create_final_spectra(date, ncpu=8)
+		analyze(date)
+		create_database(date)
 		
 	else:
 		logging.critical('Wrong number of command line arguments.')
