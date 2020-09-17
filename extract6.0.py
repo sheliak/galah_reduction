@@ -33,9 +33,6 @@ ndfclass_types={'MFFFF':'fibre flat', 'MFARC':'arc', 'MFOBJECT':'object', 'BIAS'
 # possible fibre one-letter values in human readable form
 fibre_types={'S':'sky fibre', 'P':'positioned fibre', 'U':'parked fibre', 'N':'fibre not in use', 'F':'guiding fibre'}
 
-start_folder=''
-
-
 def print_cobs(cobs, date):
 	"""
 	Print COBs for a given night
@@ -719,7 +716,7 @@ def shift_ref(date, plate, ccd, cob, flat):
 	o.close()
 	
 
-def find_apertures(date):
+def find_apertures(date, start_folder):
 	"""
 	Finds apertures on all flats for all COBs inside the date folder. A list of apertures thad can't be traced is saved as a file.
 
@@ -917,7 +914,7 @@ def remove_scattered_proc(arg):
 	Wrapper for remove_scattered to enable multiprocessing
 	"""
 
-	cob,file=arg
+	cob,file, start_folder=arg
 	os.chdir(cob)
 	iraf.apextract.database=start_folder+'/'+cob
 
@@ -991,7 +988,7 @@ def remove_scattered_proc(arg):
 	iraf.flprcache()
 
 
-def remove_scattered(date, ncpu=1):
+def remove_scattered(date, start_folder, ncpu=1):
 	"""
 	Remove sacttered light. Scattered light is measured between slitlets, at least 4 pixels from the edge of any aperture. Elswhere it is interpolated and smoothed.
 
@@ -1060,7 +1057,7 @@ def remove_scattered(date, ncpu=1):
 		os.chdir(cob)
 		files=glob.glob("[01-31]*.fits")
 		for file in files:
-			args.append([cob,file])
+			args.append([cob,file,start_folder])
 		os.chdir('../../../..')
 
 	pool = Pool(processes=ncpu)
@@ -1085,7 +1082,7 @@ def measure_cross_on_flat(date):
 	"""
 	pass
 
-def extract_spectra(date):
+def extract_spectra(date, start_folder):
 	"""
 	Takes *.fits images and creates *.ms.fits images with 392 spectra in them.
 
@@ -1146,7 +1143,7 @@ def extract_spectra(date):
 			# clear cache, or IRAF will have problems with files with the same name
 			iraf.flprcache()
 
-def wav_calibration(date):
+def wav_calibration(date, start_folder):
 	"""
 	Calculate wavelength calibration and apply it to spectra.
 
@@ -2359,7 +2356,40 @@ def create_final_spectra_proc(args):
 		if os.path.exists('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1]): iraf.disptrans(input='/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1], output='', linearize='yes', units='angstroms', Stdout="/dev/null")
 		if os.path.exists('/'.join(file.split('/')[:-1])+'/cross_'+file.split('/')[-1]): iraf.disptrans(input='/'.join(file.split('/')[:-1])+'/cross_'+file.split('/')[-1], output='', linearize='yes', units='angstroms', Stdout="/dev/null")
 		if os.path.exists('/'.join(file.split('/')[:-1])+'/res_'+file.split('/')[-1]): iraf.disptrans(input='/'.join(file.split('/')[:-1])+'/res_'+file.split('/')[-1], output='', linearize='yes', units='angstroms', Stdout="/dev/null")
-		
+
+		#save scattered light image into a png file for diagnostics
+		if os.path.exists('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1]):
+			hdul=fits.open('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1][:-8]+'.fits')
+			scat_image=hdul[0].data
+			hdul.close()
+			fig=figure('scat_'+file, figsize=(7,6))
+			subplots_adjust(left=0.07, right=0.96, top=0.95, bottom=0.07, wspace=0.1, hspace=0.1)
+			ax=fig.add_subplot(111)
+			ax_image=ax.imshow(scat_image, cmap='gray', origin='lower')
+			cbar=fig.colorbar(ax_image, fraction=0.085)
+			cbar.ax.set_ylabel('Flux')
+			ax.set_xlabel('x')
+			ax.set_ylabel('y')
+			ax.set_title('Scattered light for image %s' % str(date)+file.split('/')[-1][6:10]+'00xxx'+str(ccd)+'.fits')
+			fig.savefig('reductions/results/%s/diagnostics/scat_%s' % (date, str(date)+file.split('/')[-1][6:10]+'00xxx'+str(ccd)+'.png'), dpi=300, format='png')
+			fig.clf()
+
+		#save resolution profile image into a png file for diagnostics
+		if os.path.exists('/'.join(file.split('/')[:-1])+'/res_'+file.split('/')[-1]):
+			hdul=fits.open('/'.join(file.split('/')[:-1])+'/res_'+file.split('/')[-1])
+			res_image=hdul[0].data
+			hdul.close()
+			fig=figure('res_'+file, figsize=(7,6))
+			subplots_adjust(left=0.07, right=0.99, top=0.95, bottom=0.07, wspace=0.1, hspace=0.1)
+			ax=fig.add_subplot(111)
+			ax_image=ax.imshow(res_image, cmap='viridis', origin='lower', interpolation='nearest', aspect='auto')
+			cbar=fig.colorbar(ax_image)
+			cbar.ax.set_ylabel('FWHM / $\\mathrm{\\AA}$')
+			ax.set_xlabel('x')
+			ax.set_ylabel('Aperture')
+			ax.set_title('FWHM of the LSF for spectra %s' % str(date)+file.split('/')[-1][6:10]+'00xxx'+str(ccd))
+			fig.savefig('reductions/results/%s/diagnostics/res_%s' % (date, str(date)+file.split('/')[-1][6:10]+'00xxx'+str(ccd)+'.png'), dpi=300, format='png')
+			fig.clf()
 
 		for ap in range(1,393):
 			if fibre_table_dict[ap][8]=='P':
@@ -2784,6 +2814,9 @@ def create_final_spectra(date, ncpu=1):
 	if not os.path.exists('reductions/results/%s/db' % date):
 		os.makedirs('reductions/results/%s/db' % date)
 
+	if not os.path.exists('reductions/results/%s/diagnostics' % date):
+		os.makedirs('reductions/results/%s/diagnostics' % date)
+
 	if not os.path.exists('reductions/results/%s/spectra/all' % date):
 		os.makedirs('reductions/results/%s/spectra/all' % date)
 	if not os.path.exists('reductions/results/%s/spectra/com' % date):
@@ -2791,6 +2824,7 @@ def create_final_spectra(date, ncpu=1):
 
 	iraf.noao(_doprint=0,Stdout="/dev/null")
 	iraf.onedspec(_doprint=0,Stdout="/dev/null")
+	iraf.flprcache()
 	
 	args=[]
 
@@ -2800,9 +2834,13 @@ def create_final_spectra(date, ncpu=1):
 			files=glob.glob("%s/[01-31]*.ms.fits" % cob)
 			args.append([ccd,cob,files])
 
-	pool = Pool(processes=ncpu)
-	pool.map(create_final_spectra_proc, args)
-	pool.close()
+	if ncpu==1:
+		for arg in args:
+			create_final_spectra_proc(arg)
+	else:
+		pool = Pool(processes=ncpu)
+		pool.map(create_final_spectra_proc, args)
+		pool.close()
 
 
 def create_database(date):
@@ -3059,6 +3097,7 @@ def create_database(date):
 		csv_db.write(','.join(str_to_write))
 		csv_db.write('\n')
 	csv_db.close()
+	hdul.close()
 					
 
 def analyze_rv(args):
@@ -3279,7 +3318,7 @@ def analyze_rv(args):
 	show()
 	"""
 	
-def analyze(date):
+def analyze(date, ncpu=1):
 	"""
 	Calculate radial velocity and atmospheric parameters. Should be done after the data is combined and before the database is generated. Caculated parameters can be written into headers.
 
@@ -3330,7 +3369,7 @@ def analyze(date):
 	for sobject in sobjects:
 		args.append([sobject, templates])
 
-	pool = Pool(processes=12)
+	pool = Pool(processes=ncpu)
 	pool.map(analyze_rv, args)
 	pool.close()
 
@@ -3352,7 +3391,6 @@ if __name__ == "__main__":
 	- Memory error: You don't have enough memory to run the code with current settings. Change ncpu parameters to a lower value and try again. 
 	"""
 
-	global start_folder
 	start_folder = os.getcwd()
 
 	# Set iraf variables that are otherwise defined in local login.cl. Will probably overwrite those settings
@@ -3362,29 +3400,29 @@ if __name__ == "__main__":
 	logging.basicConfig(level=logging.DEBUG)
 
 	if len(sys.argv) == 2:
-		date='190210'
-		#date, cobs = prepare_dir(sys.argv[1])
+		date='170711'
+		#date, cobs = prepare_dir(sys.argv[1], str_range='1-19')
 		#remove_bias(date)
 		#fix_gain(date)
 		#fix_bad_pixels(date)
 		#prepare_flat_arc(date, cobs)
 		#remove_cosmics(date, ncpu=8)
-		#find_apertures(date)
+		#find_apertures(date, start_folder)
 		#plot_apertures(190210, 1902100045, 3)
-		#remove_scattered(date, ncpu=6)
+		#remove_scattered(date, start_folder, ncpu=6)
 		#measure_cross_on_flat(date)
-		#extract_spectra(date)
-		#wav_calibration(date)
-		os.system('cp -r reductions-test reductions')
+		#extract_spectra(date, start_folder)
+		#wav_calibration(date, start_folder)
+		#os.system('cp -r reductions-test reductions')
 		#remove_sky(date, method='nearest3', thr_method='flat', ncpu=8)
 		#plot_spectra(190210, 1902100045, 3)
 		#remove_telurics(date)
 		#v_bary_correction(date, quick=False, ncpu=8)
 		#os.system('cp -r reductions_bary reductions')
 		#resolution_profile(date)
-		#os.system('cp -r reductions-test reductions')
+		os.system('cp -r reductions-test reductions')
 		create_final_spectra(date, ncpu=8)
-		analyze(date)
+		analyze(date, ncpu=10)
 		create_database(date)
 		
 	else:
