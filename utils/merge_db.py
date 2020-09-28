@@ -1,5 +1,8 @@
 """
 This script merges a database for one night with a global database. If global database does not exist yet, it is created.
+
+TO DO:
+	Add command line arguments
 """
 import os
 import shutil
@@ -30,24 +33,65 @@ if os.path.isfile('reductions/dr6.0.fits'):
 	hdu=hdul[1]
 	table_global=Table(hdu.data)
 
+	#create a list of sobject_ids already in the database:
+	sobjects=np.array(table_global['sobject_id'])
+
 	# load the nightly db
 	hdul_night=fits.open('reductions/results/%s/db/%s.fits' % (date,date))
 	hdu_night=hdul_night[1]
 	table_night=Table(hdu_night.data)
 	hdul_night.close()
 
+	# only use sobject_ids not already in the database
+	mask=[i in sobjects for i in np.array(table_night['sobject_id'])]
+	mask=np.array(mask, dtype=bool)
+	table_night=table_night[~mask]
+
 	#merge tables
-	print table_global
-	print table_night
 	table_stacked=vstack([table_global, table_night])
 	hdul[1]=fits.BinTableHDU(table_stacked)
 	hdul.flush()
-	#table_stacked.write('reductions/dr6.0.fits')
 	hdul.close()
 
 	# convert table to ascii. add _1, _2, _3, _4 to fields in arrays (always representing four arms)
+	csv_db=open('reductions/dr6.0.csv', 'a')
+	hdul=fits.open('reductions/results/%s/db/%s.fits' % (date,date))
+	hdu=hdul[1]
+	data=np.array(hdu.data)
+	#add data
+	for i in data:
+		if i[0] not in sobjects:
+			str_to_write=[]
+			for j in i:
+				if j.shape==(4,):
+					for k in j:
+						str_to_write.append(str(k))
+				else:
+					str_to_write.append(str(j))
+			csv_db.write(','.join(str_to_write))
+			csv_db.write('\n')
+	csv_db.close()
+	hdul.close()
+
+	#save results
+	os.remove('reductions/.dblock')
+
+else:
+	# if global database does not exist, copy the nightly database and hence make it global. After this we are done.
+	t_sleep=0
+	while os.path.isfile('reductions/.dblock'):
+		if t_sleep>=60: 
+			sys.exit(0)
+		logging.warning('Database reductions/dr6.0.fits is being used by another process. Will wait 1 minute for accsess and then terminate.')
+		time.sleep(1)
+		t_sleep+=1
+	open('reductions/.dblock', 'a').close()
+	lock_created=True
+	shutil.copyfile('reductions/results/%s/db/%s.fits' % (date,date), 'reductions/dr6.0.fits')
+
+	# convert table to ascii. add _1, _2, _3, _4 to fields in arrays (always representing four arms)
 	csv_db=open('reductions/dr6.0.csv', 'w')
-	hdul=fits.open('reductions/dr6.0.fits')
+	hdul=fits.open('reductions/results/%s/db/%s.fits' % (date,date))
 	hdu=hdul[1]
 	t=Table(hdu.data)
 	data=np.array(hdu.data)
@@ -75,21 +119,4 @@ if os.path.isfile('reductions/dr6.0.fits'):
 		csv_db.write('\n')
 	csv_db.close()
 	hdul.close()
-
-	#save results
 	os.remove('reductions/.dblock')
-
-else:
-	# if global database does not exist, copy the nightly database and hence make it global. After this we are done.
-	t_sleep=0
-	while os.path.isfile('reductions/.dblock'):
-		if t_sleep>=60: 
-			sys.exit(0)
-		logging.warning('Database reductions/dr6.0.fits is being used by another program. Will wait 1 minute for accsess and then terminate.')
-		time.sleep(1)
-		t_sleep+=1
-	open('reductions/.dblock', 'a').close()
-	lock_created=True
-	shutil.copyfile('reductions/results/%s/db/%s.fits' % (date,date), 'reductions/dr6.0.fits')
-	os.remove('reductions/.dblock')
-

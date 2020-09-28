@@ -26,6 +26,8 @@ from datetime import datetime
 import cosmics
 import time
 import ephem
+from scipy.optimize import curve_fit
+import argparse
 
 # possible NDFCLASS values in human readable form
 ndfclass_types={'MFFFF':'fibre flat', 'MFARC':'arc', 'MFOBJECT':'object', 'BIAS':'bias'}
@@ -190,21 +192,17 @@ def correct_ndfclass(hdul):
 	return new_class
 
 
-def prepare_dir(dir, str_range='*'):
+def prepare_dir(dir, str_range='*', list_cobs=True):
 	"""
 	Open spectra from one night and print exposure types and fields. Create a folder structure in which the reduction will take place
 
 	Parameters:
 		date (str): date string (e.g. 190210)
 		str_range (str): string with range of runs to be used (e.g.  "1,2,5-7,10")
+		list_cobs (bool): Print list of COBs
 	
 	Returns:
 		none
-
-	To do:
-		Compose COBs more reliably.
-		Test option to only use some range of run_ids (1,2,3,4 or 15- or 12-16)
-
 	"""
 
 	def range_to_list(str_range):
@@ -422,7 +420,7 @@ def prepare_dir(dir, str_range='*'):
 			shutil.copyfile(j[0], 'reductions/%s/ccd4/%s/%s' % (date, i[0], j[0].split('/')[-1]))
 
 	# add comment from comments file into headers
-	files=glob.glob("reductions/%s/*/*/*.fits" % (date))
+	files=glob.glob("reductions/%s/*/*/[01-31]*.fits" % (date))
 	comments_dict=defaultdict(lambda:'', comments_dict)
 	for file in files:
 		run_num=int(file.split('/')[-1][6:10])
@@ -431,7 +429,7 @@ def prepare_dir(dir, str_range='*'):
 			hdu_c.flush()
 
 	# print the resulting structure
-	print_cobs(cobs_all, date)
+	if list_cobs: print_cobs(cobs_all, date)
 
 	# a list of files in the new destination must be returned
 	cobs_out=cobs_all
@@ -601,9 +599,13 @@ def remove_cosmics(date, ncpu=1):
 		for file in files:
 			args.append([file,ccd])
 
-	pool = Pool(processes=ncpu)
-	pool.map(remove_cosmics_proc, args)
-	pool.close()
+	if ncpu>1:
+		pool = Pool(processes=ncpu)
+		pool.map(remove_cosmics_proc, args)
+		pool.close()
+	else:
+		for arg in args:
+			remove_cosmics_proc(arg)
 
 
 def prepare_flat_arc(date, cobs):
@@ -794,9 +796,6 @@ def plot_apertures(date,cob_id,ccd):
 	
 	Returns:
 		none
-
-	To do:
-		Mark different fibre types.
 
 	"""
 	matplotlib_backend=matplotlib.get_backend()
@@ -1060,9 +1059,13 @@ def remove_scattered(date, start_folder, ncpu=1):
 			args.append([cob,file,start_folder])
 		os.chdir('../../../..')
 
-	pool = Pool(processes=ncpu)
-	pool.map(remove_scattered_proc, args)
-	pool.close()
+	if ncpu>1:
+		pool = Pool(processes=ncpu)
+		pool.map(remove_scattered_proc, args)
+		pool.close()
+	else:
+		for arg in args:
+			remove_scattered_proc(arg)
 
 	iraf.flprcache()
 
@@ -1157,6 +1160,129 @@ def wav_calibration(date, start_folder):
 	       use the same method as in dr5.3. In dr5.3 we use a custom fit, not iraf's
 	"""
 
+	def func_wav(x,a,b,c,d):
+		"""
+		Function that describes the wavelength solution. a,b,c,d are coefficients of the Chebyshev polynomial
+		"""
+		return np.polynomial.chebyshev.chebval(x,[a,b,c,d])
+
+	def fit_wav(p,ye,mask):
+		"""
+		Fit as chebyshev polynomial with sigma clipping
+		"""
+		fit_init={1:[4813.3, 94.3,-5.67,0.003], 2:[5767.5, 112.05, -6.74, 0.015], 3:[6615.4, 129.3, -7.75, 0.015], 4:[7745,150.7,-8.95,0.017]}
+		fit_range={1:[0.35, 0.06, 0.03, 0.005], 2:[0.4, 0.06, 0.03, 0.005], 3:[0.45, 0.06, 0.03, 0.005], 4:[0.52, 0.1, 0.03, 0.005]}
+
+		x=p[0]
+		y=p[1]
+		lower_bound=np.array(fit_init[1])-6.*np.array(fit_range[1])
+		upper_bound=np.array(fit_init[1])+6.*np.array(fit_range[1])
+		popt,pcov = curve_fit(func_wav,x[mask],y[mask], p0=fit_init[1], bounds=(lower_bound, upper_bound))
+		return func_wav(x,popt[0],popt[1],popt[2],popt[3])
+
+	def sclip(p,fit,n,ye=[],sl=99999,su=99999,min=0,max=0,min_data=1,grow=0,global_mask=None,verbose=True):
+		"""
+		p: array of coordinate vectors. Last line in the array must be values that are fitted. The rest are coordinates.
+		fit: name of the fitting function. It must have arguments x,y,ye,and mask and return an array of values of the fitted function at coordinates x
+		n: number of iterations
+		ye: array of errors for each point
+		sl: lower limit in sigma units
+		su: upper limit in sigma units
+		min: number or fraction of rejected points below the fitted curve
+		max: number or fraction of rejected points above the fitted curve
+		min_data: minimal number of points that can still be used to make a constrained fit
+		global_mask: if initial mask is given it will be used throughout the whole fitting process, but the final fit will be evaluated also in the masked points
+		grow: number of points to reject around the rejected point.
+		verbose: print the results or not
+		"""
+
+		nv,dim=np.shape(p)
+
+		#if error vector is not given, assume errors are equal to 0:
+		if ye==[]: ye=np.zeros(dim)
+		#if a single number is given for y errors, assume it means the same error is for all points:
+		if isinstance(ye, (int, long, float)): ye=np.ones(dim)*ye
+		
+		if global_mask==None: global_mask=np.ones(dim, dtype=bool)
+		else: pass
+		
+		f_initial=fit(p,ye,global_mask)
+		s_initial=np.std(p[-1]-f_initial)
+
+		f=f_initial
+		s=s_initial
+
+		tmp_results=[]
+
+		b_old=np.ones(dim, dtype=bool)
+
+		for step in range(n):
+			#check that only sigmas or only min/max are given:
+			if (sl!=99999 or su!=99999) and (min!=0 or max!=0):
+				raise RuntimeError('Sigmas and min/max are given. Only one can be used.')
+
+			#if sigmas are given:
+			if sl!=99999 or su!=99999:
+				b=np.zeros(dim, dtype=bool)
+				if sl>=99999 and su!=sl: sl=su#check if only one is given. In this case set the other to the same value
+				if su>=99999 and sl!=su: su=sl
+
+				good_values=np.where(((f-p[-1])<(sl*(s+ye))) & ((f-p[-1])>-(su*(s+ye))))#find points that pass the sigma test
+				b[good_values]=True
+
+			#if min/max are given
+			if min!=0 or max!=0:
+				b=np.ones(dim, dtype=bool)
+				if min<1: min=dim*min#detect if min is in number of points or percentage
+				if max<1: max=dim*max#detect if max is in number of points or percentage
+
+				bad_values=np.concatenate(((p[-1]-f).argsort()[-int(max):], (p[-1]-f).argsort()[:int(min)]))
+				b[bad_values]=False
+
+			#check the grow parameter:
+			if grow>=1 and nv==2:
+				b_grown=np.ones(dim, dtype=bool)
+				for ind,val in enumerate(b):
+					if val==False:
+						ind_l=ind-int(grow)
+						ind_u=ind+int(grow)+1
+						if ind_l<0: ind_l=0
+						b_grown[ind_l:ind_u]=False
+
+				b=b_grown
+
+			tmp_results.append(f)
+
+			#check that the minimal number of good points is not too low:
+			if len(b[b])<min_data:
+				step=step-1
+				b=b_old
+				break
+
+			#check if the new b is the same as old one and break if yes:
+			if np.array_equal(b,b_old):
+				step=step-1
+				break
+
+			#fit again
+			f=fit(p,ye,b&global_mask)
+			s=np.std(p[-1][b]-f[b])
+			b_old=b
+
+		if verbose:
+			print ''
+			print 'FITTING RESULTS:'
+			print 'Number of iterations requested:    ',n
+			print 'Number of iterations performed:    ', step+1
+			print 'Initial standard deviation:        ', s_initial
+			print 'Final standard deviation:          ', s
+			print 'Number of rejected points:         ',len(np.invert(b[np.invert(b)]))
+			print ''
+		
+		return f,tmp_results,b
+
+	fit_init={1:[4813.3, 94.3,-5.67,0.003], 2:[5767.5, 112.05, -6.74, 0.015], 3:[6615.4, 129.3, -7.75, 0.015], 4:[7745,150.7,-8.95,0.017]}
+
 	# linelists of the arc lamp for each CCD
 	cal_linelist={1: 'aux/linelist_art_blue_ar.dat', 2: 'aux/linelist_art_green_ar.dat', 3: 'aux/linelist_art_red.dat', 4: 'aux/linelist_art_ir.dat'}
 
@@ -1217,28 +1343,177 @@ def wav_calibration(date, start_folder):
 			hdul.close()
 			iraf.dispcor(input='masterarc.ms.fits', lineari='no', databas=start_folder+'/'+cob, output="", samedis='no', ignorea='yes',Stdout="/dev/null")
 
+			# make diagnostics plots
+			#read default fit coefficients
+			f=open("id%s" % (cal_arc[plate][ccd][4:-5]), "r")
+			ap=0
+			start=False
+			coefficients_default=[]
+			for line in f:
+				if len(line.strip())>0 and line.strip().split()[0]=='aperture': 
+					ap=int(line.strip().split()[1])
+				
+				if len(line.strip())>0 and line.strip().split()[0]=='coefficients': 
+					start=True
+					coefficients_tmp=[]
+
+				if len(line.strip().split())==1 and start: 
+					c=float(line.strip())
+					coefficients_tmp.append(c)
+
+				if len(line.strip())==0 and start:
+					start=False
+					coefficients_default.append(coefficients_tmp[-4:])
+			f.close()
+			coefficients_default=np.array(coefficients_default)
+
+			#read fitted coefficients
+			#read the id file
+			ff=open("idmasterarc.ms", "r")
+			ap=0
+			start=False
+			start_c=False
+			coefficients=[]
+			wav_solution_rms=[]
+			for line in ff:
+				if len(line.strip())>0 and line.strip().split()[0]=='aperture': 
+					ap=int(line.strip().split()[1])
+				
+				if len(line.strip())>0 and line.strip().split()[0]=='features': 
+					start=True
+					pixel=[]
+					wav=[]
+
+				if len(line.strip())>0 and start and len(line.strip().split())==6: 
+					features=line.strip().split()
+					pixel.append(float(features[0]))
+					wav.append(float(features[2]))
+
+				if len(line.strip())>0 and line.strip().split()[0]=='function': 
+					start=False
+					
+					max_=4100
+					min_=0
+
+					pixel=np.array(pixel)
+					wav=np.array(wav)
+
+					pixel=(2*pixel-(max_+min_))/(max_-min_)
+
+					#fit
+					f,steps,mask=sclip((pixel,wav),fit_wav,5,[],sl=2.5,su=2.5,min_data=25,grow=0,verbose=False)
+					#f2,steps2,mask2=sclip((pixel,wav),fit_wav,5,[],sl=3.5,su=3.5,min_data=25,grow=0,verbose=False)
+					#f3,steps3,mask3=sclip((pixel,wav),fit_wav_3,5,[],sl=2.5,su=2.5,min_data=12,grow=0,verbose=False)
+
+					#mask[0:5]=mask2[0:5]
+					#mask[-5:-1]=mask2[-5:-1]
+
+					popt,pcov=curve_fit(func_wav,pixel[mask],wav[mask],p0=fit_init[ccd])
+					#print ap,popt, np.std(wav[mask]-func_wav(pixel[mask],popt[0],popt[1],popt[2],popt[3]))
+					#s=np.std(wav[mask3]-func_wav(pixel[mask3],popt[0],popt[1],popt[2],popt[3]))
+					#wav_solution_rms.append(s)
+					#iraf.hedit(images=str(i[0][:-4])+"ms.fits", fields="W_RMS%s" % (ap), value=s, add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
+
+					coefficients.append(popt)
+
+
+			# save diagnostics plots
+			coefficients=np.array(coefficients)
+
+			fig=plt.figure(0, figsize=(16,7.5))
+			subplots_adjust(left=0.06, right=0.99, top=0.95, bottom=0.07, wspace=0.0, hspace=0.0)
+			ax=fig.add_subplot(411)
+			ax.set_title('COB = '+cob.split('/')[-1]+', CCD = '+str(ccd))
+			y_points=np.concatenate((coefficients_default[:392][:,0],coefficients[:,0]))
+			y_points=y_points[(y_points<np.percentile(y_points,90))&(y_points>np.percentile(y_points,10))]
+			y_lower=np.average(y_points)-3.2*np.std(y_points)
+			y_upper=np.average(y_points)+3.2*np.std(y_points)
+			ax.set_ylim(y_lower, y_upper)
+			ax.set_ylabel('$C_1$')
+			for n,i in enumerate(coefficients_default[:392][:,0]):
+				if i<y_lower:
+					ax.scatter(n+1,y_lower,c='g', alpha=0.5,lw=0.0,s=15,marker=7)
+				elif i>y_upper:
+					ax.scatter(n+1,y_upper,c='g', alpha=0.5,lw=0.0,s=15,marker=6)
+				else:
+					ax.scatter(n+1,i,c='g', alpha=0.5,lw=0.0,s=10, marker='o')
+			for n,i in enumerate(coefficients[:,0]):
+				if i<y_lower:
+					ax.scatter(n+1,y_lower,c='r', alpha=0.5,lw=0.0,s=15,marker=7)
+				elif i>y_upper:
+					ax.scatter(n+1,y_upper,c='r', alpha=0.5,lw=0.0,s=15,marker=6)
+				else:
+					ax.scatter(n+1,i,c='r', alpha=0.5,lw=0.0,s=10, marker='o')
+			ax=fig.add_subplot(412, sharex=ax)
+			y_points=np.concatenate((coefficients_default[:392][:,1],coefficients[:,1]))
+			y_points=y_points[(y_points<np.percentile(y_points,90))&(y_points>np.percentile(y_points,10))]
+			y_lower=np.average(y_points)-4.0*np.std(y_points)
+			y_upper=np.average(y_points)+4.0*np.std(y_points)
+			ax.set_ylim(y_lower, y_upper)
+			ax.set_ylabel('$C_2$')
+			for n,i in enumerate(coefficients_default[:392][:,1]):
+				if i<y_lower:
+					ax.scatter(n+1,y_lower,c='g', alpha=0.5,lw=0.0,s=15,marker=7)
+				elif i>y_upper:
+					ax.scatter(n+1,y_upper,c='g', alpha=0.5,lw=0.0,s=15,marker=6)
+				else:
+					ax.scatter(n+1,i,c='g', alpha=0.5,lw=0.0,s=10, marker='o')
+			for n,i in enumerate(coefficients[:,1]):
+				if i<y_lower:
+					ax.scatter(n+1,y_lower,c='r', alpha=0.5,lw=0.0,s=15,marker=7)
+				elif i>y_upper:
+					ax.scatter(n+1,y_upper,c='r', alpha=0.5,lw=0.0,s=15,marker=6)
+				else:
+					ax.scatter(n+1,i,c='r', alpha=0.5,lw=0.0,s=10, marker='o')
+			ax=fig.add_subplot(413, sharex=ax)
+			y_points=np.concatenate((coefficients_default[:392][:,2],coefficients[:,2]))
+			y_points=y_points[(y_points<np.percentile(y_points,90))&(y_points>np.percentile(y_points,10))]
+			y_lower=np.average(y_points)-4.5*np.std(y_points)
+			y_upper=np.average(y_points)+4.5*np.std(y_points)
+			ax.set_ylim(y_lower, y_upper)
+			ax.set_ylabel('$C_3$')
+			for n,i in enumerate(coefficients_default[:392][:,2]):
+				if i<y_lower:
+					ax.scatter(n+1,y_lower,c='g', alpha=0.5,lw=0.0,s=15,marker=7)
+				elif i>y_upper:
+					ax.scatter(n+1,y_upper,c='g', alpha=0.5,lw=0.0,s=15,marker=6)
+				else:
+					ax.scatter(n+1,i,c='g', alpha=0.5,lw=0.0,s=10, marker='o')
+			for n,i in enumerate(coefficients[:,2]):
+				if i<y_lower:
+					ax.scatter(n+1,y_lower,c='r', alpha=0.5,lw=0.0,s=15,marker=7)
+				elif i>y_upper:
+					ax.scatter(n+1,y_upper,c='r', alpha=0.5,lw=0.0,s=15,marker=6)
+				else:
+					ax.scatter(n+1,i,c='r', alpha=0.5,lw=0.0,s=10, marker='o')
+			ax=fig.add_subplot(414, sharex=ax)
+			y_points=np.concatenate((coefficients_default[:392][:,3],coefficients[:,3]))
+			y_points=y_points[(y_points<np.percentile(y_points,90))&(y_points>np.percentile(y_points,10))]
+			y_lower=np.average(y_points)-5.0*np.std(y_points)
+			y_upper=np.average(y_points)+5.0*np.std(y_points)
+			ax.set_ylim(y_lower, y_upper)
+			ax.set_ylabel('$C_4$')
+			for n,i in enumerate(coefficients_default[:392][:,3]):
+				if i<y_lower:
+					ax.scatter(n+1,y_lower,c='g', alpha=0.5,lw=0.0,s=15,marker=7)
+				elif i>y_upper:
+					ax.scatter(n+1,y_upper,c='g', alpha=0.5,lw=0.0,s=15,marker=6)
+				else:
+					ax.scatter(n+1,i,c='g', alpha=0.5,lw=0.0,s=10, marker='o')
+			for n,i in enumerate(coefficients[:,3]):
+				if i<y_lower:
+					ax.scatter(n+1,y_lower,c='r', alpha=0.5,lw=0.0,s=15,marker=7)
+				elif i>y_upper:
+					ax.scatter(n+1,y_upper,c='r', alpha=0.5,lw=0.0,s=15,marker=6)
+				else:
+					ax.scatter(n+1,i,c='r', alpha=0.5,lw=0.0,s=10, marker='o')
+			ax.set_xlim(0,394)
+			ax.set_xlabel('Aperture')
+			fig.savefig('wav_'+cob.split('/')[-1]+'00xxx'+str(ccd)+'.png', dpi=300, format='png')
+			fig.clf()
 
 			os.chdir('../../../..')
 			iraf.flprcache()
-
-def plot_wav_coeff(date, cob_id, ccd):
-	"""
-	Illustrate wavelength calibration, similar to dr5.3
-
-	Parameters:
-		date (str): date string (e.g. 190210)
-		cob_id (str): COB ID (e.g. 1902100040)
-		ccd (int): CCD number (1=Blue, .., 4=IR)
-	
-	Returns:
-		none
-
-	To do:
-		Everything
-
-	"""
-
-	pass
 
 def resolution_profile(date):
 	"""
@@ -1251,8 +1526,7 @@ def resolution_profile(date):
 		none
 
 	To do:
-		Make it pretty
-		Do diagnostics plots
+		Do some cleaning
 		Paralelize
 	"""
 
@@ -1584,9 +1858,13 @@ def v_bary_correction(date, quick=False, ncpu=1):
 			args.append([file, fibre_table, obstime, AAT])
 	
 	if quick==False:
-		pool = Pool(processes=ncpu)
-		pool.map(v_bary_correction_proc, args)
-		pool.close()
+		if ncpu>1:
+			pool = Pool(processes=ncpu)
+			pool.map(v_bary_correction_proc, args)
+			pool.close()
+		else:
+			for arg in args:
+				v_bary_correction_proc(arg)
 
 
 def plot_spectra(date, cob_id, ccd):
@@ -1600,8 +1878,6 @@ def plot_spectra(date, cob_id, ccd):
 	
 	Returns:
 		none
-
-	To do:
 
 	"""
 	matplotlib_backend=matplotlib.get_backend()
@@ -1899,6 +2175,7 @@ def remove_sky(date, method='nearest', thr_method='flat', ncpu=1):
 	To do:
 		More options for different methods of sky removal
 		Urgent: separate magnitude based throughput for plate 0 and plate 1
+		Add option to manually scale sky
 
 	"""
 
@@ -2041,19 +2318,23 @@ def remove_sky(date, method='nearest', thr_method='flat', ncpu=1):
 
 		if method=='nearest':
 			# First method is where we use the nearest sky fibre to remove sky from object spectra. This is good, because the resolutions of the sky and object spectra are as close as possible.
-			pool = Pool(processes=ncpu)
-			pool.map(remove_sky_nearest, args)
-			pool.close()
-			#for arg in args:
-			#	remove_sky_nearest(arg)
+			if ncpu>1:
+				pool = Pool(processes=ncpu)
+				pool.map(remove_sky_nearest, args)
+				pool.close()
+			else:
+				for arg in args:
+					remove_sky_nearest(arg)
 
 		if method=='nearest3':
 			# Second method is where we use three nearest sky spectra. Resolution is still somewhat similar, but we can take a median of three sky spectra and thus remove any remaining cosmics
-			pool = Pool(processes=ncpu)
-			pool.map(remove_sky_nearest3, args)
-			pool.close()
-			#for arg in args:
-			#	remove_sky_nearest3(arg)
+			if ncpu>1:
+				pool = Pool(processes=ncpu)
+				pool.map(remove_sky_nearest3, args)
+				pool.close()
+			else:
+				for arg in args:
+					remove_sky_nearest3(arg)
 
 
 def remove_telurics(date):
@@ -2317,6 +2598,10 @@ def create_final_spectra_proc(args):
 	Multiprocessing wrapper for create_final_spectra
 	"""
 	ccd, cob, files=args
+	date=cob.split('/')[1]
+
+	# copy wavelength solution diagnostics plot
+	shutil.copyfile(cob+'/wav_'+cob.split('/')[-1]+'00xxx'+str(ccd)+'.png', 'reductions/results/'+date+'/diagnostics/'+'wav_'+cob.split('/')[-1]+'00xxx'+str(ccd)+'.png')
 
 	# save individual spectra
 	for file in files:
@@ -2349,6 +2634,7 @@ def create_final_spectra_proc(args):
 		iraf.sarith(input1=file, op='*', input2='0.0', output='/'.join(file.split('/')[:-1])+'/cross_'+file.split('/')[-1], apertures='', Stdout="/dev/null")
 
 		#linearize all spectra
+		logging.info('Linearizing spectra.')
 		iraf.disptrans(input=file, output='', linearize='yes', units='angstroms', Stdout="/dev/null")
 		iraf.disptrans(input='/'.join(file.split('/')[:-1])+'/norm_'+file.split('/')[-1], output='', linearize='yes', units='angstroms', Stdout="/dev/null")
 		if os.path.exists('/'.join(file.split('/')[:-1])+'/sky_'+file.split('/')[-1]): iraf.disptrans(input='/'.join(file.split('/')[:-1])+'/sky_'+file.split('/')[-1], output='', linearize='yes', units='angstroms', Stdout="/dev/null")
@@ -2356,8 +2642,10 @@ def create_final_spectra_proc(args):
 		if os.path.exists('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1]): iraf.disptrans(input='/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1], output='', linearize='yes', units='angstroms', Stdout="/dev/null")
 		if os.path.exists('/'.join(file.split('/')[:-1])+'/cross_'+file.split('/')[-1]): iraf.disptrans(input='/'.join(file.split('/')[:-1])+'/cross_'+file.split('/')[-1], output='', linearize='yes', units='angstroms', Stdout="/dev/null")
 		if os.path.exists('/'.join(file.split('/')[:-1])+'/res_'+file.split('/')[-1]): iraf.disptrans(input='/'.join(file.split('/')[:-1])+'/res_'+file.split('/')[-1], output='', linearize='yes', units='angstroms', Stdout="/dev/null")
+		iraf.flprcache()
 
 		#save scattered light image into a png file for diagnostics
+		logging.info('Saving diagnostic plots (scattered light).')
 		if os.path.exists('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1]):
 			hdul=fits.open('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1][:-8]+'.fits')
 			scat_image=hdul[0].data
@@ -2375,6 +2663,7 @@ def create_final_spectra_proc(args):
 			fig.clf()
 
 		#save resolution profile image into a png file for diagnostics
+		logging.info('Saving diagnostic plots (resolution profile).')
 		if os.path.exists('/'.join(file.split('/')[:-1])+'/res_'+file.split('/')[-1]):
 			hdul=fits.open('/'.join(file.split('/')[:-1])+'/res_'+file.split('/')[-1])
 			res_image=hdul[0].data
@@ -2834,13 +3123,12 @@ def create_final_spectra(date, ncpu=1):
 			files=glob.glob("%s/[01-31]*.ms.fits" % cob)
 			args.append([ccd,cob,files])
 
-	if ncpu==1:
-		for arg in args:
-			create_final_spectra_proc(arg)
-	else:
+	if ncpu>1:
 		pool = Pool(processes=ncpu)
 		pool.map(create_final_spectra_proc, args)
 		pool.close()
+	else:
+		create_final_spectra_proc(arg)
 
 
 def create_database(date):
@@ -3369,9 +3657,13 @@ def analyze(date, ncpu=1):
 	for sobject in sobjects:
 		args.append([sobject, templates])
 
-	pool = Pool(processes=ncpu)
-	pool.map(analyze_rv, args)
-	pool.close()
+	if ncpu>1:
+		pool = Pool(processes=ncpu)
+		pool.map(analyze_rv, args)
+		pool.close()
+	else:
+		for arg in args:
+			analyze_rv(arg)
 
 	# calculate stellar parameters
 
@@ -3397,33 +3689,77 @@ if __name__ == "__main__":
 	iraf.set(min_lenuserarea=128000)
 	iraf.set(uparm=start_folder + '/uparm')
 
+	# Set logging levels
 	logging.basicConfig(level=logging.DEBUG)
+	mpl_logger=logging.getLogger('matplotlib')
+	mpl_logger.setLevel(logging.WARNING)
 
-	if len(sys.argv) == 2:
-		date='170711'
-		#date, cobs = prepare_dir(sys.argv[1], str_range='1-19')
-		#remove_bias(date)
-		#fix_gain(date)
-		#fix_bad_pixels(date)
-		#prepare_flat_arc(date, cobs)
-		#remove_cosmics(date, ncpu=8)
-		#find_apertures(date, start_folder)
-		#plot_apertures(190210, 1902100045, 3)
-		#remove_scattered(date, start_folder, ncpu=6)
-		#measure_cross_on_flat(date)
-		#extract_spectra(date, start_folder)
-		#wav_calibration(date, start_folder)
-		#os.system('cp -r reductions-test reductions')
-		#remove_sky(date, method='nearest3', thr_method='flat', ncpu=8)
-		#plot_spectra(190210, 1902100045, 3)
-		#remove_telurics(date)
-		#v_bary_correction(date, quick=False, ncpu=8)
-		#os.system('cp -r reductions_bary reductions')
-		#resolution_profile(date)
-		os.system('cp -r reductions-test reductions')
-		create_final_spectra(date, ncpu=8)
-		analyze(date, ncpu=10)
-		create_database(date)
-		
+	# Parse command line arguments
+	parser = argparse.ArgumentParser()
+	parser.add_argument("night", help="Path to the data for one night.")
+	parser.add_argument("--list_cobs", help="Only list COBs.", action="store_true")
+	parser.add_argument("--initial", help="Do initial reduction.", action="store_true")
+	parser.add_argument("--cosmics", help="Remove cosmics.", action="store_true")
+	parser.add_argument("--trace", help="Trace apertures.", action="store_true")
+	parser.add_argument("--scattered", help="Remove scattered light.", action="store_true")
+	parser.add_argument("--xtalk", help="Measure and remove cross talk.", action="store_true")
+	parser.add_argument("--extract", help="Extract spectra.", action="store_true")
+	parser.add_argument("--wav", help="Do wavelength calibration.", action="store_true")
+	parser.add_argument("--sky", help="Remove sky.", action="store_true")
+	parser.add_argument("--telurics", help="Remove telurics.", action="store_true")
+	parser.add_argument("--bary", help="Correct for barycentric velocity.", action="store_true")
+	parser.add_argument("--resolution", help="Calculate resolution profile.", action="store_true")
+	parser.add_argument("--final", help="Create final spectra.", action="store_true")
+	parser.add_argument("--analyze", help="Analize spectra.", action="store_true")
+	parser.add_argument("--database", help="Create database.", action="store_true")
+	parser.add_argument("--n_cpu", help="Specify how many cpus you want to use.", default=1)
+	parser.add_argument("--runs", help="Which run numbers to use.", default='*')
+	parser.add_argument("--sky_method", help="Sky removal method.", default='nearest3')
+	parser.add_argument("--sky_thru", help="Fibre throughput measuring method.", default='flat')
+	parser.add_argument("--bary_quick", help="Quick v_bary correction", action="store_true")
+	args = parser.parse_args()
+
+	# if only COBs are to be listed, perform first function and then clean afterwards
+	if args.list_cobs:
+		date, cobs = prepare_dir(args.night, str_range=args.runs, list_cobs=args.list_cobs)
+		shutil.rmtree("reductions/%s" % (date))
+		sys.exit(0)
+	# otherwise perform required reduction steps
 	else:
-		logging.critical('Wrong number of command line arguments.')
+		if args.initial:
+			date, cobs = prepare_dir(args.night, str_range=args.runs, list_cobs=True)
+			remove_bias(date)
+			fix_gain(date)
+			fix_bad_pixels(date)
+			prepare_flat_arc(date, cobs)
+		else:
+			date=args.night.split('/')[-1]
+		if args.cosmics:
+			remove_cosmics(date, ncpu=int(args.n_cpu))
+		if args.trace:
+			find_apertures(date, start_folder)
+			#plot_apertures(190210, 1902100045, 3)
+		if args.scattered:
+			remove_scattered(date, start_folder, ncpu=int(args.n_cpu))
+		if args.xtalk:
+			measure_cross_on_flat(date)
+		if args.extract:
+			extract_spectra(date, start_folder)
+		if args.wav:
+			wav_calibration(date, start_folder)
+		if args.sky: 
+			remove_sky(date, method=args.sky_method, thr_method=args.sky_thru, ncpu=int(args.n_cpu))
+			#plot_spectra(190210, 1902100045, 3)
+		if args.telurics:
+			remove_telurics(date)
+		if args.bary:
+			v_bary_correction(date, quick=args.bary_quick, ncpu=int(args.n_cpu))
+		if args.resolution:
+			resolution_profile(date)
+		if args.final:
+			create_final_spectra(date, ncpu=int(args.n_cpu))
+		if args.analyze:
+			analyze(date, ncpu=int(args.n_cpu))
+		if args.database:
+			create_database(date)
+		sys.exit(0)
