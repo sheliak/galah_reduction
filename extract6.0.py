@@ -3128,7 +3128,8 @@ def create_final_spectra(date, ncpu=1):
 		pool.map(create_final_spectra_proc, args)
 		pool.close()
 	else:
-		create_final_spectra_proc(arg)
+		for arg in args:
+			create_final_spectra_proc(arg)
 
 
 def create_database(date):
