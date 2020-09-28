@@ -4,6 +4,7 @@ If some steps fail, the script will recover from a backup and try once again.
 
 TODO:
 	Figure out what is not working with multiprocessing in run_one_night. It is working with multiprocess module for now.
+	Add optional parameters for sky and bary
 """
 from os import system
 from time import sleep
@@ -83,11 +84,11 @@ def run_one_night(args):
 	system('rm -r reductions/.backup_%s' % date)
 	sleep(3)
 
-if __name__ == "__main__":
+if __name__=="__main__":
 
-	parser = argparse.ArgumentParser()
+	parser=argparse.ArgumentParser()
 	parser.add_argument("settings", help="Path to the settings file (settings.py).")
-	args = parser.parse_args()
+	args=parser.parse_args()
 
 	settings_file=args.settings
 	if settings_file[-3:]=='.py': settings_file=settings_file[:-3]
