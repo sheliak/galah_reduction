@@ -41,9 +41,10 @@ def run_one_night(args):
 		if st.cross: system('python extract6.0.py %s%s --xtalk --n_cpu %s' % (data_folder, date, ncpu))
 		if st.extract: system('python extract6.0.py %s%s --extract --n_cpu %s' % (data_folder, date, ncpu))
 		if st.wav_cal: system('python extract6.0.py %s%s --wav --n_cpu %s' % (data_folder, date, ncpu))
-		if st.sky: system('python extract6.0.py %s%s --sky --n_cpu %s' % (data_folder, date, ncpu))
+		if st.sky: system('python extract6.0.py %s%s --sky --sky_method %s --sky_thru %s --n_cpu %s' % (data_folder, st.method, st.throughput_method date, ncpu))
 		if st.teluric: system('python extract6.0.py %s%s --telurics --n_cpu %s' % (data_folder, date, ncpu))
-		if st.v_bary: system('python extract6.0.py %s%s --bary --n_cpu %s' % (data_folder, date, ncpu))
+		if st.v_bary and st.quick: system('python extract6.0.py %s%s --bary --quick --n_cpu %s' % (data_folder, date, ncpu))
+		elif st.v_bary: system('python extract6.0.py %s%s --bary --n_cpu %s' % (data_folder, date, ncpu))
 		if st.resolution: system('python extract6.0.py %s%s --resolution --n_cpu %s' % (data_folder, date, ncpu))
 	except:
 		# If they fail, delete folder and try again
@@ -55,9 +56,10 @@ def run_one_night(args):
 		if st.cross: system('python extract6.0.py %s%s --xtalk --n_cpu %s' % (data_folder, date, ncpu))
 		if st.extract: system('python extract6.0.py %s%s --extract --n_cpu %s' % (data_folder, date, ncpu))
 		if st.wav_cal: system('python extract6.0.py %s%s --wav --n_cpu %s' % (data_folder, date, ncpu))
-		if st.sky: system('python extract6.0.py %s%s --sky --n_cpu %s' % (data_folder, date, ncpu))
+		if st.sky: system('python extract6.0.py %s%s --sky --sky_method %s --sky_thru %s --n_cpu %s' % (data_folder, st.method, st.throughput_method date, ncpu))
 		if st.teluric: system('python extract6.0.py %s%s --telurics --n_cpu %s' % (data_folder, date, ncpu))
-		if st.v_bary: system('python extract6.0.py %s%s --bary --n_cpu %s' % (data_folder, date, ncpu))
+		if st.v_bary and st.quick: system('python extract6.0.py %s%s --bary --quick --n_cpu %s' % (data_folder, date, ncpu))
+		elif st.v_bary: system('python extract6.0.py %s%s --bary --n_cpu %s' % (data_folder, date, ncpu))
 		if st.resolution: system('python extract6.0.py %s%s --resolution --n_cpu %s' % (data_folder, date, ncpu))
 
 	# Create backup of the first batch of steps
@@ -99,8 +101,8 @@ if __name__=="__main__":
 		# if there are multiple nights to reduce 
 		dates=settings.nights
 		args=[]
-		for date in dates:
-			args.append([settings, date])
+		for date_ in dates:
+			args.append([settings, date_])
 		pool = Pool(processes=settings.ncpu)
 		pool.map(run_one_night, args)
 		pool.close()
