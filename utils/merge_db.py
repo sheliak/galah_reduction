@@ -12,10 +12,22 @@ from astropy.io import fits
 from astropy.table import vstack, Table
 import time
 import numpy as np
+import argparse
 
 logging.basicConfig(level=logging.DEBUG)
 
-date=190210
+parser=argparse.ArgumentParser()
+parser.add_argument("date", help="Date you want to merge into the global DB (in format yymmdd).")
+args=parser.parse_args()
+
+date=args.date
+
+if isinstance(date, (int, long)):
+	pass
+else:
+	logging.error('Date must be an intiger in format yymmdd.')
+	sys.exit(-1)
+
 
 if os.path.isfile('reductions/dr6.0.fits'):
 	# check if global database exists and open it if it does
