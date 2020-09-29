@@ -41,15 +41,17 @@ This step is optional as iraf will instead use settings from the default login.c
 
 **1. RUNNING COMPLETE REDUCTION PIPELINE**
 
-To reduce one night run
+All parameters, including which nights to reduce, are set in the settings.py file. 
+
+To run the reduction do
 ```
-python extract6.0.py /path/to/spectra/night
+python run.py /path/to/settings.py
 ```
-where `/path/to/spectra/night` is a path to standard GALAH folders for one night. Inside this folder should be folders: comments, data, fld, sds, etc. When testing, make a copy of data in case they get corrupted. The reduction pipeline should make a local copy and not write anything into `/path/to/spectra/night`.
+where `/path/to/settings.py` is a path to the settings file you are using.
 
 **2. RUNNING MINIMAL REDUCTION**
 
-The pipeline will make a minimal reduction to get 1D spectra. This preview is useful for quick checks during observations. The steps required for this reduction are already defined in the function `min_red`.
+The pipeline will make a minimal reduction to get 1D spectra. This preview is useful for quick checks during observations. Comming soon.
 
 **3. PARTIAL REDUCTION**
 
