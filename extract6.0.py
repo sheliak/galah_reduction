@@ -1284,7 +1284,7 @@ def wav_calibration(date, start_folder):
 	fit_init={1:[4813.3, 94.3,-5.67,0.003], 2:[5767.5, 112.05, -6.74, 0.015], 3:[6615.4, 129.3, -7.75, 0.015], 4:[7745,150.7,-8.95,0.017]}
 
 	# linelists of the arc lamp for each CCD
-	cal_linelist={1: 'aux/linelist_art_blue_ar.dat', 2: 'aux/linelist_art_green_ar.dat', 3: 'aux/linelist_art_red.dat', 4: 'aux/linelist_art_ir.dat'}
+	cal_linelist={1: 'aux/linelist_art_blue_new.dat', 2: 'aux/linelist_art_green_new.dat', 3: 'aux/linelist_art_red_new.dat', 4: 'aux/linelist_art_ir_new.dat'}
 
 	# reference images
 	cal_arc={'Plate 0': {1: 'aux/master_arc_p_0_ccd_1.ms.fits', 2: 'aux/master_arc_p_0_ccd_2.ms.fits', 3: 'aux/master_arc_p_0_ccd_3.ms.fits', 4: 'aux/master_arc_p_0_ccd_4.ms.fits'}, 'Plate 1':{1: 'aux/master_arc_p_1_ccd_1.ms.fits', 2: 'aux/master_arc_p_1_ccd_2.ms.fits', 3: 'aux/master_arc_p_1_ccd_3.ms.fits', 4: 'aux/master_arc_p_1_ccd_4.ms.fits'}}
