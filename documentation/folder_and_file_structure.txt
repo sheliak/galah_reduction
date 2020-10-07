@@ -1,0 +1,63 @@
+Folder structure
+
+When reducing the data, a folder reductions will be created. It includes all temporary files created during the reduction as well as the final results. Folder yymmdd (6 digit date number) contains all temporary files and will be deleted when the reduction of that night is completed successfully. It contains folders for four CCDs, and each of those contains a folders of all COBs. If one night is successfully reduced, the final spectra (individual and combined within each COB), and the databases for that night will be written into the results folder. It contains a folder for each reduced night. Inside that folder are folders db (containing the databases for that night only), spectra (containing individual spectra in folder all and combined spectra in fodler com), and a diagnostics folder. The latter can contain some information saved during the reduction that can help with troubleshooting and debugging.
+
+In the reductions folder are also databases in fits and csv formats. This is the whole database into which databases of individual nights are merged.
+
+reductions
+|-- yymmdd (6 digit date number)
+|   |-- ccd1
+|   |   |-- yymmddrrrr
+|   |   |-- ...
+|   |
+|   |-- ccd2
+|   |   |-- yymmddrrrr
+|   |   |-- ...
+|   |   
+|   |-- ccd3
+|   |   |-- yymmddrrrr
+|   |   |-- ...
+|   |   
+|   |-- ccd4
+|   |   |-- yymmddrrrr
+|   |   |-- ...
+|   |   |-- yymmddrrrr
+|
+|-- results
+|   |-- yymmdd 
+|   |   |-- db
+|   |   |   |-- yymmdd.fits
+|   |   |   |-- yymmdd.csv
+|   |   |
+|   |   |-- spectra
+|   |   |   |-- all
+|   |   |   |   |-- yymmddrrrr00pppc.fits
+|   |   |   |   |-- ...
+|   |   |   |   
+|   |   |   |-- com
+|   |   |   |   |-- yymmddrrrr01pppc.fits
+|   |   |   |   |-- ...
+|   |   |
+|   |   |-- diagnostics
+|   |   |   |-- *.png
+|   |   |   |-- *.txt
+|   |   |   |-- ...
+|
+|-- dr6.0.fits
+|-- dr6.0.csv
+
+File structure
+
+Fits files containing the spectra have the same format in ``all'' and ``com'' folders. Each file consists of 8 extensions, all of which are 1D images representing spectra. All spectra/extensions have linearised wavelength calibration which is also identical for all 8 extensions. Wavelengths are already corrected for the barycentric velocity, but are not shifted for the measured radial velocity. Wavelength calibration is given in the header. Keyword CRVAL1 is the wavelength in the middle of the first pixel in Angstroms. CDELT1 or CD1_1 give dispersion per pixel in Angstroms. Number of pixels in a spectrum is given by keyword NAXIS1. Below is a list of extensions. 
+
+Extension number	Extension name	Description
+0	Primary	Fluxed (non-normalsied) spectrum. Flux units are in counted electrons.
+1	normalized	Normalised spectrum. It is obtained by normalising extension 0. If this is a combined spectrum it is also cleaned. Normalisation is done by a 5th degree polynomial to prevent most information loss.
+2	relative_error	Relative error of fluxed or normalised spectrum.
+3	sky	Sky spectrum. This was already subtracted from the spectrum that became extension 0. If you want to see how a spectrum before the sky removal looks like, add extensions 0 and 3.
+4	teluric	Teluric spectrum. Spectra are already divided by the teluric spectrum. If you want to see how a spectrum before the teluric correction looks like, multiply extensions 0 aor 1 with extension 4.
+5	scattered	Scattered light. Scattered light was removed from a 2D image. This is a 1D spectrum extracted from the scattered light image.
+6	cross_talk	Cross talk spectrum. This is the spectrum calculated in the cross talk reduction step. It was already subtracted from the spectrum that became extension 0.
+7	resolution_profile	Resolution profile gives FWHM of the line-spread-function for each pixel of the final spectrum. Functional form of the LSF is written in the header. 
+
+Fits-format databases have two extensions. Extension 0 (Primary) is empty and extension 1 (table) contains one fits binary table described in db_description.txt.

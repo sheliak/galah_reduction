@@ -1,0 +1,28 @@
+# PyCharm folder
+.idea
+
+# Comipled code
+*.pyc
+
+# Datasets
+*.csv
+*.fits
+*.vot
+*.dat
+
+# Images
+*.jpg
+*.png
+
+# Temporary
+.~lock*
+
+# Log files
+*.log
+logfile
+
+# Other
+login.cl
+pyraf
+reductions
+uparm

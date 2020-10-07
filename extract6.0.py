@@ -20,10 +20,14 @@ import csv
 from scipy import optimize, signal, ndimage
 from scipy.interpolate import griddata
 from astropy.convolution import Gaussian1DKernel, convolve, CustomKernel
-from lmfit import Minimizer, Parameters, report_fit
+from lmfit import Minimizer, Parameters, report_fit, minimize
 from multiprocessing import Pool
+from datetime import datetime
 import cosmics
 import time
+import ephem
+from scipy.optimize import curve_fit
+import argparse
 
 # possible NDFCLASS values in human readable form
 ndfclass_types={'MFFFF':'fibre flat', 'MFARC':'arc', 'MFOBJECT':'object', 'BIAS':'bias'}
@@ -31,15 +35,13 @@ ndfclass_types={'MFFFF':'fibre flat', 'MFARC':'arc', 'MFOBJECT':'object', 'BIAS'
 # possible fibre one-letter values in human readable form
 fibre_types={'S':'sky fibre', 'P':'positioned fibre', 'U':'parked fibre', 'N':'fibre not in use', 'F':'guiding fibre'}
 
-start_folder=''
-
-
-def print_cobs(cobs):
+def print_cobs(cobs, date):
 	"""
 	Print COBs for a given night
 
 	Parameters:
 		cobs (array): numpy array of cobs
+		date (str): date string (e.g. 190210)
 	
 	Returns:
 		none
@@ -49,6 +51,11 @@ def print_cobs(cobs):
 	print 'The following images and COBs (continous observing blocks) will be reduced.\n'
 
 	print "\033[1m"+'CCD 1:'+"\033[0;0m"+'\n' # weird strings are the beginning and end of the bold text (will not work outside linux/unix)
+	print "    Biases:   ",
+	for b in sorted([i.split('/')[-1] for i in glob.glob('reductions/%s/ccd1/biases/*.fits' % date)]):
+		print b,
+	print ''
+	print ''
 	for i in cobs[0]:
 		for n,j in enumerate(i[1]):
 			if n==0:
@@ -59,6 +66,11 @@ def print_cobs(cobs):
 		print ''
 
 	print '\n'+"\033[1m"+'CCD 2:'+"\033[0;0m"+'\n'
+	print "    Biases:   ",
+	for b in sorted([i.split('/')[-1] for i in glob.glob('reductions/%s/ccd2/biases/*.fits' % date)]):
+		print b,
+	print ''
+	print ''
 	for i in cobs[1]:
 		for n,j in enumerate(i[1]):
 			if n==0:
@@ -69,6 +81,11 @@ def print_cobs(cobs):
 		print ''
 
 	print '\n'+"\033[1m"+'CCD 3:'+"\033[0;0m"+'\n'
+	print "    Biases:   ",
+	for b in sorted([i.split('/')[-1] for i in glob.glob('reductions/%s/ccd3/biases/*.fits' % date)]):
+		print b,
+	print ''
+	print ''
 	for i in cobs[2]:
 		for n,j in enumerate(i[1]):
 			if n==0:
@@ -79,6 +96,11 @@ def print_cobs(cobs):
 		print ''
 
 	print '\n'+"\033[1m"+'CCD 4:'+"\033[0;0m"+'\n'
+	print "    Biases:   ",
+	for b in sorted([i.split('/')[-1] for i in glob.glob('reductions/%s/ccd4/biases/*.fits' % date)]):
+		print b,
+	print ''
+	print ''
 	for i in cobs[3]:
 		for n,j in enumerate(i[1]):
 			if n==0:
@@ -100,22 +122,118 @@ def correct_ndfclass(hdul):
 		ndfclass (str)
 
 	"""
-	return hdul[0].header['NDFCLASS']
+	h_head = hdul[0].header
+	orig_class = h_head['NDFCLASS']
 
-def inspect_dir(dir):
+	# check readout speed - all images have to be taken with the same readout speed, FAST is the usual
+	if h_head['SPEED'] != 'FAST':
+		return None
+
+	# handle uncommon exposure classes
+	if orig_class in ['MFFLX', 'LFLAT']:
+		return orig_class
+
+	# bias should always be determined correctly
+	if orig_class == 'BIAS':
+		return orig_class
+
+	# check should always be determined correctly
+	if orig_class == 'MFARC':
+		return orig_class
+
+	# get essential parameters on which the decision about a class will be based on
+	ex_time = h_head['EXPOSED']
+	flaps = h_head['FLAPS']
+	tracking = h_head['TRACKING']
+	t_ra = h_head['MEANRA']
+	t_dec = h_head['MEANDEC']
+	f_data = Table(hdul['STRUCT.MORE.FIBRES'].data)
+	f_ra = np.rad2deg(np.median(f_data['RA']))
+	f_dec = np.rad2deg(np.median(f_data['DEC']))
+	t_coord = SkyCoord(ra=t_ra*u.deg, dec=t_dec*u.deg)
+	f_coord = SkyCoord(ra=f_ra*u.deg, dec=f_dec*u.deg)
+
+	# compute height of the sun above/bellow the horizon
+	sun = ephem.Sun()
+	obs = ephem.Observer()
+	# lat and long must be string if you do not want troubles
+	obs.lon, obs.lat, obs.elevation = str(h_head['LONG_OBS']), str(h_head['LAT_OBS']), h_head['ALT_OBS']
+	obs.date = h_head['UTDATE'].replace(':', '/') + ' ' + h_head['UTSTART']
+	# ephem assumes input time to in UTC
+	sun.compute(obs)
+	sun_alt = np.rad2deg(float(sun.alt))
+
+	# check other science types - object and flats
+	new_class = 'UNKNOWN'
+
+	if flaps == 'OPEN':
+		if tracking != 'TRACKING':
+			# TODO: delineate between sflat or dflat
+			if 0. > sun_alt > -8:
+				new_class = 'SFLAT'
+			else:
+				new_class = 'DFLAT'
+		else:
+			if t_coord.separation(f_coord) < 1 * u.deg:
+				new_class = 'MFOBJECT'
+			else:
+				if sun_alt > -8:
+					new_class = 'SFLAT'
+	else:
+		# only bias, dark or flat images can be acquired with closed flaps
+		if 'LAMPNAME' in h_head.keys():
+			new_class = 'MFFFF'
+		else:
+			new_class = 'DARK'  # or bias or something else
+
+	if new_class == 'UNKNOWN':
+		print t_coord, f_coord, sun_alt, t_coord.separation(f_coord)
+
+	return new_class
+
+
+def prepare_dir(dir, str_range='*', list_cobs=True):
 	"""
 	Open spectra from one night and print exposure types and fields. Create a folder structure in which the reduction will take place
 
 	Parameters:
 		date (str): date string (e.g. 190210)
+		str_range (str): string with range of runs to be used (e.g.  "1,2,5-7,10")
+		list_cobs (bool): Print list of COBs
 	
 	Returns:
 		none
-
-	To do:
-		Compose COBs more reliably.
-
 	"""
+
+	def range_to_list(str_range):
+		"""
+		Gets string with ranges (e.g.  "1,2,5-7,10") and converts it into a list (e.g. [1,2,5,6,7,10]).
+		"""
+		str_range=str_range.replace(',', ', ')
+		str_range=str_range.replace('  ', ' ')
+		temp = [(lambda sub: range(sub[0], sub[-1] + 1))(map(int, ele.split('-'))) for ele in str_range.split(', ')]
+		return [b for a in temp for b in a]
+
+	if str_range=='*':
+		runs=range(10000)
+	else:
+		try:
+			runs=range_to_list(str_range)
+			runs=np.array(runs, dtype=int)
+		except:
+			logging.error('List of runs (%s) cannot be converted into a list. Check formatting.' % str_range)
+			runs=range(10000)
+
+	# function that checks if cob has all three types of science frames
+	def _has_cob_all_frames(cob_files, cob_str, ccd_i):
+		types_in_cob = list([])
+		for cob_exp in cob_files:
+			types_in_cob.append(cob_exp[1])
+		if len(np.unique(types_in_cob)) == 3:
+			return True
+		else:
+			logging.warning('CCD %d of COB %s is missing some science frames and will be skipped' % (ccd_i, cob_str))
+			return False
 
 	logging.info('Checking contents of the given folder.')
 
@@ -124,6 +242,7 @@ def inspect_dir(dir):
 	cobs_all=[]
 	list_of_cob_ids=[]
 	biases_all=[]
+	comments_dict={}
 	for ccd in [1,2,3,4]:
 		# read list of all files
 		cobs_ccd=[]
@@ -136,13 +255,23 @@ def inspect_dir(dir):
 				obstatus_dict[int(l[0])]=[int(l[1]),l[-1].replace('\n','')]
 		obstatus_dict=defaultdict(lambda:[1, ''], obstatus_dict)
 		files=[]
-		for file in files_all:
-			#accept file if obstatus is >0. Also add comment from comments.txt into the header
-			if obstatus_dict[int(file.split('/')[-1][6:10])][0]>0:
+
+		for file in np.sort(files_all):
+
+			fits_name = file.split('/')[-1]
+			try:
+				run_num = int(fits_name[6:10])
+			except ValueError as err:
+				logging.warning('Skipping file %s as it has no valid run number in filename' % fits_name)
+				continue
+
+			# accept file if obstatus is >0. Also add comment from comments.txt into the header
+			# also check if run is in the list of runs to be reduced
+			if obstatus_dict[run_num][0]>0 and int(fits_name[6:10]) in runs:
 				files.append(file)
-				with fits.open(file, mode='update') as hdu_c:
-					hdu_c[0].header['COMM_OBS']=(obstatus_dict[int(file.split('/')[-1][6:10])][1], 'Comments by the observer')
-					hdu_c.flush()
+				obs_comment = obstatus_dict[run_num][1].rstrip()  # rstrip will remove trailing whitespaces and \r characters
+				comments_dict[run_num]=obs_comment
+
 		files=np.array(files)
 
 		if len(files)==0:
@@ -153,26 +282,54 @@ def inspect_dir(dir):
 			list_of_biases=[]
 			for f in files:
 				hdul=fits.open(f)
-				if correct_ndfclass(hdul) in ['MFFFF', 'MFARC', 'MFOBJECT']: list_of_fits.append([f, correct_ndfclass(hdul), hdul[0].header['UTMJD'], hdul[0].header['CFG_FILE'], hdul[0].header['SOURCE']])
-				if correct_ndfclass(hdul)=='BIAS': list_of_biases.append([f, correct_ndfclass(hdul), hdul[0].header['UTMJD'], hdul[0].header['CFG_FILE'], hdul[0].header['SOURCE']])
+				hdul_ndfclass = correct_ndfclass(hdul)
+				# print f.split('/')[-1], hdul[0].header['NDFCLASS'], '->', hdul_ndfclass
 				hdul.close()
+				if hdul_ndfclass in ['MFFFF', 'MFARC', 'MFOBJECT']: list_of_fits.append([f, hdul_ndfclass, hdul[0].header['UTMJD'], hdul[0].header['CFG_FILE'], hdul[0].header['SOURCE']])
+				if hdul_ndfclass == 'BIAS': list_of_biases.append([f, hdul_ndfclass, hdul[0].header['UTMJD'], hdul[0].header['CFG_FILE'], hdul[0].header['SOURCE']])
+
+			# determine date from folder name
+			date = dir.split('/')[-1]
+
+			# check if we found any science image
+			if len(list_of_fits) == 0:
+				error_str = 'No science data found for night ' + date
+				logging.error(error_str)
+				raise RuntimeError(error_str)
 
 			# order list of files in timely order
 			list_of_fits=np.array(list_of_fits)
 			list_of_fits=list_of_fits[list_of_fits[:,2].argsort()]
 
 			# iterate over the list of files and break it into cobs
-			date=dir.split('/')[-1]
 			cob_id=date+list_of_fits[0][0].split('/')[-1][6:10]
 			list_of_cob_ids.append(cob_id)
 			current_cob=cob_id
 			current_field=list_of_fits[0][3]
 			current_plate=list_of_fits[0][4]
+
+			hdul = fits.open(list_of_fits[0][0])
+			current_t_coord = SkyCoord(ra=hdul[0].header['MEANRA'] * u.deg, dec=hdul[0].header['MEANDEC'] * u.deg)
+			hdul.close()
+
+			# t_ra =
+			# t_dec =
+			# f_data = Table(hdul['STRUCT.MORE.FIBRES'].data)
+			# f_ra = np.rad2deg(np.median(f_data['RA']))
+			# f_dec = np.rad2deg(np.median(f_data['DEC']))
+			# t_coord = SkyCoord(ra=t_ra * u.deg, dec=t_dec * u.deg)
+			# f_coord = SkyCoord(ra=f_ra * u.deg, dec=f_dec * u.deg)
 			cobs=[]
 			cob_content=[]
 			for f in list_of_fits:
-				if f[3]!=current_field or f[4]!=current_plate:
-					cobs.append([current_cob,cob_content])
+
+				hdul = fits.open(f[0])
+				new_t_coord = SkyCoord(ra=hdul[0].header['MEANRA'] * u.deg, dec=hdul[0].header['MEANDEC'] * u.deg)
+				hdul.close()
+
+				if f[3]!=current_field or f[4]!=current_plate or current_t_coord.separation(new_t_coord) > 1 * u.deg:
+					if _has_cob_all_frames(cob_content, current_cob, ccd):
+						cobs.append([current_cob,cob_content])
 					date=dir.split('/')[-1]
 					cob_id=date+f[0].split('/')[-1][6:10]
 					list_of_cob_ids.append(cob_id)
@@ -180,11 +337,13 @@ def inspect_dir(dir):
 					current_cob=cob_id
 					current_field=f[3]
 					current_plate=f[4]
+					current_t_coord = new_t_coord
 					cob_content.append(f)
 				else:
 					cob_content.append(f)
 
-			cobs.append([current_cob,cob_content])
+			if _has_cob_all_frames(cob_content, current_cob, ccd):
+				cobs.append([current_cob,cob_content])
 
 			cobs_all.append(cobs)
 			biases_all.append(list_of_biases)
@@ -238,19 +397,14 @@ def inspect_dir(dir):
 		if not os.path.exists('reductions/%s/ccd4/%s' % (date,i)):
 			os.makedirs('reductions/%s/ccd4/%s' % (date,i))
 
-	# print the resulting structure
-	print_cobs(cobs_all)
-
 	# copy fits files into correct folders
 	logging.info('Copying files into correct folders for the reduction.')
-	for i in biases_all[0]:
-		shutil.copyfile(i[0], 'reductions/%s/ccd1/biases/%s' % (date, i[0].split('/')[-1]))
-	for i in biases_all[1]:
-		shutil.copyfile(i[0], 'reductions/%s/ccd2/biases/%s' % (date, i[0].split('/')[-1]))
-	for i in biases_all[2]:
-		shutil.copyfile(i[0], 'reductions/%s/ccd3/biases/%s' % (date, i[0].split('/')[-1]))
-	for i in biases_all[3]:
-		shutil.copyfile(i[0], 'reductions/%s/ccd4/biases/%s' % (date, i[0].split('/')[-1]))
+
+	for biases_all_ccd in biases_all:
+		for bias_info in biases_all_ccd:
+			bias_ccd = ''.join((bias_info[0].split('/')[-2]).split('_'))
+			bias_filename = bias_info[0].split('/')[-1]
+			shutil.copyfile(bias_info[0], 'reductions/%s/%s/biases/%s' % (date, bias_ccd, bias_filename))
 
 	for i in cobs_all[0]:
 		for j in i[1]:
@@ -264,6 +418,18 @@ def inspect_dir(dir):
 	for i in cobs_all[3]:
 		for j in i[1]:
 			shutil.copyfile(j[0], 'reductions/%s/ccd4/%s/%s' % (date, i[0], j[0].split('/')[-1]))
+
+	# add comment from comments file into headers
+	files=glob.glob("reductions/%s/*/*/[01-31]*.fits" % (date))
+	comments_dict=defaultdict(lambda:'', comments_dict)
+	for file in files:
+		run_num=int(file.split('/')[-1][6:10])
+		with fits.open(file, mode='update') as hdu_c:
+			hdu_c[0].header['COMM_OBS']=(comments_dict[run_num], 'Comments by the observer')
+			hdu_c.flush()
+
+	# print the resulting structure
+	if list_cobs: print_cobs(cobs_all, date)
 
 	# a list of files in the new destination must be returned
 	cobs_out=cobs_all
@@ -325,7 +491,7 @@ def remove_bias(date):
 			masterbias=np.median(np.array(biases), axis=0)
 
 			# remove bias from images
-			files=glob.glob("reductions/%s/ccd%s/*/[1-31]*.fits" % (date,ccd))
+			files=glob.glob("reductions/%s/ccd%s/*/[01-31]*.fits" % (date,ccd))
 			for f in files:
 				if 'biases' in f: 
 					continue
@@ -334,7 +500,7 @@ def remove_bias(date):
 						hdu_c[0].data=hdu_c[0].data-masterbias
 						hdu_c.flush()
 		else: # if there are not enough biases, use overscan
-			files=glob.glob("reductions/%s/ccd%s/*/[1-31]*.fits" % (date,ccd))
+			files=glob.glob("reductions/%s/ccd%s/*/[01-31]*.fits" % (date,ccd))
 			for f in files:
 				if 'biases' in f: 
 					continue
@@ -359,7 +525,7 @@ def fix_gain(date):
 	"""
 	logging.info('Normalizing gain')
 	for ccd in [1,2,3,4]:
-		files=glob.glob("reductions/%s/ccd%s/*/[1-31]*.fits" % (date,ccd))
+		files=glob.glob("reductions/%s/ccd%s/*/[01-31]*.fits" % (date,ccd))
 		for f in files:
 			with fits.open(f, mode='update') as hdu_c:
 				gain_top=hdu_c[0].header['RO_GAIN1']
@@ -390,10 +556,10 @@ def fix_bad_pixels(date):
 	iraf.ccdred(_doprint=0,Stdout="/dev/null")
 	iraf.ccdred.instrum='aux/blank.txt'
 
-	files=glob.glob("reductions/%s/ccd2/*/[1-31]*.fits" % (date))
+	files=glob.glob("reductions/%s/ccd2/*/[01-31]*.fits" % (date))
 	for f in files:
 		iraf.ccdproc(images=f, output='', ccdtype='', fixpix='yes', fixfile='aux/badpix2.dat',  oversca='no', trim='no', zerocor='no', darkcor='no', flatcor='no',Stdout="/dev/null")
-	files=glob.glob("reductions/%s/ccd4/*/[1-31]*.fits" % (date))
+	files=glob.glob("reductions/%s/ccd4/*/[01-31]*.fits" % (date))
 	for f in files:
 		iraf.ccdproc(images=f, output='', ccdtype='', fixpix='yes', fixfile='aux/badpix4.dat',  oversca='no', trim='no', zerocor='no', darkcor='no', flatcor='no',Stdout="/dev/null")
 
@@ -429,12 +595,17 @@ def remove_cosmics(date, ncpu=1):
 
 	args=[]
 	for ccd in [1,2,3,4]:
-		files=glob.glob("reductions/%s/ccd%s/*/[1-31]*.fits" % (date, ccd))
+		files=glob.glob("reductions/%s/ccd%s/*/[01-31]*.fits" % (date, ccd))
 		for file in files:
 			args.append([file,ccd])
 
-	pool = Pool(processes=ncpu)
-	pool.map(remove_cosmics_proc, args)
+	if ncpu>1:
+		pool = Pool(processes=ncpu)
+		pool.map(remove_cosmics_proc, args)
+		pool.close()
+	else:
+		for arg in args:
+			remove_cosmics_proc(arg)
 
 
 def prepare_flat_arc(date, cobs):
@@ -443,7 +614,7 @@ def prepare_flat_arc(date, cobs):
 
 	Parameters:
 		date (str): date string (e.g. 190210)
-		cobs (array): COB array from function inspect_dir
+		cobs (array): COB array from function prepare_dir
 	
 	Returns:
 		none
@@ -490,7 +661,7 @@ def prepare_flat_arc(date, cobs):
 				if os.path.exists(a):
 					os.remove(a)
 
-def shift_ref(date, plate, ccd, flat):
+def shift_ref(date, plate, ccd, cob, flat):
 	"""
 	To guaranty the correct order of apertures, we use a list of predefined apertures. The image, however, is not necessarly aligned with the list of apertures. List is shifted, so the order of apertures remains the same, but the apertures are at the same place as in the image.
 
@@ -498,12 +669,14 @@ def shift_ref(date, plate, ccd, flat):
 		date (str): date string (e.g. 190210)
 		plate (str): either 'Plate 0' or 'Plate 1'
 		ccd (int): CCD number (1=Blue, .., 4=IR)
+		cob (str): path to current cob
 		flat (str): image name of the flat on which the apertures are to be found
 	
 	Returns:
 		none
 
 	"""
+
 	if int(date)>=140601:
 		if plate=='Plate 0':
 			ap_ref={1: 'aux/masterflat_blue0.fits', 2: 'aux/masterflat_green0.fits', 3: 'aux/masterflat_red20.fits', 4: 'aux/masterflat_ir20.fits'}
@@ -515,8 +688,8 @@ def shift_ref(date, plate, ccd, flat):
 		if plate=='Plate 1':
 			ap_ref={1: 'aux/masterflat_blue.fits', 2: 'aux/masterflat_green.fits', 3: 'aux/masterflat_red.fits', 4: 'aux/masterflat_ir.fits'}
 
-	shift=iraf.xregister(input=ap_ref[ccd]+'[1990:2010,*],'+flat+'[1990:2010,*]', reference=ap_ref[ccd]+'[1990:2010,*]', regions='[*,*]', shifts="shifts", output="", databasefmt="no", correlation="fourier", xwindow=3, ywindow=51, xcbox=21, ycbox=21, Stdout=1)
-	os.remove('shifts')
+	shift=iraf.xregister(input=ap_ref[ccd]+'[1990:2010,*],'+flat+'[1990:2010,*]', reference=ap_ref[ccd]+'[1990:2010,*]', regions='[*,*]', shifts=cob+"/shifts", output="", databasefmt="no", correlation="fourier", xwindow=3, ywindow=51, xcbox=21, ycbox=21, Stdout=1)
+	os.remove(cob+'/shifts')
 	shift=float(shift[-2].split()[-2])
 
 	ap_file=ap_ref[ccd][:-5].replace('/','/ap')
@@ -545,7 +718,7 @@ def shift_ref(date, plate, ccd, flat):
 	o.close()
 	
 
-def find_apertures(date):
+def find_apertures(date, start_folder):
 	"""
 	Finds apertures on all flats for all COBs inside the date folder. A list of apertures thad can't be traced is saved as a file.
 
@@ -566,16 +739,20 @@ def find_apertures(date):
 	iraf.unlearn('apall')
 	iraf.apextract.dispaxis=1
 
-
 	for ccd in [1,2,3,4]:
 		cobs=glob.glob("reductions/%s/ccd%s/*" % (date,ccd))
 		for cob in cobs:
 			print cob
 			# shift reference flat, so the apertures will be found correctly and will always be in the same order
-			hdul=fits.open(cob+'/masterflat.fits')
+			try:
+				hdul=fits.open(cob+'/masterflat.fits')
+			except IOError as err:
+				logging.warning('Masterflat was not found in ccd %d of COB %s' % (ccd, cob.split('/')[-1]))
+				continue
+
 			plate= hdul[0].header['SOURCE']
 			hdul.close()
-			shift_ref(date, plate, ccd, cob+'/masterflat.fits')
+			shift_ref(date, plate, ccd, cob, cob+'/masterflat.fits')
 
 			# trace apertures on masterflat
 			iraf.apextract.database=start_folder+'/'+cob
@@ -620,9 +797,6 @@ def plot_apertures(date,cob_id,ccd):
 	Returns:
 		none
 
-	To do:
-		Mark different fibre types.
-
 	"""
 	matplotlib_backend=matplotlib.get_backend()
 
@@ -663,7 +837,7 @@ def plot_apertures(date,cob_id,ccd):
 	ax=fig.add_subplot(122, sharex=ax, sharey=ax, aspect=1)
 	
 	# display an object
-	files=glob.glob("reductions/%s/ccd%s/%s/[1-31]*.fits" % (date, ccd, cob_id))
+	files=glob.glob("reductions/%s/ccd%s/%s/[01-31]*.fits" % (date, ccd, cob_id))
 	valid_files=[]
 	for f in files:
 		if '.ms' not in f: valid_files.append(f)
@@ -739,7 +913,7 @@ def remove_scattered_proc(arg):
 	Wrapper for remove_scattered to enable multiprocessing
 	"""
 
-	cob,file=arg
+	cob,file, start_folder=arg
 	os.chdir(cob)
 	iraf.apextract.database=start_folder+'/'+cob
 
@@ -813,7 +987,7 @@ def remove_scattered_proc(arg):
 	iraf.flprcache()
 
 
-def remove_scattered(date, ncpu=1):
+def remove_scattered(date, start_folder, ncpu=1):
 	"""
 	Remove sacttered light. Scattered light is measured between slitlets, at least 4 pixels from the edge of any aperture. Elswhere it is interpolated and smoothed.
 
@@ -841,7 +1015,6 @@ def remove_scattered(date, ncpu=1):
 				z+=m[n]*x**i*y**j
 				n+=1
 		return z
-		
 
 	def eval_diff(m, image):
 		xx, yy = np.meshgrid(np.arange(0,image.shape[1],1), np.arange(0,image.shape[0],1), sparse=True)
@@ -860,11 +1033,19 @@ def remove_scattered(date, ncpu=1):
 		cobs=glob.glob("reductions/%s/ccd%s/*" % (date,ccd))
 		for cob in cobs:
 			os.chdir(cob)
-			iraf.imcopy(input='masterarc.fits[1:4096,*]', output='crop.tmp', verbose='no')
-			shutil.move('crop.tmp.fits', 'masterarc.fits')
-			files=glob.glob("./[1-31]*.fits")
+			try:
+				iraf.imcopy(input='masterarc.fits[1:4096,*]', output='crop.tmp', verbose='no',Stdout="/dev/null")
+				for t in range(20):#wait for max 10 sec for the file to be created
+					if os.path.isfile('crop.tmp')==False: time.sleep(0.5)
+					else: break
+				shutil.move('crop.tmp.fits', 'masterarc.fits')
+				iraf.flprcache()
+			except:
+				logging.warning('Masterarc was not found in ccd %d of COB %s' % (ccd, cob.split('/')[-1]))
+
+			files=glob.glob("./[01-31]*.fits")
 			for f in files:
-				iraf.imcopy(input=f+'[1:4096,*]', output='crop.tmp', verbose='no')
+				iraf.imcopy(input=f+'[1:4096,*]', output='crop.tmp', verbose='no',Stdout="/dev/null")
 				shutil.move('crop.tmp.fits', f)
 			os.chdir('../../../..')
 			iraf.flprcache()
@@ -873,13 +1054,18 @@ def remove_scattered(date, ncpu=1):
 	args=[]
 	for cob in cobs:
 		os.chdir(cob)
-		files=glob.glob("[1-31]*.fits")
+		files=glob.glob("[01-31]*.fits")
 		for file in files:
-			args.append([cob,file])
+			args.append([cob,file,start_folder])
 		os.chdir('../../../..')
 
-	pool = Pool(processes=ncpu)
-	pool.map(remove_scattered_proc, args)
+	if ncpu>1:
+		pool = Pool(processes=ncpu)
+		pool.map(remove_scattered_proc, args)
+		pool.close()
+	else:
+		for arg in args:
+			remove_scattered_proc(arg)
 
 	iraf.flprcache()
 
@@ -899,7 +1085,7 @@ def measure_cross_on_flat(date):
 	"""
 	pass
 
-def extract_spectra(date):
+def extract_spectra(date, start_folder):
 	"""
 	Takes *.fits images and creates *.ms.fits images with 392 spectra in them.
 
@@ -921,18 +1107,25 @@ def extract_spectra(date):
 		cobs=glob.glob("reductions/%s/ccd%s/*" % (date,ccd))
 		for cob in cobs:
 			os.chdir(cob)
-			iraf.imcopy(input='masterarc.fits[1:4096,*]', output='crop.tmp', verbose='no')
-			shutil.move('crop.tmp.fits', 'masterarc.fits')
-			files=glob.glob("./[1-31]*.fits")
+			try:
+				iraf.imcopy(input='masterarc.fits[1:4096,*]', output='crop.tmp', verbose='no',Stdout="/dev/null")
+				for t in range(20):#wait for max 10 sec for the file to be created
+					if os.path.isfile('crop.tmp')==False: time.sleep(0.5)
+					else: break
+				shutil.move('crop.tmp.fits', 'masterarc.fits')
+				iraf.flprcache()
+			except:
+				logging.warning('Masterarc was not found in ccd %d of COB %s' % (ccd, cob))
+
+			files=glob.glob("./[01-31]*.fits")
 			for f in files:
-				iraf.imcopy(input=f+'[1:4096,*]', output='crop.tmp', verbose='no')
+				iraf.imcopy(input=f+'[1:4096,*]', output='crop.tmp', verbose='no',Stdout="/dev/null")
 				shutil.move('crop.tmp.fits', f)
 				if os.path.exists('scat_'+f):# at this point we should have a scattered light file somewhere which will also be extracted, so do the same for it
-					iraf.imcopy(input='scat_'+f+'[1:4096,*]', output='crop.tmp', verbose='no')
+					iraf.imcopy(input='scat_'+f+'[1:4096,*]', output='crop.tmp', verbose='no',Stdout="/dev/null")
 					shutil.move('crop.tmp.fits', 'scat_'+f)
 				iraf.flprcache()
 			os.chdir('../../../..')
-
 
 	for ccd in [1,2,3,4]:
 		cobs=glob.glob("reductions/%s/ccd%s/*" % (date,ccd))
@@ -942,8 +1135,8 @@ def extract_spectra(date):
 			os.chdir(cob)
 			check=iraf.apall(input='masterarc.fits', format='multispec', referen='masterflat', interac='no', find='no', recenter='no', resize='no', edit='no', trace='no', fittrac='no', extract='yes', extras='no', review='no', lower=-3.0, upper=3.0, nsubaps=1, pfit="fit1d", background='none', Stdout=1)
 			#extract spectra
-			files=glob.glob("./[1-31]*.fits")
-			files_scat=glob.glob("./scat_[1-31]*.fits")
+			files=glob.glob("./[01-31]*.fits")
+			files_scat=glob.glob("./scat_[01-31]*.fits")
 			check=iraf.apall(input=','.join(files), format='multispec', referen='masterflat', interac='no', find='no', recenter='no', resize='no', edit='no', trace='no', fittrac='no', extract='yes', extras='no', review='no', lower=-3.0, upper=3.0, nsubaps=1, pfit="fit1d", background='none', Stdout=1)
 			#extract scattered light spectra, so they can be saved in the final output
 			if len(files_scat)>0:
@@ -953,7 +1146,7 @@ def extract_spectra(date):
 			# clear cache, or IRAF will have problems with files with the same name
 			iraf.flprcache()
 
-def wav_calibration(date):
+def wav_calibration(date, start_folder):
 	"""
 	Calculate wavelength calibration and apply it to spectra.
 
@@ -967,8 +1160,131 @@ def wav_calibration(date):
 	       use the same method as in dr5.3. In dr5.3 we use a custom fit, not iraf's
 	"""
 
+	def func_wav(x,a,b,c,d):
+		"""
+		Function that describes the wavelength solution. a,b,c,d are coefficients of the Chebyshev polynomial
+		"""
+		return np.polynomial.chebyshev.chebval(x,[a,b,c,d])
+
+	def fit_wav(p,ye,mask):
+		"""
+		Fit as chebyshev polynomial with sigma clipping
+		"""
+		fit_init={1:[4813.3, 94.3,-5.67,0.003], 2:[5767.5, 112.05, -6.74, 0.015], 3:[6615.4, 129.3, -7.75, 0.015], 4:[7745,150.7,-8.95,0.017]}
+		fit_range={1:[0.35, 0.06, 0.03, 0.005], 2:[0.4, 0.06, 0.03, 0.005], 3:[0.45, 0.06, 0.03, 0.005], 4:[0.52, 0.1, 0.03, 0.005]}
+
+		x=p[0]
+		y=p[1]
+		lower_bound=np.array(fit_init[1])-6.*np.array(fit_range[1])
+		upper_bound=np.array(fit_init[1])+6.*np.array(fit_range[1])
+		popt,pcov = curve_fit(func_wav,x[mask],y[mask], p0=fit_init[1], bounds=(lower_bound, upper_bound))
+		return func_wav(x,popt[0],popt[1],popt[2],popt[3])
+
+	def sclip(p,fit,n,ye=[],sl=99999,su=99999,min=0,max=0,min_data=1,grow=0,global_mask=None,verbose=True):
+		"""
+		p: array of coordinate vectors. Last line in the array must be values that are fitted. The rest are coordinates.
+		fit: name of the fitting function. It must have arguments x,y,ye,and mask and return an array of values of the fitted function at coordinates x
+		n: number of iterations
+		ye: array of errors for each point
+		sl: lower limit in sigma units
+		su: upper limit in sigma units
+		min: number or fraction of rejected points below the fitted curve
+		max: number or fraction of rejected points above the fitted curve
+		min_data: minimal number of points that can still be used to make a constrained fit
+		global_mask: if initial mask is given it will be used throughout the whole fitting process, but the final fit will be evaluated also in the masked points
+		grow: number of points to reject around the rejected point.
+		verbose: print the results or not
+		"""
+
+		nv,dim=np.shape(p)
+
+		#if error vector is not given, assume errors are equal to 0:
+		if ye==[]: ye=np.zeros(dim)
+		#if a single number is given for y errors, assume it means the same error is for all points:
+		if isinstance(ye, (int, long, float)): ye=np.ones(dim)*ye
+		
+		if global_mask==None: global_mask=np.ones(dim, dtype=bool)
+		else: pass
+		
+		f_initial=fit(p,ye,global_mask)
+		s_initial=np.std(p[-1]-f_initial)
+
+		f=f_initial
+		s=s_initial
+
+		tmp_results=[]
+
+		b_old=np.ones(dim, dtype=bool)
+
+		for step in range(n):
+			#check that only sigmas or only min/max are given:
+			if (sl!=99999 or su!=99999) and (min!=0 or max!=0):
+				raise RuntimeError('Sigmas and min/max are given. Only one can be used.')
+
+			#if sigmas are given:
+			if sl!=99999 or su!=99999:
+				b=np.zeros(dim, dtype=bool)
+				if sl>=99999 and su!=sl: sl=su#check if only one is given. In this case set the other to the same value
+				if su>=99999 and sl!=su: su=sl
+
+				good_values=np.where(((f-p[-1])<(sl*(s+ye))) & ((f-p[-1])>-(su*(s+ye))))#find points that pass the sigma test
+				b[good_values]=True
+
+			#if min/max are given
+			if min!=0 or max!=0:
+				b=np.ones(dim, dtype=bool)
+				if min<1: min=dim*min#detect if min is in number of points or percentage
+				if max<1: max=dim*max#detect if max is in number of points or percentage
+
+				bad_values=np.concatenate(((p[-1]-f).argsort()[-int(max):], (p[-1]-f).argsort()[:int(min)]))
+				b[bad_values]=False
+
+			#check the grow parameter:
+			if grow>=1 and nv==2:
+				b_grown=np.ones(dim, dtype=bool)
+				for ind,val in enumerate(b):
+					if val==False:
+						ind_l=ind-int(grow)
+						ind_u=ind+int(grow)+1
+						if ind_l<0: ind_l=0
+						b_grown[ind_l:ind_u]=False
+
+				b=b_grown
+
+			tmp_results.append(f)
+
+			#check that the minimal number of good points is not too low:
+			if len(b[b])<min_data:
+				step=step-1
+				b=b_old
+				break
+
+			#check if the new b is the same as old one and break if yes:
+			if np.array_equal(b,b_old):
+				step=step-1
+				break
+
+			#fit again
+			f=fit(p,ye,b&global_mask)
+			s=np.std(p[-1][b]-f[b])
+			b_old=b
+
+		if verbose:
+			print ''
+			print 'FITTING RESULTS:'
+			print 'Number of iterations requested:    ',n
+			print 'Number of iterations performed:    ', step+1
+			print 'Initial standard deviation:        ', s_initial
+			print 'Final standard deviation:          ', s
+			print 'Number of rejected points:         ',len(np.invert(b[np.invert(b)]))
+			print ''
+		
+		return f,tmp_results,b
+
+	fit_init={1:[4813.3, 94.3,-5.67,0.003], 2:[5767.5, 112.05, -6.74, 0.015], 3:[6615.4, 129.3, -7.75, 0.015], 4:[7745,150.7,-8.95,0.017]}
+
 	# linelists of the arc lamp for each CCD
-	cal_linelist={1: 'aux/linelist_art_blue_ar.dat', 2: 'aux/linelist_art_green_ar.dat', 3: 'aux/linelist_art_red.dat', 4: 'aux/linelist_art_ir.dat'}
+	cal_linelist={1: 'aux/linelist_art_blue_new.dat', 2: 'aux/linelist_art_green_new.dat', 3: 'aux/linelist_art_red_new.dat', 4: 'aux/linelist_art_ir_new.dat'}
 
 	# reference images
 	cal_arc={'Plate 0': {1: 'aux/master_arc_p_0_ccd_1.ms.fits', 2: 'aux/master_arc_p_0_ccd_2.ms.fits', 3: 'aux/master_arc_p_0_ccd_3.ms.fits', 4: 'aux/master_arc_p_0_ccd_4.ms.fits'}, 'Plate 1':{1: 'aux/master_arc_p_1_ccd_1.ms.fits', 2: 'aux/master_arc_p_1_ccd_2.ms.fits', 3: 'aux/master_arc_p_1_ccd_3.ms.fits', 4: 'aux/master_arc_p_1_ccd_4.ms.fits'}}
@@ -981,6 +1297,10 @@ def wav_calibration(date):
 	for ccd in [1,2,3,4]:
 		cobs=glob.glob("reductions/%s/ccd%s/*" % (date,ccd))
 		for cob in cobs:
+			if not os.path.isfile(cob+'/masterarc.ms.fits'):
+				logging.warning('Masterarc was not found in ccd %d of COB %s, wavelength calibration will be skipped for this ccd-COB combination' % (ccd, cob.split('/')[-1]))
+				continue
+
 			hdul=fits.open(cob+'/masterarc.ms.fits')
 			plate= hdul[0].header['SOURCE']
 			hdul.close()
@@ -1000,8 +1320,8 @@ def wav_calibration(date):
 			for ap in range(1,393):
 				wav_good.append(wav_good_dict[ap])
 			np.save('wav_fit', np.array(wav_good))
-			files=glob.glob("./[1-31]*.ms.fits")
-			files_scat=glob.glob("./scat_[1-31]*.ms.fits")
+			files=glob.glob("./[01-31]*.ms.fits")
+			files_scat=glob.glob("./scat_[01-31]*.ms.fits")
 			#wavelength calibrate object files
 			for file in files:
 				hdul=fits.open(file, mode='update')
@@ -1023,28 +1343,177 @@ def wav_calibration(date):
 			hdul.close()
 			iraf.dispcor(input='masterarc.ms.fits', lineari='no', databas=start_folder+'/'+cob, output="", samedis='no', ignorea='yes',Stdout="/dev/null")
 
+			# make diagnostics plots
+			#read default fit coefficients
+			f=open("id%s" % (cal_arc[plate][ccd][4:-5]), "r")
+			ap=0
+			start=False
+			coefficients_default=[]
+			for line in f:
+				if len(line.strip())>0 and line.strip().split()[0]=='aperture': 
+					ap=int(line.strip().split()[1])
+				
+				if len(line.strip())>0 and line.strip().split()[0]=='coefficients': 
+					start=True
+					coefficients_tmp=[]
+
+				if len(line.strip().split())==1 and start: 
+					c=float(line.strip())
+					coefficients_tmp.append(c)
+
+				if len(line.strip())==0 and start:
+					start=False
+					coefficients_default.append(coefficients_tmp[-4:])
+			f.close()
+			coefficients_default=np.array(coefficients_default)
+
+			#read fitted coefficients
+			#read the id file
+			ff=open("idmasterarc.ms", "r")
+			ap=0
+			start=False
+			start_c=False
+			coefficients=[]
+			wav_solution_rms=[]
+			for line in ff:
+				if len(line.strip())>0 and line.strip().split()[0]=='aperture': 
+					ap=int(line.strip().split()[1])
+				
+				if len(line.strip())>0 and line.strip().split()[0]=='features': 
+					start=True
+					pixel=[]
+					wav=[]
+
+				if len(line.strip())>0 and start and len(line.strip().split())==6: 
+					features=line.strip().split()
+					pixel.append(float(features[0]))
+					wav.append(float(features[2]))
+
+				if len(line.strip())>0 and line.strip().split()[0]=='function': 
+					start=False
+					
+					max_=4100
+					min_=0
+
+					pixel=np.array(pixel)
+					wav=np.array(wav)
+
+					pixel=(2*pixel-(max_+min_))/(max_-min_)
+
+					#fit
+					f,steps,mask=sclip((pixel,wav),fit_wav,5,[],sl=2.5,su=2.5,min_data=25,grow=0,verbose=False)
+					#f2,steps2,mask2=sclip((pixel,wav),fit_wav,5,[],sl=3.5,su=3.5,min_data=25,grow=0,verbose=False)
+					#f3,steps3,mask3=sclip((pixel,wav),fit_wav_3,5,[],sl=2.5,su=2.5,min_data=12,grow=0,verbose=False)
+
+					#mask[0:5]=mask2[0:5]
+					#mask[-5:-1]=mask2[-5:-1]
+
+					popt,pcov=curve_fit(func_wav,pixel[mask],wav[mask],p0=fit_init[ccd])
+					#print ap,popt, np.std(wav[mask]-func_wav(pixel[mask],popt[0],popt[1],popt[2],popt[3]))
+					#s=np.std(wav[mask3]-func_wav(pixel[mask3],popt[0],popt[1],popt[2],popt[3]))
+					#wav_solution_rms.append(s)
+					#iraf.hedit(images=str(i[0][:-4])+"ms.fits", fields="W_RMS%s" % (ap), value=s, add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
+
+					coefficients.append(popt)
+
+
+			# save diagnostics plots
+			coefficients=np.array(coefficients)
+
+			fig=plt.figure(0, figsize=(16,7.5))
+			subplots_adjust(left=0.06, right=0.99, top=0.95, bottom=0.07, wspace=0.0, hspace=0.0)
+			ax=fig.add_subplot(411)
+			ax.set_title('COB = '+cob.split('/')[-1]+', CCD = '+str(ccd))
+			y_points=np.concatenate((coefficients_default[:392][:,0],coefficients[:,0]))
+			y_points=y_points[(y_points<np.percentile(y_points,90))&(y_points>np.percentile(y_points,10))]
+			y_lower=np.average(y_points)-3.2*np.std(y_points)
+			y_upper=np.average(y_points)+3.2*np.std(y_points)
+			ax.set_ylim(y_lower, y_upper)
+			ax.set_ylabel('$C_1$')
+			for n,i in enumerate(coefficients_default[:392][:,0]):
+				if i<y_lower:
+					ax.scatter(n+1,y_lower,c='g', alpha=0.5,lw=0.0,s=15,marker=7)
+				elif i>y_upper:
+					ax.scatter(n+1,y_upper,c='g', alpha=0.5,lw=0.0,s=15,marker=6)
+				else:
+					ax.scatter(n+1,i,c='g', alpha=0.5,lw=0.0,s=10, marker='o')
+			for n,i in enumerate(coefficients[:,0]):
+				if i<y_lower:
+					ax.scatter(n+1,y_lower,c='r', alpha=0.5,lw=0.0,s=15,marker=7)
+				elif i>y_upper:
+					ax.scatter(n+1,y_upper,c='r', alpha=0.5,lw=0.0,s=15,marker=6)
+				else:
+					ax.scatter(n+1,i,c='r', alpha=0.5,lw=0.0,s=10, marker='o')
+			ax=fig.add_subplot(412, sharex=ax)
+			y_points=np.concatenate((coefficients_default[:392][:,1],coefficients[:,1]))
+			y_points=y_points[(y_points<np.percentile(y_points,90))&(y_points>np.percentile(y_points,10))]
+			y_lower=np.average(y_points)-4.0*np.std(y_points)
+			y_upper=np.average(y_points)+4.0*np.std(y_points)
+			ax.set_ylim(y_lower, y_upper)
+			ax.set_ylabel('$C_2$')
+			for n,i in enumerate(coefficients_default[:392][:,1]):
+				if i<y_lower:
+					ax.scatter(n+1,y_lower,c='g', alpha=0.5,lw=0.0,s=15,marker=7)
+				elif i>y_upper:
+					ax.scatter(n+1,y_upper,c='g', alpha=0.5,lw=0.0,s=15,marker=6)
+				else:
+					ax.scatter(n+1,i,c='g', alpha=0.5,lw=0.0,s=10, marker='o')
+			for n,i in enumerate(coefficients[:,1]):
+				if i<y_lower:
+					ax.scatter(n+1,y_lower,c='r', alpha=0.5,lw=0.0,s=15,marker=7)
+				elif i>y_upper:
+					ax.scatter(n+1,y_upper,c='r', alpha=0.5,lw=0.0,s=15,marker=6)
+				else:
+					ax.scatter(n+1,i,c='r', alpha=0.5,lw=0.0,s=10, marker='o')
+			ax=fig.add_subplot(413, sharex=ax)
+			y_points=np.concatenate((coefficients_default[:392][:,2],coefficients[:,2]))
+			y_points=y_points[(y_points<np.percentile(y_points,90))&(y_points>np.percentile(y_points,10))]
+			y_lower=np.average(y_points)-4.5*np.std(y_points)
+			y_upper=np.average(y_points)+4.5*np.std(y_points)
+			ax.set_ylim(y_lower, y_upper)
+			ax.set_ylabel('$C_3$')
+			for n,i in enumerate(coefficients_default[:392][:,2]):
+				if i<y_lower:
+					ax.scatter(n+1,y_lower,c='g', alpha=0.5,lw=0.0,s=15,marker=7)
+				elif i>y_upper:
+					ax.scatter(n+1,y_upper,c='g', alpha=0.5,lw=0.0,s=15,marker=6)
+				else:
+					ax.scatter(n+1,i,c='g', alpha=0.5,lw=0.0,s=10, marker='o')
+			for n,i in enumerate(coefficients[:,2]):
+				if i<y_lower:
+					ax.scatter(n+1,y_lower,c='r', alpha=0.5,lw=0.0,s=15,marker=7)
+				elif i>y_upper:
+					ax.scatter(n+1,y_upper,c='r', alpha=0.5,lw=0.0,s=15,marker=6)
+				else:
+					ax.scatter(n+1,i,c='r', alpha=0.5,lw=0.0,s=10, marker='o')
+			ax=fig.add_subplot(414, sharex=ax)
+			y_points=np.concatenate((coefficients_default[:392][:,3],coefficients[:,3]))
+			y_points=y_points[(y_points<np.percentile(y_points,90))&(y_points>np.percentile(y_points,10))]
+			y_lower=np.average(y_points)-5.0*np.std(y_points)
+			y_upper=np.average(y_points)+5.0*np.std(y_points)
+			ax.set_ylim(y_lower, y_upper)
+			ax.set_ylabel('$C_4$')
+			for n,i in enumerate(coefficients_default[:392][:,3]):
+				if i<y_lower:
+					ax.scatter(n+1,y_lower,c='g', alpha=0.5,lw=0.0,s=15,marker=7)
+				elif i>y_upper:
+					ax.scatter(n+1,y_upper,c='g', alpha=0.5,lw=0.0,s=15,marker=6)
+				else:
+					ax.scatter(n+1,i,c='g', alpha=0.5,lw=0.0,s=10, marker='o')
+			for n,i in enumerate(coefficients[:,3]):
+				if i<y_lower:
+					ax.scatter(n+1,y_lower,c='r', alpha=0.5,lw=0.0,s=15,marker=7)
+				elif i>y_upper:
+					ax.scatter(n+1,y_upper,c='r', alpha=0.5,lw=0.0,s=15,marker=6)
+				else:
+					ax.scatter(n+1,i,c='r', alpha=0.5,lw=0.0,s=10, marker='o')
+			ax.set_xlim(0,394)
+			ax.set_xlabel('Aperture')
+			fig.savefig('wav_'+cob.split('/')[-1]+'00xxx'+str(ccd)+'.png', dpi=300, format='png')
+			fig.clf()
 
 			os.chdir('../../../..')
 			iraf.flprcache()
-
-def plot_wav_coeff(date, cob_id, ccd):
-	"""
-	Illustrate wavelength calibration, similar to dr5.3
-
-	Parameters:
-		date (str): date string (e.g. 190210)
-		cob_id (str): COB ID (e.g. 1902100040)
-		ccd (int): CCD number (1=Blue, .., 4=IR)
-	
-	Returns:
-		none
-
-	To do:
-		Everything
-
-	"""
-
-	pass
 
 def resolution_profile(date):
 	"""
@@ -1057,8 +1526,8 @@ def resolution_profile(date):
 		none
 
 	To do:
-		Make it pretty
-		Do diagnostics plots
+		Do some cleaning
+		Paralelize
 	"""
 
 	def peak_profile(a,x,y):
@@ -1092,7 +1561,7 @@ def resolution_profile(date):
 		cobs=glob.glob("reductions/%s/ccd%s/*" % (date,ccd))
 		for cob in cobs:
 			logging.info('Calculating resolution profile for COB %s.' % cob)
-			files=glob.glob("%s/[1-31]*.ms.fits" % cob)
+			files=glob.glob("%s/[01-31]*.ms.fits" % cob)
 			arc=cob+"/masterarc.ms.fits"
 			# linearize arc
 			iraf.disptrans(input=arc, output='', linearize='yes', units='angstroms', Stdout="/dev/null")
@@ -1243,13 +1712,13 @@ def resolution_profile(date):
 			#xx,yy=np.meshgrid(x,y)	
 
 			#ax2=fig.add_subplot(142)
-			#ax2.pcolor(xx, yy, p(xx,yy))
+			#ax2.pcolormesh(xx, yy, p(xx,yy))
 
 			#ax3=fig.add_subplot(143)
-			#ax3.pcolor(xx,yy,f)
+			#ax3.pcolormesh(xx,yy,f)
 
 			#ax4=fig.add_subplot(144)
-			#ax4.pcolor(xx,yy,p(xx,yy)+f, vmin=4.0,vmax=6.5)
+			#ax4.pcolormesh(xx,yy,p(xx,yy)+f, vmin=4.0,vmax=6.5)
 
 			#ax4.set_title('Combined model')
 			#ax3.set_title('Fibre model')
@@ -1322,7 +1791,6 @@ def v_bary_correction(date, quick=False, ncpu=1):
 		Sort out downloading UT1-UTC tables.
 		Make sure the header cleans OK for both (quick=True and False) cases.
 		Check with Tomaz whether vbary is the same as his
-		correct other files than main one in quick=True method
 
 	"""
 
@@ -1340,7 +1808,7 @@ def v_bary_correction(date, quick=False, ncpu=1):
 
 	args=[]
 
-	files=glob.glob("reductions/%s/ccd*/*/[1-31]*.ms.fits" % (date))
+	files=glob.glob("reductions/%s/ccd*/*/[01-31]*.ms.fits" % (date))
 	for file in files:
 		# we need coordinates for indivisual fibres
 		fibre_table_file='/'.join(file.split('/')[:-1])+'/fibre_table_'+file.split('/')[-1].replace('.ms', '')
@@ -1365,14 +1833,38 @@ def v_bary_correction(date, quick=False, ncpu=1):
 			hdul=fits.open(file, mode='update')
 			hdul[0].header['BARYEFF']=(v_bary_mean, 'Barycentric velocity correction in km/s')
 			hdul.close()
+			if os.path.exists('/'.join(file.split('/')[:-1])+'/sky_'+file.split('/')[-1]): 
+				hdul_sky=fits.open('/'.join(file.split('/')[:-1])+'/sky_'+file.split('/')[-1], mode='update')
+				hdul_sky[0].header['BARYEFF']=v_bary_mean
+				hdul_sky.close()
+			if os.path.exists('/'.join(file.split('/')[:-1])+'/telurics_'+file.split('/')[-1]): 
+				hdul_tel=fits.open('/'.join(file.split('/')[:-1])+'/telurics_'+file.split('/')[-1], mode='update')
+				hdul_tel[0].header['BARYEFF']=v_bary_mean
+				hdul_tel.close()
+			if os.path.exists('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1]): 
+				hdul_scat=fits.open('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1], mode='update')
+				hdul_scat[0].header['BARYEFF']=v_bary_mean
+				hdul_scat.close()
+
 			iraf.dopcor(input=file, output='', redshift='-%s' % v_bary_mean, isveloc='yes', add='yes', dispers='yes', apertures='', flux='no')
+			if os.path.exists('/'.join(file.split('/')[:-1])+'/sky_'+file.split('/')[-1]): 
+				iraf.dopcor(input='/'.join(file.split('/')[:-1])+'/sky_'+file.split('/')[-1], output='', redshift='-%s' % v_bary_mean, isveloc='yes', add='yes', dispers='yes', apertures='', flux='no')
+			if os.path.exists('/'.join(file.split('/')[:-1])+'/telurics_'+file.split('/')[-1]): 
+				iraf.dopcor(input='/'.join(file.split('/')[:-1])+'/telurics_'+file.split('/')[-1], output='', redshift='-%s' % v_bary_mean, isveloc='yes', add='yes', dispers='yes', apertures='', flux='no')
+			if os.path.exists('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1]): 
+				iraf.dopcor(input='/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1], output='', redshift='-%s' % v_bary_mean, isveloc='yes', add='yes', dispers='yes', apertures='', flux='no')
 		else:
 			# Otherwise do it aperture by aperture. Downloading is currently turned off. 
 			args.append([file, fibre_table, obstime, AAT])
 	
 	if quick==False:
-		pool = Pool(processes=ncpu)
-		pool.map(v_bary_correction_proc, args)
+		if ncpu>1:
+			pool = Pool(processes=ncpu)
+			pool.map(v_bary_correction_proc, args)
+			pool.close()
+		else:
+			for arg in args:
+				v_bary_correction_proc(arg)
 
 
 def plot_spectra(date, cob_id, ccd):
@@ -1386,10 +1878,6 @@ def plot_spectra(date, cob_id, ccd):
 	
 	Returns:
 		none
-
-	To do:
-		Mark sky fibres if image is not sky subtracted
-		Do not plot sky fibres if image is sky subtracted (because a zero spectrum cannot be normalized)
 
 	"""
 	matplotlib_backend=matplotlib.get_backend()
@@ -1407,7 +1895,7 @@ def plot_spectra(date, cob_id, ccd):
 	wavs_max=[]
 	vel_frame=[]
 
-	files=glob.glob("reductions/%s/ccd%s/%s/[1-31]*.ms.fits" % (date, ccd, cob_id))
+	files=glob.glob("reductions/%s/ccd%s/%s/[01-31]*.ms.fits" % (date, ccd, cob_id))
 	for n_file, file in enumerate(files):
 		#create a dict from fibre table
 		if n_file==0:
@@ -1687,7 +2175,7 @@ def remove_sky(date, method='nearest', thr_method='flat', ncpu=1):
 	To do:
 		More options for different methods of sky removal
 		Urgent: separate magnitude based throughput for plate 0 and plate 1
-		Check if method='nearest3' works with paralelization
+		Add option to manually scale sky
 
 	"""
 
@@ -1700,11 +2188,15 @@ def remove_sky(date, method='nearest', thr_method='flat', ncpu=1):
 		fibre_throughputs_dict_mags={}
 		cobs=glob.glob("reductions/%s/ccd%s/*" % (date,ccd))
 		for cob in cobs:
-			files=glob.glob("%s/[1-31]*.fits" % cob)
+			if not os.path.isfile(cob+'/masterarc.ms.fits'):
+				logging.warning('Masterarc was not found in ccd %d of COB %s, fibre throughput will not be estimated for this ccd-COB combination' % (ccd, cob.split('/')[-1]))
+				continue
+
+			files=glob.glob("%s/[01-31]*.fits" % cob)
 			valid_files=[]
 			for f in files:
 				if '.ms' not in f: valid_files.append(f)
-			
+
 			#create a dict from fibre table
 			table_name='fibre_table_'+valid_files[0].split('/')[-1]
 			hdul=fits.open('/'.join(valid_files[0].split('/')[:-1])+'/'+table_name)
@@ -1721,7 +2213,7 @@ def remove_sky(date, method='nearest', thr_method='flat', ncpu=1):
 			fibre_table_dict=defaultdict(lambda:('FIBRE NOT IN USE', 0.0, 0.0, 0, 0, 0, 0, 0.0, 'N', 0, 0.0, 0, 'Not in use', '0', 0.0, 0.0, 0.0), fibre_table_dict)
 
 			# create a dict of fibre throughputs based on magnitudes. This is done for the whole night, because some fibres are positioned on the sky and don't have an associated magnitude. On a different exposure these fibres are used for stars.
-			files=glob.glob("%s/[1-31]*.ms.fits" % cob)
+			files=glob.glob("%s/[01-31]*.ms.fits" % cob)
 			file_data_all=[]
 			for file in files:
 				hdul=fits.open(file)
@@ -1748,11 +2240,17 @@ def remove_sky(date, method='nearest', thr_method='flat', ncpu=1):
 		cobs=glob.glob("reductions/%s/ccd%s/*" % (date,ccd))
 		args=[]
 		for cob in cobs:	
-			files=glob.glob("%s/[1-31]*.fits" % cob)
+			files=glob.glob("%s/[01-31]*.fits" % cob)
 			valid_files=[]
 			for f in files:
-				if '.ms' not in f: valid_files.append(f)
-			
+				if '.ms' not in f:
+					valid_files.append(f)
+
+			if len(valid_files) == 0:
+				error_str = 'No spectra files found for sky removal in ccd %d of COB %s' % (ccd, cob.split('/')[-1])
+				logging.error(error_str)
+				continue
+
 			#create a dict from fibre table
 			table_name='fibre_table_'+valid_files[0].split('/')[-1]
 			hdul=fits.open('/'.join(valid_files[0].split('/')[:-1])+'/'+table_name)
@@ -1801,7 +2299,7 @@ def remove_sky(date, method='nearest', thr_method='flat', ncpu=1):
 			fibre_throughputs_dict_use=defaultdict(lambda:1.0, fibre_throughputs_dict_use)
 
 			#list of ms files
-			files=glob.glob("%s/[1-31]*.ms.fits" % cob)
+			files=glob.glob("%s/[01-31]*.ms.fits" % cob)
 
 			#change dicts into arrays, because parallelization fails with dicts. First entry in the array will be unused, because apertures are counted with 1,2,3,4, so element 0 is necessary in the array, but was not in the dict
 			fibre_throughputs_arr_use=[fibre_throughputs_dict_use[-1]]
@@ -1820,20 +2318,23 @@ def remove_sky(date, method='nearest', thr_method='flat', ncpu=1):
 
 		if method=='nearest':
 			# First method is where we use the nearest sky fibre to remove sky from object spectra. This is good, because the resolutions of the sky and object spectra are as close as possible.
-			pool = Pool(processes=ncpu)
-			pool.map(remove_sky_nearest, args)
-			#for arg in args:
-			#	remove_sky_nearest(arg)
+			if ncpu>1:
+				pool = Pool(processes=ncpu)
+				pool.map(remove_sky_nearest, args)
+				pool.close()
+			else:
+				for arg in args:
+					remove_sky_nearest(arg)
 
 		if method=='nearest3':
 			# Second method is where we use three nearest sky spectra. Resolution is still somewhat similar, but we can take a median of three sky spectra and thus remove any remaining cosmics
-			pool = Pool(processes=ncpu)
-			pool.map(remove_sky_nearest3, args)
-			#for arg in args:
-			#	remove_sky_nearest3(arg)
-					
-
-
+			if ncpu>1:
+				pool = Pool(processes=ncpu)
+				pool.map(remove_sky_nearest3, args)
+				pool.close()
+			else:
+				for arg in args:
+					remove_sky_nearest3(arg)
 
 
 def remove_telurics(date):
@@ -1926,6 +2427,7 @@ def remove_telurics(date):
 
 	iraf.noao(_doprint=0,Stdout="/dev/null")
 	iraf.onedspec(_doprint=0,Stdout="/dev/null")
+	iraf.dataio(_doprint=0,Stdout="/dev/null")
 
 	# create a dictionary of fitted parameters
 	trans_params={}
@@ -1941,7 +2443,7 @@ def remove_telurics(date):
 
 		cobs=glob.glob("reductions/%s/ccd%s/*" % (date,ccd))
 		for cob in cobs:	
-			files=glob.glob("%s/[1-31]*.fits" % cob)
+			files=glob.glob("%s/[01-31]*.fits" % cob)
 			valid_files=[]
 			for f in files:
 				if '.ms' not in f: valid_files.append(f)
@@ -1961,7 +2463,7 @@ def remove_telurics(date):
 					fibre_table_dict[n]=i
 			fibre_table_dict=defaultdict(lambda:('FIBRE NOT IN USE', 0.0, 0.0, 0, 0, 0, 0, 0.0, 'N', 0, 0.0, 0, 'Not in use', '0', 0.0, 0.0, 0.0), fibre_table_dict)
 
-			files=glob.glob("%s/[1-31]*.ms.fits" % cob)
+			files=glob.glob("%s/[01-31]*.ms.fits" % cob)
 			files=sorted(files)
 
 			# find valid apertures
@@ -2091,8 +2593,487 @@ def remove_telurics(date):
 				#	ax.legend()
 				#	show()
 
+def create_final_spectra_proc(args):
+	"""
+	Multiprocessing wrapper for create_final_spectra
+	"""
+	ccd, cob, files=args
+	date=cob.split('/')[1]
 
-def create_final_spectra(date):
+	# copy wavelength solution diagnostics plot
+	shutil.copyfile(cob+'/wav_'+cob.split('/')[-1]+'00xxx'+str(ccd)+'.png', 'reductions/results/'+date+'/diagnostics/'+'wav_'+cob.split('/')[-1]+'00xxx'+str(ccd)+'.png')
+
+	# save individual spectra
+	for file in files:
+		#create a dict from fibre table
+		fibre_table_file='/'.join(file.split('/')[:-1])+'/fibre_table_'+file.split('/')[-1].replace('.ms', '')
+		hdul=fits.open(fibre_table_file)
+		fibre_table=hdul[1].data
+		hdul.close
+		fibre_table_dict={}
+		n=0
+		for fibre,i in enumerate(fibre_table):
+			if i[8]=='F': 
+				pass
+			else: 
+				n+=1
+				fibre_table_dict[n]=np.append(np.array(i), np.array([fibre+1]))
+		fibre_table_dict=defaultdict(lambda:np.array(['FIBRE NOT IN USE', 0.0, 0.0, 0, 0, 0, 0, 0.0, 'N', 0, 0.0, 0, 'Not in use', '0', 0.0, 0.0, 0.0, fibre+1]), fibre_table_dict)
+
+		#read saved b_values
+		if os.path.exists(cob+'/b_values.npy'): b_values=np.load(cob+'/b_values.npy')
+		else: b_values=np.array([2.0]*392)
+
+		#make a normalized spectrum, because this will be added to the final fits files
+		iraf.continuum(input=file, output='/'.join(file.split('/')[:-1])+'/norm_'+file.split('/')[-1], order=5, interactive='no', low_reject=2.0, high_reject=0.0, niterate=5, naverage=11, Stdout="/dev/null")
+
+		#make a sqrt spectrum for adding errors to it
+		iraf.sarith(input1=file, op='^', input2='-0.5', output='/'.join(file.split('/')[:-1])+'/err_'+file.split('/')[-1], apertures='', Stdout="/dev/null")
+
+		#make a cross_talk spectrum placeholder
+		iraf.sarith(input1=file, op='*', input2='0.0', output='/'.join(file.split('/')[:-1])+'/cross_'+file.split('/')[-1], apertures='', Stdout="/dev/null")
+
+		#linearize all spectra
+		logging.info('Linearizing spectra.')
+		iraf.disptrans(input=file, output='', linearize='yes', units='angstroms', Stdout="/dev/null")
+		iraf.disptrans(input='/'.join(file.split('/')[:-1])+'/norm_'+file.split('/')[-1], output='', linearize='yes', units='angstroms', Stdout="/dev/null")
+		if os.path.exists('/'.join(file.split('/')[:-1])+'/sky_'+file.split('/')[-1]): iraf.disptrans(input='/'.join(file.split('/')[:-1])+'/sky_'+file.split('/')[-1], output='', linearize='yes', units='angstroms', Stdout="/dev/null")
+		if os.path.exists('/'.join(file.split('/')[:-1])+'/telurics_'+file.split('/')[-1]): iraf.disptrans(input='/'.join(file.split('/')[:-1])+'/telurics_'+file.split('/')[-1], output='', linearize='yes', units='angstroms', Stdout="/dev/null")
+		if os.path.exists('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1]): iraf.disptrans(input='/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1], output='', linearize='yes', units='angstroms', Stdout="/dev/null")
+		if os.path.exists('/'.join(file.split('/')[:-1])+'/cross_'+file.split('/')[-1]): iraf.disptrans(input='/'.join(file.split('/')[:-1])+'/cross_'+file.split('/')[-1], output='', linearize='yes', units='angstroms', Stdout="/dev/null")
+		if os.path.exists('/'.join(file.split('/')[:-1])+'/res_'+file.split('/')[-1]): iraf.disptrans(input='/'.join(file.split('/')[:-1])+'/res_'+file.split('/')[-1], output='', linearize='yes', units='angstroms', Stdout="/dev/null")
+		iraf.flprcache()
+
+		#save scattered light image into a png file for diagnostics
+		logging.info('Saving diagnostic plots (scattered light).')
+		if os.path.exists('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1]):
+			hdul=fits.open('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1][:-8]+'.fits')
+			scat_image=hdul[0].data
+			hdul.close()
+			fig=figure('scat_'+file, figsize=(7,6))
+			subplots_adjust(left=0.07, right=0.96, top=0.95, bottom=0.07, wspace=0.1, hspace=0.1)
+			ax=fig.add_subplot(111)
+			ax_image=ax.imshow(scat_image, cmap='gray', origin='lower')
+			cbar=fig.colorbar(ax_image, fraction=0.085)
+			cbar.ax.set_ylabel('Flux')
+			ax.set_xlabel('x')
+			ax.set_ylabel('y')
+			ax.set_title('Scattered light for image %s' % str(date)+file.split('/')[-1][6:10]+'00xxx'+str(ccd)+'.fits')
+			fig.savefig('reductions/results/%s/diagnostics/scat_%s' % (date, str(date)+file.split('/')[-1][6:10]+'00xxx'+str(ccd)+'.png'), dpi=300, format='png')
+			fig.clf()
+
+		#save resolution profile image into a png file for diagnostics
+		logging.info('Saving diagnostic plots (resolution profile).')
+		if os.path.exists('/'.join(file.split('/')[:-1])+'/res_'+file.split('/')[-1]):
+			hdul=fits.open('/'.join(file.split('/')[:-1])+'/res_'+file.split('/')[-1])
+			res_image=hdul[0].data
+			hdul.close()
+			fig=figure('res_'+file, figsize=(7,6))
+			subplots_adjust(left=0.07, right=0.99, top=0.95, bottom=0.07, wspace=0.1, hspace=0.1)
+			ax=fig.add_subplot(111)
+			ax_image=ax.imshow(res_image, cmap='viridis', origin='lower', interpolation='nearest', aspect='auto')
+			cbar=fig.colorbar(ax_image)
+			cbar.ax.set_ylabel('FWHM / $\\mathrm{\\AA}$')
+			ax.set_xlabel('x')
+			ax.set_ylabel('Aperture')
+			ax.set_title('FWHM of the LSF for spectra %s' % str(date)+file.split('/')[-1][6:10]+'00xxx'+str(ccd))
+			fig.savefig('reductions/results/%s/diagnostics/res_%s' % (date, str(date)+file.split('/')[-1][6:10]+'00xxx'+str(ccd)+'.png'), dpi=300, format='png')
+			fig.clf()
+
+		for ap in range(1,393):
+			if fibre_table_dict[ap][8]=='P':
+				filename=str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits'
+				iraf.scopy(input=file, output='reductions/results/%s/spectra/all/%s' % (date,filename), apertures=ap, Stdout="/dev/null")
+				#add normalized spectrum
+				iraf.scopy(input='/'.join(file.split('/')[:-1])+'/norm_'+file.split('/')[-1], output='reductions/results/%s/spectra/all/tmp_norm_%s.fits' % (date, filename), apertures=ap, Stdout="/dev/null")
+				iraf.imcopy(input='reductions/results/%s/spectra/all/tmp_norm_%s.fits' % (date, filename), output='reductions/results/%s/spectra/all/%s[append]' % (date,filename), Stdout="/dev/null")
+				os.remove('reductions/results/%s/spectra/all/tmp_norm_%s.fits' % (date, filename))
+				iraf.hedit(images='reductions/results/%s/spectra/all/%s[1]' % (date,filename), fields="EXTNAME", value='normalized', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
+				#add error spectrum (add a copy of the spectrum as a placeholder)
+				iraf.scopy(input=file, output='reductions/results/%s/spectra/all/tmp_err_%s.fits' % (date, filename), apertures=ap, Stdout="/dev/null")
+				iraf.imcopy(input='reductions/results/%s/spectra/all/tmp_err_%s.fits' % (date, filename), output='reductions/results/%s/spectra/all/%s[append]' % (date,filename), Stdout="/dev/null")
+				os.remove('reductions/results/%s/spectra/all/tmp_err_%s.fits' % (date, filename))
+				iraf.hedit(images='reductions/results/%s/spectra/all/%s[2]' % (date,filename), fields="EXTNAME", value='relative_error', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
+				#add sky spectrum
+				if os.path.exists('/'.join(file.split('/')[:-1])+'/sky_'+file.split('/')[-1]):
+					iraf.scopy(input='/'.join(file.split('/')[:-1])+'/sky_'+file.split('/')[-1], output='reductions/results/%s/spectra/all/tmp_sky_%s.fits' % (date, filename), apertures=ap, Stdout="/dev/null")
+					iraf.imcopy(input='reductions/results/%s/spectra/all/tmp_sky_%s.fits' % (date, filename), output='reductions/results/%s/spectra/all/%s[append]' % (date,filename), Stdout="/dev/null")
+					os.remove('reductions/results/%s/spectra/all/tmp_sky_%s.fits' % (date, filename))
+					iraf.hedit(images='reductions/results/%s/spectra/all/%s[3]' % (date,filename), fields="EXTNAME", value='sky', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
+				else:
+					iraf.sarith(input1='reductions/results/%s/spectra/all/%s[0]' % (date,filename), op='*', input2='0', output='reductions/results/%s/spectra/all/tmp_sky_%s.fits' % (date, filename), apertures=ap, Stdout="/dev/null")
+					iraf.imcopy(input='reductions/results/%s/spectra/all/tmp_sky_%s.fits' % (date, filename), output='reductions/results/%s/spectra/all/%s[append]' % (date,filename), Stdout="/dev/null")
+					os.remove('reductions/results/%s/spectra/all/tmp_sky_%s.fits' % (date, filename))
+					iraf.hedit(images='reductions/results/%s/spectra/all/%s[3]' % (date,filename), fields="EXTNAME", value='sky', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
+				#add teluric correction
+				if os.path.exists('/'.join(file.split('/')[:-1])+'/telurics_'+file.split('/')[-1]):
+					iraf.scopy(input='/'.join(file.split('/')[:-1])+'/telurics_'+file.split('/')[-1], output='reductions/results/%s/spectra/all/tmp_tel_%s.fits' % (date, filename), apertures=ap, Stdout="/dev/null")#scopy does not accept [append] option
+					iraf.imcopy(input='reductions/results/%s/spectra/all/tmp_tel_%s.fits' % (date, filename), output='reductions/results/%s/spectra/all/%s[append]' % (date,filename), Stdout="/dev/null")
+					os.remove('reductions/results/%s/spectra/all/tmp_tel_%s.fits' % (date, filename))
+					iraf.hedit(images='reductions/results/%s/spectra/all/%s[4]' % (date,filename), fields="EXTNAME", value='teluric', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
+				else:
+					iraf.sarith(input1='reductions/results/%s/spectra/all/%s[0]' % (date,filename), op='*', input2='0', output='reductions/results/%s/spectra/all/tmp_tel_%s.fits' % (date, filename), apertures=ap, Stdout="/dev/null")
+					iraf.sarith(input1='reductions/results/%s/spectra/all/tmp_tel_%s.fits' % (date, filename), op='+', input2='1.0', output='reductions/results/%s/spectra/all/tmp_tel2_%s.fits' % (date, filename), apertures='', Stdout="/dev/null")
+					iraf.imcopy(input='reductions/results/%s/spectra/all/tmp_tel2_%s.fits' % (date, filename), output='reductions/results/%s/spectra/all/%s[append]' % (date,filename), Stdout="/dev/null")
+					os.remove('reductions/results/%s/spectra/all/tmp_tel_%s.fits' % (date, filename))
+					os.remove('reductions/results/%s/spectra/all/tmp_tel2_%s.fits' % (date, filename))
+					iraf.hedit(images='reductions/results/%s/spectra/all/%s[4]' % (date,filename), fields="EXTNAME", value='teluric', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
+				#add scattered light
+				if os.path.exists('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1]):
+					iraf.scopy(input='/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1], output='reductions/results/%s/spectra/all/tmp_scat_%s.fits' % (date, filename), apertures=ap, Stdout="/dev/null")
+					iraf.imcopy(input='reductions/results/%s/spectra/all/tmp_scat_%s.fits' % (date, filename), output='reductions/results/%s/spectra/all/%s[append]' % (date,filename), Stdout="/dev/null")
+					os.remove('reductions/results/%s/spectra/all/tmp_scat_%s.fits' % (date, filename))
+					iraf.hedit(images='reductions/results/%s/spectra/all/%s[5]' % (date,filename), fields="EXTNAME", value='scattered', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
+				else:
+					iraf.sarith(input1='reductions/results/%s/spectra/all/%s[0]' % (date,filename), op='*', input2='0', output='reductions/results/%s/spectra/all/tmp_scat_%s.fits' % (date, filename), apertures=ap, Stdout="/dev/null")
+					iraf.imcopy(input='reductions/results/%s/spectra/all/tmp_scat_%s.fits' % (date, filename), output='reductions/results/%s/spectra/all/%s[append]' % (date,filename), Stdout="/dev/null")
+					os.remove('reductions/results/%s/spectra/all/tmp_scat_%s.fits' % (date, filename))
+					iraf.hedit(images='reductions/results/%s/spectra/all/%s[5]' % (date,filename), fields="EXTNAME", value='scattered', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
+				#add cross talk spectrum
+				if os.path.exists('/'.join(file.split('/')[:-1])+'/cross_'+file.split('/')[-1]):
+					iraf.scopy(input='/'.join(file.split('/')[:-1])+'/cross_'+file.split('/')[-1], output='reductions/results/%s/spectra/all/tmp_cross_%s.fits' % (date, filename), apertures=ap, Stdout="/dev/null")
+					iraf.imcopy(input='reductions/results/%s/spectra/all/tmp_cross_%s.fits' % (date, filename), output='reductions/results/%s/spectra/all/%s[append]' % (date,filename), Stdout="/dev/null")
+					os.remove('reductions/results/%s/spectra/all/tmp_cross_%s.fits' % (date, filename))
+					iraf.hedit(images='reductions/results/%s/spectra/all/%s[6]' % (date,filename), fields="EXTNAME", value='cross_talk', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
+				else:
+					iraf.sarith(input1='reductions/results/%s/spectra/all/%s[0]' % (date,filename), op='*', input2='0', output='reductions/results/%s/spectra/all/tmp_cross_%s.fits' % (date, filename), apertures=ap, Stdout="/dev/null")
+					iraf.imcopy(input='reductions/results/%s/spectra/all/tmp_cross_%s.fits' % (date, filename), output='reductions/results/%s/spectra/all/%s[append]' % (date,filename), Stdout="/dev/null")
+					os.remove('reductions/results/%s/spectra/all/tmp_cross_%s.fits' % (date, filename))
+					iraf.hedit(images='reductions/results/%s/spectra/all/%s[6]' % (date,filename), fields="EXTNAME", value='cross_talk', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
+				#add resolution profile
+				if os.path.exists('/'.join(file.split('/')[:-1])+'/res_'+file.split('/')[-1]):
+					iraf.scopy(input='/'.join(file.split('/')[:-1])+'/res_'+file.split('/')[-1], output='reductions/results/%s/spectra/all/tmp_res_%s.fits' % (date, filename), apertures=ap, Stdout="/dev/null")
+					iraf.imcopy(input='reductions/results/%s/spectra/all/tmp_res_%s.fits' % (date, filename), output='reductions/results/%s/spectra/all/%s[append]' % (date,filename), Stdout="/dev/null")
+					os.remove('reductions/results/%s/spectra/all/tmp_res_%s.fits' % (date, filename))
+					iraf.hedit(images='reductions/results/%s/spectra/all/%s[7]' % (date,filename), fields="EXTNAME", value='resolution_profile', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
+				else:
+					hdul=fits.open('reductions/results/%s/spectra/all/%s' % (date,filename), mode='update')
+					hdul.append(fits.ImageHDU([0]))
+					hdul.close()
+					iraf.hedit(images='reductions/results/%s/spectra/all/%s[7]' % (date,filename), fields="EXTNAME", value='resolution_profile', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
+				#add errors to the error spectrum
+				hdul=fits.open('reductions/results/%s/spectra/all/%s' % (date,filename), mode='update')
+				noise_squared=hdul[0].data+hdul[3].data+hdul[5].data+hdul[6].data+float(hdul[0].header['RO_NOIS1'])**2
+				signal=hdul[0].data
+				rel_err=np.sqrt(noise_squared)/signal
+				hdul[2].data=rel_err
+				hdul.close()
+				#add data
+				hdul=fits.open('reductions/results/%s/spectra/all/%s' % (date,filename), mode='update')
+				#read some info drom fibre table
+				object_name=fibre_table_dict[ap][0]
+				ra=float(fibre_table_dict[ap][1])/np.pi*180.
+				dec=float(fibre_table_dict[ap][2])/np.pi*180.
+				pivot=fibre_table_dict[ap][9]
+				fibre=fibre_table_dict[ap][-1]
+				x=fibre_table_dict[ap][3]
+				y=fibre_table_dict[ap][4]
+				theta=fibre_table_dict[ap][7]
+				mag=fibre_table_dict[ap][10]
+				#check aperture flags
+				aperture_flags_dict={}
+				a=open('%s/aplast' % (cob))
+				failed_apertures=np.load('%s/failed_apertures.npy' % (cob))
+				for line in a:
+					l=line.split()
+					if len(l)>0 and l[0]=='begin':
+						y=float(l[5])
+						n=int(l[3])
+						if n in failed_apertures:
+							aperture_flags_dict[n]=(y,0)
+						else:
+							aperture_flags_dict[n]=(y,1)
+				#load fitting results for wavelength solution
+				wav_dict=np.load(cob+'/wav_fit.npy')
+				#load fibre throughputs
+				fib_thr=np.load(cob+'/fibre_throughputs.npy')
+				#write to fits
+				for extension in range(8):
+					#clean header
+					if 'BARY_%s' % ap in hdul[extension].header: hdul[extension].header['BARYEFF']=(hdul[extension].header['BARY_%s' % ap], 'Barycentric velocity correction in km/s')
+					elif 'BARYEFF' in hdul[extension].header: pass
+					else: hdul[extension].header['BARYEFF']=('None', 'Barycentric velocity correction was not done')
+					if hdul[0].header['SOURCE']=='Plate 1': hdul[extension].header['PLATE']=(1, '2dF plate source')
+					elif hdul[0].header['SOURCE']=='Plate 0': hdul[extension].header['PLATE']=(0, '2dF plate source')
+					else: hdul[extension].header['PLATE']=('None', 'Problem determining plate number')
+					del hdul[extension].header['BARY_*']
+					del hdul[extension].header['BANDID*']
+					del hdul[extension].header['APNUM*']
+					del hdul[extension].header['DC-FLAG*']
+					del hdul[extension].header['DCLOG*']
+					del hdul[extension].header['WAT1*']
+					if 'CD1_1' in hdul[extension].header: del hdul[extension].header['CD1_1']
+					if 'AAOPRGID' in hdul[extension].header: del hdul[extension].header['AAOPRGID']
+					if 'RUN' in hdul[extension].header: del hdul[extension].header['RUN']
+					if 'OBSNUM' in hdul[extension].header: del hdul[extension].header['OBSNUM']
+					if 'GPRNUM' in hdul[extension].header: del hdul[extension].header['GRPNUM']
+					if 'GPRMEM' in hdul[extension].header: del hdul[extension].header['GRPMEM']
+					if 'GPRMAX' in hdul[extension].header: del hdul[extension].header['GRPMAX']
+					if 'OBSTYPE' in hdul[extension].header: del hdul[extension].header['OBSTYPE']
+					if 'NDFCLASS' in hdul[extension].header: del hdul[extension].header['NDFCLASS']
+					if 'FILEORIG' in hdul[extension].header: del hdul[extension].header['FILEORIG']
+					if 'RO_GAIN1' in hdul[extension].header: del hdul[extension].header['RO_GAIN1']
+					if 'RO_NOIS1' in hdul[extension].header: del hdul[extension].header['RO_NOIS1']
+					if 'RO_GAIN' in hdul[extension].header: del hdul[extension].header['RO_GAIN']
+					if 'RO_NOISE' in hdul[extension].header: del hdul[extension].header['RO_NOISE']
+					if 'ELAPSED' in hdul[extension].header: del hdul[extension].header['ELAPSED']
+					if 'TOTALEXP' in hdul[extension].header: del hdul[extension].header['TOTALEXP']
+					if 'UTSTART' in hdul[extension].header: del hdul[extension].header['UTSTART']
+					if 'UTEND' in hdul[extension].header: del hdul[extension].header['UTEND']
+					if 'STSTART' in hdul[extension].header: del hdul[extension].header['STSTART']
+					if 'STEND' in hdul[extension].header: del hdul[extension].header['STEND']
+					if 'APPRA' in hdul[extension].header: del hdul[extension].header['APPRA']
+					if 'APPDEC' in hdul[extension].header: del hdul[extension].header['APPDEC']
+					if 'COMMENT' in hdul[extension].header: del hdul[extension].header['COMMENT']
+					#compatibility
+					hdul[extension].header['APNUM1']=('1 1   ', '')
+					hdul[extension].header['CD1_1']=(hdul[0].header['CDELT1'], '')
+					hdul[extension].header['CTYPE1']=('Wavelength', '')
+					hdul[extension].header['CUNIT1']=('angstroms', '')
+					#add galah_id (galahic number) if it exists
+					if 'galahic' in object_name:
+						hdul[extension].header['GALAH_ID']=(object_name.split('_')[1], 'GALAH id number (if exists)')
+					else:
+						hdul[extension].header['GALAH_ID']='None'
+					#add object name (first column in fibre table)
+					hdul[extension].header['OBJ_NAME']=(object_name, 'Object name from the .fld file')
+					#add average snr and average resolution
+					snr=1.0/np.nanmedian(hdul[2].data)
+					if np.isnan(snr) or np.isinf(snr): snr=0.0
+					hdul[extension].header['SNR']=(snr, 'Average SNR of the final spectrum')
+					hdul[extension].header['RES']=(np.nanmean(hdul[7].data), 'Average resolution (FWHM in angstroms)')
+					#add ra and dec of object
+					hdul[extension].header['RA_OBJ']=(ra, 'RA of object in degrees')
+					hdul[extension].header['DEC_OBJ']=(dec, 'dec of object in degrees')
+					#fibre and pivot numbers
+					hdul[extension].header['APERTURE']=(ap, 'aperture number (1-392, in image)')
+					hdul[extension].header['PIVOT']=(int(pivot), 'pivot number (1-400, in 2dF)')
+					hdul[extension].header['FIBRE']=(int(fibre), 'fibre number (1-400, in image)')
+					hdul[extension].header['X']=(float(x), 'x position of fibre on plate in um')
+					hdul[extension].header['Y']=(float(y), 'y position of fibre on plate in um')
+					hdul[extension].header['THETA']=(float(theta), 'bend of fibre in degrees')
+					#position of aperture on image
+					hdul[extension].header['AP_POS']=(aperture_flags_dict[ap][0], 'Position of aperture in image at x=2000')
+					hdul[extension].header['TRACE_OK']=(aperture_flags_dict[ap][1], 'Is aperture trace OK? 1=yes, 0=no')
+					#magnitude
+					hdul[extension].header['MAG']=(float(mag), 'magnitude from the .fld file')
+					#origin
+					hdul[extension].header['ORIGIN']='IRAF reduction pipeline'
+					hdul[extension].header['PIPE_VER']=('6.0', 'IRAF reduction pipeline version')
+					#stellar parameters
+					hdul[extension].header['RV']=('None', 'radial velocity (one arm) in km/s')
+					hdul[extension].header['E_RV']=('None', 'radial velocity uncertainty in km/s')
+					hdul[extension].header['RV_OK']=('None', 'Did RV pipeline converge? 1=yes, 0=no')
+					hdul[extension].header['RVCOM']=('None', 'Combined radial velocity in km/s')
+					hdul[extension].header['E_RVCOM']=('None', 'radial velocity uncertainty in km/s')
+					hdul[extension].header['RVCOM_OK']=('None', 'Did RV pipeline converge? 1=yes, 0=no')
+					hdul[extension].header['TEFF']=('None', 'T_eff in K')
+					hdul[extension].header['LOGG']=('None', 'log g in log cm/s^2')
+					hdul[extension].header['MET']=('None', 'Metallicity in dex')#more parameters?
+					hdul[extension].header['PAR_OK']=('None', 'Are parameters trustworthy? 1=yes, 0=no')
+					#set exposure of the resolution profile to the same value as for spectra
+					hdul[extension].header['EXPOSED']=hdul[0].header['EXPOSED']
+					#correct times
+					hdul[extension].header['UTMJD']=hdul[0].header['UTMJD']+hdul[0].header['EXPOSED']/3600./24./2.#svae MJD in the middle of teh exposure
+					tm=Time(hdul[extension].header['UTMJD'], format='mjd')
+					hdul[extension].header['UTDATE']=(tm.iso, 'Mean UT date in iso format')#save date and time in iso format in the middle of the exposure
+					#convert start and end zd and ha to average ha and zd
+					hdul[extension].header['MEAN_ZD']=((hdul[0].header['ZDEND']+hdul[0].header['ZDSTART'])/2., 'Mean zenith distance')
+					hdul[extension].header['MEAN_HA']=((hdul[0].header['HAEND']+hdul[0].header['HASTART'])/2., 'Mean hour angle')
+					#wavelength solution
+					try: wav_rms=float(wav_dict[ap-1][1])
+					except: wav_rms='None'
+					hdul[extension].header['WAV_RMS']=(wav_rms, 'RMS of the wavelength solution in Angstroms')
+					hdul[extension].header['WAVLINES']=(wav_dict[ap-1][0], 'Number of arc lines (used/found)')
+					wav_flag=1
+					if int(wav_dict[ap-1][0].split('/')[0])<15: wav_flag=0
+					if wav_rms=='None' or wav_rms>0.2: wav_flag=0
+					hdul[extension].header['WAV_OK']=(wav_flag, 'Is wav. solution OK? 1=yes, 0=no')
+					#fibre throughput
+					fibre_throughput=fib_thr[ap]
+					hdul[extension].header['FIB_THR']=(fibre_throughput, 'Fibre throughput relative to best fibre in field')
+					#write down the LSF 
+					hdul[extension].header['LSF']=('exp(-0.693147|2x/fwhm|^B)', 'Line spread function')
+					hdul[extension].header['LSF_FULL']=('exp(-0.693147|2x/fwhm|^%s)' % round(b_values[ap-1],3), 'Line spread function')
+					hdul[extension].header['B']=(round(b_values[ap-1],3), 'Boxiness parameter for LSF')
+					hdul[extension].header['COMMENT']=('Explanation of the LSF function: function is centred at 0. fwhm is full width at half maximum in angstroms and is given in extension 7, it is wavelength dependent and varies from fibre to fibre as well. It is advised to use the whole resolution profile from extension 7 rather than average resolution in RES keyword. B is a boxiness parameter. It is given in keyword B in the header. LSF_FULL includes B in the function.')
+					if extension>0:
+						if 'HASTART' in hdul[extension].header: del hdul[extension].header['HASTART']
+						if 'HAEND' in hdul[extension].header: del hdul[extension].header['HAEND']
+						if 'ZDSTART' in hdul[extension].header: del hdul[extension].header['ZDSTART']
+						if 'ZDEND' in hdul[extension].header: del hdul[extension].header['ZDEND']
+
+				del hdul[0].header['HASTART']
+				del hdul[0].header['HAEND']
+				del hdul[0].header['ZDSTART']
+				del hdul[0].header['ZDEND']
+				for extension in range(8):
+					if 'SOURCE' in hdul[extension].header: del hdul[extension].header['SOURCE']
+				#units
+				hdul[0].header['BUNIT']=('counts', '')
+				hdul[1].header['BUNIT']=('', '')
+				hdul[2].header['BUNIT']=('', '')
+				hdul[3].header['BUNIT']=('counts', '')
+				hdul[4].header['BUNIT']=('', '')
+				hdul[5].header['BUNIT']=('counts', '')
+				hdul[6].header['BUNIT']=('counts', '')
+				hdul[7].header['BUNIT']=('angstroms', '')
+				#fix size of extension 7. No need for double precision here
+				hdul[7].data=np.array(hdul[7].data, dtype=np.dtype('f4'))
+				#fix meanra and meandec for extension 7
+				hdul[7].header['MEANRA']=hdul[0].header['MEANRA']
+				hdul[7].header['MEANDEC']=hdul[0].header['MEANDEC']
+
+				hdul.close()
+
+				iraf.flprcache()
+
+	#save combined spectra
+	for ap in range(1,393):
+		if fibre_table_dict[ap][8]=='P':
+			filename=str(date)+cob.split('/')[-1][-4:]+'01'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits'
+			#sum of all exposures
+			filenames=[]
+			for file in files:
+				filenames.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits[0]')
+			to_combine=','.join(filenames)
+			iraf.scombine(input=to_combine, output='reductions/results/%s/spectra/com/%s' % (date,filename), aperture='', group='all', combine='sum', reject='none', first='no', Stdout="/dev/null")
+			#normalised spectrum
+			filenames=[]
+			for file in files:
+				filenames.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits[1]')
+			to_combine=','.join(filenames)
+			iraf.scombine(input=to_combine, output='reductions/results/%s/spectra/com/%s[append]' % (date,filename), aperture='', group='all', combine='average', reject='avsigclip', first='no', scale='none', weight='!EXPOSED', lsigma=3.0, hsigma=3.0, Stdout="/dev/null")
+			#error spectrum
+			filenames=[]
+			filenames_del=[]
+			for file in files:
+				filenames.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'_tmp2.fits')
+				filenames_del.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'_tmp.fits')
+				filenames_del.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'_tmp2.fits')
+				iraf.sarith(input1='reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits[2]', op='*', input2='reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits[0]', output='reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'_tmp.fits')#convert relative error to absolute error
+				iraf.sarith(input1='reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'_tmp.fits', op='^', input2='2', output='reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'_tmp2.fits')#square absolute errors, because we will add them in quadrature
+			to_combine=','.join(filenames)
+			iraf.scombine(input=to_combine, output='reductions/results/%s/spectra/com/errors_tmp_%s' % (date, filename), aperture='', group='all', combine='sum', reject='none', first='no', scale='none', Stdout="/dev/null")
+			for file in filenames_del:
+				os.remove(file)
+			iraf.sarith(input1='reductions/results/%s/spectra/com/errors_tmp_%s' % (date, filename), op='sqrt', input2='', output='reductions/results/%s/spectra/com/errors_abs_tmp_%s' % (date, filename))
+			iraf.sarith(input1='reductions/results/%s/spectra/com/errors_abs_tmp_%s' % (date, filename), op='/', input2='reductions/results/%s/spectra/com/%s[0]' % (date,filename), output='reductions/results/%s/spectra/com/errors_rel_tmp_%s' % (date, filename))
+			iraf.imcopy(input='reductions/results/%s/spectra/com/errors_rel_tmp_%s' % (date, filename), output='reductions/results/%s/spectra/com/%s[append]' % (date,filename), Stdout="/dev/null")
+			os.remove('reductions/results/%s/spectra/com/errors_abs_tmp_%s' % (date, filename))
+			os.remove('reductions/results/%s/spectra/com/errors_rel_tmp_%s' % (date, filename))
+			os.remove('reductions/results/%s/spectra/com/errors_tmp_%s' % (date, filename))
+			iraf.hedit(images='reductions/results/%s/spectra/com/%s[2]' % (date,filename), fields="EXTNAME", value='relative_error', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
+			#sky
+			filenames=[]
+			for file in files:
+				filenames.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits[3]')
+			to_combine=','.join(filenames)
+			iraf.scombine(input=to_combine, output='reductions/results/%s/spectra/com/%s[append]' % (date,filename), aperture='', group='all', combine='sum', reject='none', first='no', scale='none', Stdout="/dev/null")
+			#teluric
+			filenames=[]
+			for file in files:
+				filenames.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits[4]')
+			to_combine=','.join(filenames)
+			iraf.scombine(input=to_combine, output='reductions/results/%s/spectra/com/%s[append]' % (date,filename), aperture='', group='all', combine='average', reject='none', first='no', scale='none', weight='!EXPOSED', Stdout="/dev/null")
+			#scattered light
+			filenames=[]
+			for file in files:
+				filenames.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits[5]')
+			to_combine=','.join(filenames)
+			iraf.scombine(input=to_combine, output='reductions/results/%s/spectra/com/%s[append]' % (date,filename), aperture='', group='all', combine='sum', reject='none', first='no', scale='none', Stdout="/dev/null")
+			#cross_talk
+			filenames=[]
+			for file in files:
+				filenames.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits[6]')
+			to_combine=','.join(filenames)
+			iraf.scombine(input=to_combine, output='reductions/results/%s/spectra/com/%s[append]' % (date,filename), aperture='', group='all', combine='sum', reject='none', first='no', scale='none', Stdout="/dev/null")
+			#resolution profile
+			filenames=[]
+			for file in files:
+				filenames.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits[7]')
+			to_combine=','.join(filenames)
+			iraf.scombine(input=to_combine, output='reductions/results/%s/spectra/com/%s[append]' % (date,filename), aperture='', group='all', combine='average', reject='none', first='no', scale='none', weight='!EXPOSED', Stdout="/dev/null")
+			#add data
+			filenames=[]
+			for file in files:
+				filenames.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits')
+			#open combined fits file
+			hdul=fits.open('reductions/results/%s/spectra/com/%s' % (date,filename), mode='update')
+			#open individual headers read only
+			headers_dict={}
+			for file in filenames:
+				hdul_comb=fits.open(file)
+				headers_dict[file]=hdul_comb[0].header
+				hdul_comb.close()
+			#
+			#write to fits
+			for extension in range(8):
+				#write into header which spectra were combined
+				for n,file in enumerate(filenames):
+					hdul[extension].header['COMB%s' % n]=(file.split('/')[-1][:15], 'Combined spectra')
+				#combine UTMJD
+				mjd=0
+				for file in filenames:
+					mjd+=float(headers_dict[file]['UTMJD'])
+				hdul[extension].header['UTMJD']=mjd/len(filenames)
+				#combine epoch
+				epoch=0
+				for file in filenames:
+					epoch+=float(headers_dict[file]['EPOCH'])
+				hdul[extension].header['EPOCH']=epoch/len(filenames)
+				#combine times
+				tm=Time(hdul[extension].header['UTMJD'], format='mjd')
+				hdul[extension].header['UTDATE']=(tm.iso, 'Mean UT date of all exposures in ISO format')
+				#add exposure times
+				exposed=0
+				for file in filenames:
+					exposed+=float(headers_dict[file]['EXPOSED'])
+				hdul[extension].header['EXPOSED']=(exposed, 'Total exposure time of all combined spectra')
+				#trace_ok flag
+				traceok=[]
+				for file in filenames:
+					traceok.append(int(headers_dict[file]['TRACE_OK']))
+				if 0 in traceok: hdul[extension].header['TRACE_OK']=0
+				else: hdul[extension].header['TRACE_OK']=1
+				#combine BARYEFF
+				try:
+					baryeff=0
+					for file in filenames:
+						baryeff+=float(headers_dict[file]['BARYEFF'])
+					hdul[extension].header['BARYEFF']=baryeff/len(filenames)
+				except:
+					hdul[extension].header['BARYEFF']=('None', 'Barycentric velocity correction was not done.')
+				#correct HA, ZD
+				ha=[]
+				zd=[]
+				for file in filenames:
+					ha.append(float(headers_dict[file]['MEAN_HA']))
+					zd.append(float(headers_dict[file]['MEAN_ZD']))
+				hdul[extension].header['MEAN_HA']=(np.average(ha), 'Mean hour angle')
+				hdul[extension].header['MEAN_ZD']=(np.average(zd), 'Mean zenith distance')
+				#combine wavelength solution
+				wav_flag=[]
+				for file in filenames:
+					wav_flag.append(int(headers_dict[file]['WAV_OK']))
+				hdul[extension].header['WAV_OK']=(min(wav_flag), 'Is wav. solution OK? 1=yes, 0=no')
+				#combine resolution maps and B parameter
+				# There is only one resolution map for the whole COB. There is also only one wavelength sollution for the whole COB, so the resolution after combining should remain the same.
+				#fix origin
+				hdul[extension].header['ORIGIN']='IRAF reduction pipeline'
+				#edit combined SNR and resolution
+				snr=1.0/np.nanmedian(hdul[2].data)
+				if np.isnan(snr) or np.isinf(snr): snr=0.0
+				hdul[extension].header['SNR']=(snr, 'Average SNR of the final spectrum')
+				hdul[extension].header['RES']=(np.nanmean(hdul[7].data), 'Average resolution (FWHM in Angstroms)')
+
+			hdul.close()
+			iraf.flprcache()
+
+
+
+
+def create_final_spectra(date, ncpu=1):
 	"""
 	Turn reduced spectra into final output and combine consecutive exposures.
 
@@ -2122,437 +3103,34 @@ def create_final_spectra(date):
 	if not os.path.exists('reductions/results/%s/db' % date):
 		os.makedirs('reductions/results/%s/db' % date)
 
+	if not os.path.exists('reductions/results/%s/diagnostics' % date):
+		os.makedirs('reductions/results/%s/diagnostics' % date)
+
 	if not os.path.exists('reductions/results/%s/spectra/all' % date):
 		os.makedirs('reductions/results/%s/spectra/all' % date)
 	if not os.path.exists('reductions/results/%s/spectra/com' % date):
 		os.makedirs('reductions/results/%s/spectra/com' % date)
+
+	iraf.noao(_doprint=0,Stdout="/dev/null")
+	iraf.onedspec(_doprint=0,Stdout="/dev/null")
+	iraf.flprcache()
 	
+	args=[]
+
 	for ccd in [1,2,3,4]:
 		cobs=glob.glob("reductions/%s/ccd%s/*" % (date,ccd))
 		for cob in cobs:	
-			files=glob.glob("%s/[1-31]*.ms.fits" % cob)
+			files=glob.glob("%s/[01-31]*.ms.fits" % cob)
+			args.append([ccd,cob,files])
 
-			logging.info('Saving spectra for COB %s.' % cob)
-			
-			# save individual spectra
-			for file in files:
-				#create a dict from fibre table
-				fibre_table_file='/'.join(file.split('/')[:-1])+'/fibre_table_'+file.split('/')[-1].replace('.ms', '')
-				hdul=fits.open(fibre_table_file)
-				fibre_table=hdul[1].data
-				hdul.close
-				fibre_table_dict={}
-				n=0
-				for fibre,i in enumerate(fibre_table):
-					if i[8]=='F': 
-						pass
-					else: 
-						n+=1
-						fibre_table_dict[n]=np.append(np.array(i), np.array([fibre+1]))
-				fibre_table_dict=defaultdict(lambda:np.array(['FIBRE NOT IN USE', 0.0, 0.0, 0, 0, 0, 0, 0.0, 'N', 0, 0.0, 0, 'Not in use', '0', 0.0, 0.0, 0.0, fibre+1]), fibre_table_dict)
+	if ncpu>1:
+		pool = Pool(processes=ncpu)
+		pool.map(create_final_spectra_proc, args)
+		pool.close()
+	else:
+		for arg in args:
+			create_final_spectra_proc(arg)
 
-				#read saved b_values
-				if os.path.exists(cob+'/b_values.npy'): b_values=np.load(cob+'/b_values.npy')
-				else: b_values=np.array([2.0]*392)
-
-				#make a normalized spectrum, because this will be added to the final fits files
-				iraf.continuum(input=file, output='/'.join(file.split('/')[:-1])+'/norm_'+file.split('/')[-1], order=5, interactive='no', low_reject=2.0, high_reject=0.0, niterate=5, naverage=11, Stdout="/dev/null")
-
-				#make a sqrt spectrum for adding errors to it
-				iraf.sarith(input1=file, op='^', input2='-0.5', output='/'.join(file.split('/')[:-1])+'/err_'+file.split('/')[-1], apertures='', Stdout="/dev/null")
-
-				#make a cross_talk spectrum placeholder
-				iraf.sarith(input1=file, op='*', input2='0.0', output='/'.join(file.split('/')[:-1])+'/cross_'+file.split('/')[-1], apertures='', Stdout="/dev/null")
-
-				#linearize all spectra
-				iraf.disptrans(input=file, output='', linearize='yes', units='angstroms', Stdout="/dev/null")
-				iraf.disptrans(input='/'.join(file.split('/')[:-1])+'/norm_'+file.split('/')[-1], output='', linearize='yes', units='angstroms', Stdout="/dev/null")
-				if os.path.exists('/'.join(file.split('/')[:-1])+'/sky_'+file.split('/')[-1]): iraf.disptrans(input='/'.join(file.split('/')[:-1])+'/sky_'+file.split('/')[-1], output='', linearize='yes', units='angstroms', Stdout="/dev/null")
-				if os.path.exists('/'.join(file.split('/')[:-1])+'/telurics_'+file.split('/')[-1]): iraf.disptrans(input='/'.join(file.split('/')[:-1])+'/telurics_'+file.split('/')[-1], output='', linearize='yes', units='angstroms', Stdout="/dev/null")
-				if os.path.exists('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1]): iraf.disptrans(input='/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1], output='', linearize='yes', units='angstroms', Stdout="/dev/null")
-				if os.path.exists('/'.join(file.split('/')[:-1])+'/cross_'+file.split('/')[-1]): iraf.disptrans(input='/'.join(file.split('/')[:-1])+'/cross_'+file.split('/')[-1], output='', linearize='yes', units='angstroms', Stdout="/dev/null")
-				if os.path.exists('/'.join(file.split('/')[:-1])+'/res_'+file.split('/')[-1]): iraf.disptrans(input='/'.join(file.split('/')[:-1])+'/res_'+file.split('/')[-1], output='', linearize='yes', units='angstroms', Stdout="/dev/null")
-				#return 0
-
-				for ap in range(1,393):
-					print ap
-					if fibre_table_dict[ap][8]=='P':
-						filename=str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits'
-						iraf.scopy(input=file, output='reductions/results/%s/spectra/all/%s' % (date,filename), apertures=ap, Stdout="/dev/null")
-						#add normalized spectrum
-						iraf.scopy(input='/'.join(file.split('/')[:-1])+'/norm_'+file.split('/')[-1], output='reductions/results/%s/spectra/all/tmp_norm.fits' % date, apertures=ap, Stdout="/dev/null")
-						iraf.imcopy(input='reductions/results/%s/spectra/all/tmp_norm.fits' % date, output='reductions/results/%s/spectra/all/%s[append]' % (date,filename), Stdout="/dev/null")
-						os.remove('reductions/results/%s/spectra/all/tmp_norm.fits' % date)
-						iraf.hedit(images='reductions/results/%s/spectra/all/%s[1]' % (date,filename), fields="EXTNAME", value='normalized', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
-						#add error spectrum (add a copy of the spectrum as a placeholder)
-						iraf.scopy(input=file, output='reductions/results/%s/spectra/all/tmp_err.fits' % date, apertures=ap, Stdout="/dev/null")
-						iraf.imcopy(input='reductions/results/%s/spectra/all/tmp_err.fits' % date, output='reductions/results/%s/spectra/all/%s[append]' % (date,filename), Stdout="/dev/null")
-						os.remove('reductions/results/%s/spectra/all/tmp_err.fits' % date)
-						iraf.hedit(images='reductions/results/%s/spectra/all/%s[2]' % (date,filename), fields="EXTNAME", value='relative_error', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
-						#add sky spectrum
-						if os.path.exists('/'.join(file.split('/')[:-1])+'/sky_'+file.split('/')[-1]):
-							iraf.scopy(input='/'.join(file.split('/')[:-1])+'/sky_'+file.split('/')[-1], output='reductions/results/%s/spectra/all/tmp_sky.fits' % date, apertures=ap, Stdout="/dev/null")
-							iraf.imcopy(input='reductions/results/%s/spectra/all/tmp_sky.fits' % date, output='reductions/results/%s/spectra/all/%s[append]' % (date,filename), Stdout="/dev/null")
-							os.remove('reductions/results/%s/spectra/all/tmp_sky.fits' % date)
-							iraf.hedit(images='reductions/results/%s/spectra/all/%s[3]' % (date,filename), fields="EXTNAME", value='sky', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
-						else:
-							hdul=fits.open('reductions/results/%s/spectra/all/%s' % (date,filename), mode='update')
-							hdul.append(fits.ImageHDU([0]))
-							hdul.close()
-							iraf.hedit(images='reductions/results/%s/spectra/all/%s[3]' % (date,filename), fields="EXTNAME", value='sky', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
-						#add teluric correction
-						if os.path.exists('/'.join(file.split('/')[:-1])+'/telurics_'+file.split('/')[-1]):
-							iraf.scopy(input='/'.join(file.split('/')[:-1])+'/telurics_'+file.split('/')[-1], output='reductions/results/%s/spectra/all/tmp_tel.fits' % date, apertures=ap, Stdout="/dev/null")#scopy does not accept [append] option
-							iraf.imcopy(input='reductions/results/%s/spectra/all/tmp_tel.fits' % date, output='reductions/results/%s/spectra/all/%s[append]' % (date,filename), Stdout="/dev/null")
-							os.remove('reductions/results/%s/spectra/all/tmp_tel.fits' % date)
-							iraf.hedit(images='reductions/results/%s/spectra/all/%s[4]' % (date,filename), fields="EXTNAME", value='teluric', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
-						else:
-							hdul=fits.open('reductions/results/%s/spectra/all/%s' % (date,filename), mode='update')
-							hdul.append(fits.ImageHDU([0]))
-							hdul.close()
-							iraf.hedit(images='reductions/results/%s/spectra/all/%s[4]' % (date,filename), fields="EXTNAME", value='teluric', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
-						#add scattered light
-						if os.path.exists('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1]):
-							iraf.scopy(input='/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1], output='reductions/results/%s/spectra/all/tmp_scat.fits' % date, apertures=ap, Stdout="/dev/null")
-							iraf.imcopy(input='reductions/results/%s/spectra/all/tmp_scat.fits' % date, output='reductions/results/%s/spectra/all/%s[append]' % (date,filename), Stdout="/dev/null")
-							os.remove('reductions/results/%s/spectra/all/tmp_scat.fits' % date)
-							iraf.hedit(images='reductions/results/%s/spectra/all/%s[5]' % (date,filename), fields="EXTNAME", value='scattered', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
-						else:
-							hdul=fits.open('reductions/results/%s/spectra/all/%s' % (date,filename), mode='update')
-							hdul.append(fits.ImageHDU([0]))
-							hdul.close()
-							iraf.hedit(images='reductions/results/%s/spectra/all/%s[5]' % (date,filename), fields="EXTNAME", value='scattered', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
-						#add cross talk spectrum
-						if os.path.exists('/'.join(file.split('/')[:-1])+'/cross_'+file.split('/')[-1]):
-							iraf.scopy(input='/'.join(file.split('/')[:-1])+'/cross_'+file.split('/')[-1], output='reductions/results/%s/spectra/all/tmp_cross.fits' % date, apertures=ap, Stdout="/dev/null")
-							iraf.imcopy(input='reductions/results/%s/spectra/all/tmp_cross.fits' % date, output='reductions/results/%s/spectra/all/%s[append]' % (date,filename), Stdout="/dev/null")
-							os.remove('reductions/results/%s/spectra/all/tmp_cross.fits' % date)
-							iraf.hedit(images='reductions/results/%s/spectra/all/%s[6]' % (date,filename), fields="EXTNAME", value='cross_talk', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
-						else:
-							hdul=fits.open('reductions/results/%s/spectra/all/%s' % (date,filename), mode='update')
-							hdul.append(fits.ImageHDU([0]))
-							hdul.close()
-							iraf.hedit(images='reductions/results/%s/spectra/all/%s[6]' % (date,filename), fields="EXTNAME", value='cross_talk', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
-						#add resolution profile
-						if os.path.exists('/'.join(file.split('/')[:-1])+'/res_'+file.split('/')[-1]):
-							iraf.scopy(input='/'.join(file.split('/')[:-1])+'/res_'+file.split('/')[-1], output='reductions/results/%s/spectra/all/tmp_res.fits' % date, apertures=ap, Stdout="/dev/null")
-							iraf.imcopy(input='reductions/results/%s/spectra/all/tmp_res.fits' % date, output='reductions/results/%s/spectra/all/%s[append]' % (date,filename), Stdout="/dev/null")
-							os.remove('reductions/results/%s/spectra/all/tmp_res.fits' % date)
-							iraf.hedit(images='reductions/results/%s/spectra/all/%s[7]' % (date,filename), fields="EXTNAME", value='resolution_profile', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
-						else:
-							hdul=fits.open('reductions/results/%s/spectra/all/%s' % (date,filename), mode='update')
-							hdul.append(fits.ImageHDU([0]))
-							hdul.close()
-							iraf.hedit(images='reductions/results/%s/spectra/all/%s[7]' % (date,filename), fields="EXTNAME", value='resolution_profile', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
-						#add errors to the error spectrum
-						hdul=fits.open('reductions/results/%s/spectra/all/%s' % (date,filename), mode='update')
-						noise_squared=hdul[0].data+hdul[3].data+hdul[5].data+hdul[6].data+float(hdul[0].header['RO_NOIS1'])**2
-						signal=hdul[0].data
-						rel_err=np.sqrt(noise_squared)/signal
-						hdul[2].data=rel_err
-						hdul.close()
-						#add data
-						hdul=fits.open('reductions/results/%s/spectra/all/%s' % (date,filename), mode='update')
-						#read some info drom fibre table
-						object_name=fibre_table_dict[ap][0]
-						ra=float(fibre_table_dict[ap][1])/np.pi*180.
-						dec=float(fibre_table_dict[ap][2])/np.pi*180.
-						pivot=fibre_table_dict[ap][9]
-						fibre=fibre_table_dict[ap][-1]
-						x=fibre_table_dict[ap][3]
-						y=fibre_table_dict[ap][4]
-						theta=fibre_table_dict[ap][7]
-						mag=fibre_table_dict[ap][10]
-						#check aperture flags
-						aperture_flags_dict={}
-						a=open('%s/aplast' % (cob))
-						failed_apertures=np.load('%s/failed_apertures.npy' % (cob))
-						for line in a:
-							l=line.split()
-							if len(l)>0 and l[0]=='begin':
-								y=float(l[5])
-								n=int(l[3])
-								if n in failed_apertures:
-									aperture_flags_dict[n]=(y,0)
-								else:
-									aperture_flags_dict[n]=(y,1)
-						#load fitting results for wavelength solution
-						wav_dict=np.load(cob+'/wav_fit.npy')
-						#write to fits
-						for extension in range(8):
-							#clean header
-							if 'BARY_%s' % ap in hdul[extension].header: hdul[extension].header['BARYEFF']=(hdul[extension].header['BARY_%s' % ap], 'Barycentric velocity correction in km/s')
-							elif 'BARYEFF' in hdul[extension].header: pass
-							else: hdul[extension].header['BARYEFF']=('None', 'Barycentric velocity correction was not done')
-							if hdul[0].header['SOURCE']=='Plate 1': hdul[extension].header['PLATE']=(1, '2dF plate source')
-							elif hdul[0].header['SOURCE']=='Plate 0': hdul[extension].header['PLATE']=(0, '2dF plate source')
-							else: hdul[extension].header['PLATE']=('None', 'Problem determining plate number')
-							del hdul[extension].header['BARY_*']
-							del hdul[extension].header['BANDID*']
-							del hdul[extension].header['APNUM*']
-							del hdul[extension].header['DC-FLAG*']
-							del hdul[extension].header['DCLOG*']
-							del hdul[extension].header['WAT1*']
-							del hdul[extension].header['CD1_1']
-							del hdul[extension].header['AAOPRGID']
-							del hdul[extension].header['RUN']
-							del hdul[extension].header['OBSNUM']
-							del hdul[extension].header['GRPNUM']
-							del hdul[extension].header['GRPMEM']
-							del hdul[extension].header['GRPMAX']
-							del hdul[extension].header['OBSTYPE']
-							del hdul[extension].header['NDFCLASS']
-							del hdul[extension].header['FILEORIG']
-							del hdul[extension].header['RO_GAIN1']
-							del hdul[extension].header['RO_NOIS1']
-							del hdul[extension].header['RO_GAIN']
-							del hdul[extension].header['RO_NOISE']
-							del hdul[extension].header['ELAPSED']
-							del hdul[extension].header['TOTALEXP']
-							del hdul[extension].header['UTSTART']
-							del hdul[extension].header['UTEND']
-							del hdul[extension].header['STSTART']
-							del hdul[extension].header['STEND']
-							del hdul[extension].header['APPRA']
-							del hdul[extension].header['APPDEC']
-							del hdul[extension].header['COMMENT']
-							#compatibility
-							hdul[extension].header['APNUM1']=('1 1   ', '')
-							hdul[extension].header['CD1_1']=(hdul[extension].header['CDELT1'], '')
-							hdul[extension].header['CTYPE1']=('Wavelength', '')
-							hdul[extension].header['CUNIT1']=('angstroms', '')
-							#add galah_id (galahic number) if it exists
-							if 'galahic' in object_name:
-								hdul[extension].header['GALAH_ID']=(object_name.split('_')[1], 'GALAH id number (if exists)')
-							else:
-								hdul[extension].header['GALAH_ID']='None'
-							#add object name (first column in fibre table)
-							hdul[extension].header['OBJ_NAME']=(object_name, 'Object name from the .fld file')
-							#add average snr and average resolution
-							hdul[extension].header['SNR']=(1.0/np.nanmedian(hdul[2].data), 'Average SNR of the final spectrum')
-							hdul[extension].header['RES']=(np.nanmean(hdul[7].data), 'Average resolution (FWHM in angstroms)')
-							#add ra and dec of object
-							hdul[extension].header['RA_OBJ']=(ra, 'RA of object in degrees')
-							hdul[extension].header['DEC_OBJ']=(dec, 'dec of object in degrees')
-							#fibre and pivot numbers
-							hdul[extension].header['APERTURE']=(ap, 'aperture number (1-392, in image)')
-							hdul[extension].header['PIVOT']=(int(pivot), 'pivot number (1-400, in 2dF)')
-							hdul[extension].header['FIBRE']=(int(fibre), 'fibre number (1-400, in image)')
-							hdul[extension].header['X']=(float(x), 'x position of fibre on plate in um')
-							hdul[extension].header['Y']=(float(y), 'y position of fibre on plate in um')
-							hdul[extension].header['THETA']=(float(theta), 'bend of fibre in degrees')
-							#position of aperture on image
-							hdul[extension].header['AP_POS']=(aperture_flags_dict[ap][0], 'Position of aperture in image at x=2000')
-							hdul[extension].header['TRACE_OK']=(aperture_flags_dict[ap][1], 'Is aperture trace OK? 1=yes, 0=no')
-							#magnitude
-							hdul[extension].header['MAG']=(float(mag), 'magnitude from the .fld file')
-							#origin
-							hdul[extension].header['ORIGIN']='IRAF reduction pipeline'
-							hdul[extension].header['PIPE_VER']=('6.0', 'IRAF reduction pipeline version')
-							#stellar parameters
-							hdul[extension].header['RV']=('None', 'radial velocity (one arm) in km/s')
-							hdul[extension].header['E_RV']=('None', 'radial velocity uncertainty in km/s')
-							hdul[extension].header['RV_OK']=('None', 'Did RV pipeline converge? 1=yes, 0=no')
-							hdul[extension].header['RVCOM']=('None', 'Combined radial velocity in km/s')
-							hdul[extension].header['E_RVCOM']=('None', 'radial velocity uncertainty in km/s')
-							hdul[extension].header['RVCOM_OK']=('None', 'Did RV pipeline converge? 1=yes, 0=no')
-							hdul[extension].header['TEFF']=('None', 'T_eff in K')
-							hdul[extension].header['LOGG']=('None', 'log g in log cm/s^2')
-							hdul[extension].header['MET']=('None', 'Metallicity in dex')#more parameters?
-							hdul[extension].header['PAR_OK']=('None', 'Are parameters trustworthy? 1=yes, 0=no')
-							#set exposure of the resolution profile to the same value as for spectra
-							hdul[extension].header['EXPOSED']=hdul[0].header['EXPOSED']
-							#correct times
-							hdul[extension].header['UTMJD']=hdul[0].header['UTMJD']+hdul[0].header['EXPOSED']/3600./24./2.#svae MJD in the middle of teh exposure
-							tm=Time(hdul[extension].header['UTMJD'], format='mjd')
-							hdul[extension].header['UTDATE']=(tm.iso, 'Mean UT date in iso format')#save date and time in iso format in the middle of the exposure
-							#convert start and end zd and ha to average ha and zd
-							hdul[extension].header['MEAN_ZD']=((hdul[0].header['ZDEND']+hdul[0].header['ZDSTART'])/2., 'Mean zenith distance')
-							hdul[extension].header['MEAN_HA']=((hdul[0].header['HAEND']+hdul[0].header['HASTART'])/2., 'Mean hour angle')
-							#wavelength solution
-							try: wav_rms=float(wav_dict[ap-1][1])
-							except: wav_rms='None'
-							hdul[extension].header['WAV_RMS']=(wav_rms, 'RMS of the wavelength solution in Angstroms')
-							hdul[extension].header['WAVLINES']=(wav_dict[ap-1][0], 'Number of arc lines (used/found)')
-							wav_flag=1
-							if int(wav_dict[ap-1][0].split('/')[0])<15: wav_flag=0
-							if wav_rms=='None' or wav_rms>0.2: wav_flag=0
-							hdul[extension].header['WAV_OK']=(wav_flag, 'Is wav. solution OK? 1=yes, 0=no')
-							#write down the LSF 
-							hdul[extension].header['LSF']=('exp(-0.693147|2(x-m)/fwhm|^B)', 'Line spread function')
-							hdul[extension].header['LSF_FULL']=('exp(-0.693147|2(x-m)/fwhm|^%s)' % round(b_values[ap-1],3), 'Line spread function')
-							hdul[extension].header['B']=(round(b_values[ap-1],3), 'Boxiness parameter for LSF')#2.5 is a placeholder
-							hdul[extension].header['COMMENT']=('Explanation of the LSF function: m is the position in the spectrum. fwhm is full width at half maximum in angstroms and is given in extension 7, it is wavelength dependent and varies from fibre to fibre as well. It is advised to use the whole resolution profile from extension 7 rather than average resolution in RES keyword. B is a boxiness parameter. It is given in keyword B in the header. LSF_FULL includes B in the function.')
-							if extension>0:
-								del hdul[extension].header['HASTART']
-								del hdul[extension].header['HAEND']
-								del hdul[extension].header['ZDSTART']
-								del hdul[extension].header['ZDEND']
-
-						del hdul[0].header['HASTART']
-						del hdul[0].header['HAEND']
-						del hdul[0].header['ZDSTART']
-						del hdul[0].header['ZDEND']
-						for extension in range(8):
-							del hdul[extension].header['SOURCE']
-						#units
-						hdul[0].header['BUNIT']=('counts', '')
-						hdul[1].header['BUNIT']=('', '')
-						hdul[2].header['BUNIT']=('', '')
-						hdul[3].header['BUNIT']=('counts', '')
-						hdul[4].header['BUNIT']=('', '')
-						hdul[5].header['BUNIT']=('counts', '')
-						hdul[6].header['BUNIT']=('counts', '')
-						hdul[7].header['BUNIT']=('angstroms', '')
-						#fix size of extension 7. No need for double precision here
-						hdul[7].data=np.array(hdul[7].data, dtype=np.dtype('f4'))
-						#fix meanra and meandec for extension 7
-						hdul[7].header['MEANRA']=hdul[0].header['MEANRA']
-						hdul[7].header['MEANDEC']=hdul[0].header['MEANDEC']
-
-						hdul.close()
-
-						iraf.flprcache()
-
-			#save combined spectra
-			for ap in range(1,393):
-				if fibre_table_dict[ap][8]=='P':
-					filename=str(date)+cob.split('/')[-1][-4:]+'01'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits'
-					#sum of all exposures
-					filenames=[]
-					for file in files:
-						filenames.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits[0]')
-					to_combine=','.join(filenames)
-					iraf.scombine(input=to_combine, output='reductions/results/%s/spectra/com/%s' % (date,filename), aperture='', group='all', combine='sum', reject='none', first='no', Stdout="/dev/null")
-					#normalised spectrum
-					filenames=[]
-					for file in files:
-						filenames.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits[1]')
-					to_combine=','.join(filenames)
-					iraf.scombine(input=to_combine, output='reductions/results/%s/spectra/com/%s[append]' % (date,filename), aperture='', group='all', combine='average', reject='avsigclip', first='no', scale='none', weight='!EXPOSED', lsigma=3.0, hsigma=3.0, Stdout="/dev/null")
-					#error spectrum
-					filenames=[]
-					filenames_del=[]
-					for file in files:
-						filenames.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'_tmp2.fits')
-						filenames_del.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'_tmp.fits')
-						filenames_del.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'_tmp2.fits')
-						iraf.sarith(input1='reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits[2]', op='*', input2='reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits[0]', output='reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'_tmp.fits')#convert relative error to absolute error
-						iraf.sarith(input1='reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'_tmp.fits', op='^', input2='2', output='reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'_tmp2.fits')#square absolute errors, because we will add them in quadrature
-					to_combine=','.join(filenames)
-					iraf.scombine(input=to_combine, output='reductions/results/%s/spectra/com/errors_tmp' % (date), aperture='', group='all', combine='sum', reject='none', first='no', scale='none', Stdout="/dev/null")
-					for file in filenames_del:#delete temporary absolute error files and squared files
-						os.remove(file)
-					iraf.sarith(input1='reductions/results/%s/spectra/com/errors_tmp' % (date), op='sqrt', input2='', output='reductions/results/%s/spectra/com/errors_abs_tmp' % (date))
-					iraf.sarith(input1='reductions/results/%s/spectra/com/errors_abs_tmp' % (date), op='/', input2='reductions/results/%s/spectra/com/%s[0]' % (date,filename), output='reductions/results/%s/spectra/com/errors_rel_tmp' % (date))
-					iraf.imcopy(input='reductions/results/%s/spectra/com/errors_rel_tmp' % (date), output='reductions/results/%s/spectra/com/%s[append]' % (date,filename), Stdout="/dev/null")
-					os.remove('reductions/results/%s/spectra/com/errors_abs_tmp.fits' % (date))
-					os.remove('reductions/results/%s/spectra/com/errors_rel_tmp.fits' % (date))
-					os.remove('reductions/results/%s/spectra/com/errors_tmp.fits' % (date))
-					iraf.hedit(images='reductions/results/%s/spectra/com/%s[2]' % (date,filename), fields="EXTNAME", value='relative_error', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
-					#sky
-					filenames=[]
-					for file in files:
-						filenames.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits[3]')
-					to_combine=','.join(filenames)
-					iraf.scombine(input=to_combine, output='reductions/results/%s/spectra/com/%s[append]' % (date,filename), aperture='', group='all', combine='sum', reject='none', first='no', scale='none', Stdout="/dev/null")
-					#teluric
-					filenames=[]
-					for file in files:
-						filenames.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits[4]')
-					to_combine=','.join(filenames)
-					iraf.scombine(input=to_combine, output='reductions/results/%s/spectra/com/%s[append]' % (date,filename), aperture='', group='all', combine='average', reject='none', first='no', scale='none', weight='!EXPOSED', Stdout="/dev/null")
-					#scattered light
-					filenames=[]
-					for file in files:
-						filenames.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits[5]')
-					to_combine=','.join(filenames)
-					iraf.scombine(input=to_combine, output='reductions/results/%s/spectra/com/%s[append]' % (date,filename), aperture='', group='all', combine='sum', reject='none', first='no', scale='none', Stdout="/dev/null")
-					#cross_talk
-					filenames=[]
-					for file in files:
-						filenames.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits[6]')
-					to_combine=','.join(filenames)
-					iraf.scombine(input=to_combine, output='reductions/results/%s/spectra/com/%s[append]' % (date,filename), aperture='', group='all', combine='sum', reject='none', first='no', scale='none', Stdout="/dev/null")
-					#resolution profile
-					filenames=[]
-					for file in files:
-						filenames.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits[7]')
-					to_combine=','.join(filenames)
-					iraf.scombine(input=to_combine, output='reductions/results/%s/spectra/com/%s[append]' % (date,filename), aperture='', group='all', combine='average', reject='none', first='no', scale='none', weight='!EXPOSED', Stdout="/dev/null")
-					#add data
-					filenames=[]
-					for file in files:
-						filenames.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits')
-					#open combined fits file
-					hdul=fits.open('reductions/results/%s/spectra/com/%s' % (date,filename), mode='update')
-					#open individual headers read only
-					headers_dict={}
-					for file in filenames:
-						hdul_comb=fits.open(file)
-						headers_dict[file]=hdul_comb[0].header
-						hdul_comb.close()
-					#
-					#write to fits
-					for extension in range(8):
-						#write into header which spectra were combined
-						for n,file in enumerate(filenames):
-							hdul[extension].header['COMB%s' % n]=(file.split('/')[-1][:15], 'Combined spectra')
-						#combine UTMJD
-						mjd=0
-						for file in filenames:
-							mjd+=float(headers_dict[file]['UTMJD'])
-						hdul[extension].header['UTMJD']=mjd/len(filenames)
-						#combine epoch
-						epoch=0
-						for file in filenames:
-							epoch+=float(headers_dict[file]['EPOCH'])
-						hdul[extension].header['EPOCH']=epoch/len(filenames)
-						#combine times
-						tm=Time(hdul[extension].header['UTMJD'], format='mjd')
-						hdul[extension].header['UTDATE']=(tm.iso, 'Mean UT date of all exposures in iso format')
-						#add exposure times
-						exposed=0
-						for file in filenames:
-							exposed+=float(headers_dict[file]['EXPOSED'])
-						hdul[extension].header['EXPOSED']=(exposed, 'Total exposure time of all combined spectra')
-						#trace_ok flag
-						traceok=[]
-						for file in filenames:
-							traceok.append(int(headers_dict[file]['TRACE_OK']))
-						if 0 in traceok: hdul[extension].header['TRACE_OK']=0
-						else: hdul[extension].header['TRACE_OK']=1
-						#combine BARYEFF
-						try:
-							baryeff=0
-							for file in filenames:
-								baryeff+=float(headers_dict[file]['BARYEFF'])
-							hdul[extension].header['BARYEFF']=baryeff/len(filenames)
-						except:
-							hdul[extension].header['BARYEFF']=('None', 'Barycentric velocity correction was not done.')
-						#correct HA, ZD
-						ha=[]
-						zd=[]
-						for file in filenames:
-							ha.append(float(headers_dict[file]['MEAN_HA']))
-							zd.append(float(headers_dict[file]['MEAN_ZD']))
-						hdul[extension].header['MEAN_HA']=(np.average(ha), 'Mean hour angle')
-						hdul[extension].header['MEAN_ZD']=(np.average(zd), 'Mean zenith distance')
-						#combine wavelength solution
-						wav_flag=[]
-						for file in filenames:
-							wav_flag.append(int(headers_dict[file]['WAV_OK']))
-						hdul[extension].header['WAV_OK']=(min(wav_flag), 'Is wav. solution OK? 1=yes, 0=no')
-						#combine resolution maps and B parameter
-						# There is only one resolution map for the whole COB. There is also only one wavelength sollution for the whole COB, so the resolution after combining should remain the same.
-						#fix origin
-						hdul[extension].header['ORIGIN']='IRAF reduction pipeline'
-						#edit combined SNR and resolution
-						hdul[extension].header['SNR']=(1.0/np.nanmedian(hdul[2].data), 'Average SNR of the final spectrum')
-						hdul[extension].header['RES']=(np.nanmean(hdul[7].data), 'Average resolution (FWHM in Angstroms)')
-
-					hdul.close()
-					iraf.flprcache()
 
 def create_database(date):
 	"""
@@ -2594,6 +3172,7 @@ def create_database(date):
 	cols.append(fits.Column(name='obj_name', format='A48', null=None))
 	cols.append(fits.Column(name='galah_id', format='K', null=None))
 	cols.append(fits.Column(name='snr', format='4E', null=None))
+	cols.append(fits.Column(name='fibre_throughput', format='4E', null=None))
 	cols.append(fits.Column(name='res', format='4E', null=None, unit='A'))
 	cols.append(fits.Column(name='b_par', format='4E', null=None))
 	cols.append(fits.Column(name='v_bary_eff', format='E', unit='km/s'))
@@ -2608,7 +3187,7 @@ def create_database(date):
 	cols.append(fits.Column(name='teff', format='E', unit='K', null=None))
 	cols.append(fits.Column(name='logg', format='E', unit='cm / s^-2', null=None))
 	cols.append(fits.Column(name='met', format='E', null=None))
-	cols.append(fits.Column(name='obs_comment', format='A32'))
+	cols.append(fits.Column(name='obs_comment', format='A56'))
 	cols.append(fits.Column(name='pipeline_version', format='A5'))
 	cols.append(fits.Column(name='reduction_flags', format='I'))
 	hdu=fits.BinTableHDU.from_columns(cols)
@@ -2674,6 +3253,8 @@ def create_database(date):
 		wav_n_lines=''.join([i.ljust(7, ' ') for i in wav_n_lines_arr])#weird formating because of astropy bugs
 		snr=[header1['SNR'], header2['SNR'], header3['SNR'], header4['SNR']]
 		snr=[None if i=='None' else i for i in snr]
+		fibre_throughput=[header1['FIB_THR'], header2['FIB_THR'], header3['FIB_THR'], header4['FIB_THR']]
+		fibre_throughput=[None if i=='None' else i for i in fibre_throughput]
 		res=[header1['RES'], header2['RES'], header3['RES'], header4['RES']]
 		res=[None if i=='None' else i for i in res]
 		b=[header1['B'], header2['B'], header3['B'], header4['B']]
@@ -2688,7 +3269,7 @@ def create_database(date):
 		e_rv=[None if i=='None' else i for i in e_rv]
 		rv_com=header1['rvcom']
 		if rv_com=='None': rv_com=None
-		e_rv_com=header1['rvcom']
+		e_rv_com=header1['e_rvcom']
 		if e_rv_com=='None': e_rv_com=None
 		teff=header1['TEFF']
 		if teff=='None': teff=None
@@ -2716,7 +3297,7 @@ def create_database(date):
 		if header1['PAR_OK']==0: flag+=8192#parameters are calculated over all arms, so this flag is the same for all 4 ccds
 
 		#add parameters into the table
-		table.add_row([sobject, ra, dec, mjd, utdate, epoch, aperture, pivot, fibre, fibre_x, fibre_y, fibre_theta, plate, aperture_position, mean_ra, mean_dec, mean_zd, mean_ha, cfg_file, cfg_field_name, obj_name, galah_id, snr, res, b, v_bary_eff, exposed, mag, wav_rms, wav_n_lines, rv, e_rv, rv_com, e_rv_com, teff, logg, met, obs_comment, pipeline_version, flag])
+		table.add_row([sobject, ra, dec, mjd, utdate, epoch, aperture, pivot, fibre, fibre_x, fibre_y, fibre_theta, plate, aperture_position, mean_ra, mean_dec, mean_zd, mean_ha, cfg_file, cfg_field_name, obj_name, galah_id, snr, fibre_throughput, res, b, v_bary_eff, exposed, mag, wav_rms, wav_n_lines, rv, e_rv, rv_com, e_rv_com, teff, logg, met, obs_comment, pipeline_version, flag])
 
 	#write table to hdu
 	hdu=fits.BinTableHDU(table)
@@ -2728,12 +3309,53 @@ def create_database(date):
 	hdul=fits.open('reductions/results/%s/db/%s.fits' % (date, date), mode='update')
 	header=hdul[1].header
 	header['TTYPE1']=(header['TTYPE1'], 'sobject_id is unique for each GALAH observation')
-	#header['TTYPE2']=(header['TTYPE2'], 'RA of object in deg')
-	#header['TTYPE3']=(header['TTYPE3'], 'dec of object in deg')
-	#header['TTYPE4']=(header['TTYPE4'], 'modified UT julian date, exposures weighted')
-	#fix bug in astropy (formating of string arrays)
-	header['TFORM30']='28A7'#this is wav_n_lines column
+	header['TTYPE2']=(header['TTYPE2'], 'RA of object in deg')
+	header['TTYPE3']=(header['TTYPE3'], 'dec of object in deg')
+	header['TTYPE4']=(header['TTYPE4'], 'modified UTC julian date, exposures weighted')
+	header['TTYPE5']=(header['TTYPE5'], 'UTC date in ISO 8601 format')
+	header['TTYPE6']=(header['TTYPE6'], 'epoch')
+	header['TTYPE7']=(header['TTYPE7'], 'aperture number (1-392)')
+	header['TTYPE8']=(header['TTYPE8'], 'pivot number (1-400)')
+	header['TTYPE9']=(header['TTYPE9'], 'fibre number (1-400)')
+	header['TTYPE10']=(header['TTYPE10'], 'x position on 2dF plate')
+	header['TTYPE11']=(header['TTYPE11'], 'y position on 2dF plate')
+	header['TTYPE12']=(header['TTYPE12'], 'fibre bent on 2dF plate')
+	header['TTYPE13']=(header['TTYPE13'], '2dF plate number (0-1)')
+	header['TTYPE14']=(header['TTYPE14'], 'aperture position in image (at x=2000)')
+	header['TTYPE15']=(header['TTYPE15'], 'RA of telescope position')
+	header['TTYPE16']=(header['TTYPE16'], 'dec of telescope position')
+	header['TTYPE17']=(header['TTYPE17'], 'zenith distance of telescope position')
+	header['TTYPE18']=(header['TTYPE18'], 'hour angle of telescope position')
+	header['TTYPE19']=(header['TTYPE19'], 'name of the fibre configuration file')
+	header['TTYPE20']=(header['TTYPE20'], 'name of the field in cfg_file')
+	header['TTYPE21']=(header['TTYPE21'], 'object name')
+	header['TTYPE22']=(header['TTYPE22'], 'galahic id')
+	header['TTYPE23']=(header['TTYPE23'], 'mean snr in 4 CCDs')
+	header['TTYPE24']=(header['TTYPE24'], 'fibre throughput in 4 CCDs')
+	header['TTYPE25']=(header['TTYPE25'], 'mean resolution (FWHM) in 4 CCDs')
+	header['TTYPE26']=(header['TTYPE26'], 'LSF B parameter in 4 CCDs')
+	header['TTYPE27']=(header['TTYPE27'], 'mean barycentric velocity (already corrected)')
+	header['TTYPE28']=(header['TTYPE28'], 'total exposure time')
+	header['TTYPE29']=(header['TTYPE29'], 'magnitude as given in cfg_file')
+	header['TTYPE30']=(header['TTYPE30'], 'RMS of wavlength calibr. in 4 CCDs')
+	header['TTYPE31']=(header['TTYPE31'], 'number of lines found/used for wav. cal.')
+	header['TTYPE32']=(header['TTYPE32'], 'radial velocity in 4 CCDs')
+	header['TTYPE33']=(header['TTYPE33'], 'rv uncertainty in 4 CCDs')
+	header['TTYPE34']=(header['TTYPE34'], 'rv combined from all arms')
+	header['TTYPE35']=(header['TTYPE35'], 'combined rv uncertainty')
+	header['TTYPE36']=(header['TTYPE36'], 'effective tmperature')
+	header['TTYPE37']=(header['TTYPE37'], 'log of surface gravitational acceleration')
+	header['TTYPE38']=(header['TTYPE38'], 'metallicity ([M/H])')
+	header['TTYPE39']=(header['TTYPE39'], 'comments by observer')
+	header['TTYPE40']=(header['TTYPE40'], 'pipeline evrsion')
+	header['TTYPE41']=(header['TTYPE41'], 'reduction flags given as a binary mask')
+
+	#fix bug in astropy (formating of string arrays. Last 7 is dropped when data is inserted)
+	header['TFORM31']='28A7'#this is wav_n_lines column
 	hdul.close()
+
+	#set table name
+	iraf.hedit(images='reductions/results/%s/db/%s.fits[1]' % (date, date), fields="EXTNAME", value='table', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
 
 	# convert table to ascii. add _1, _2, _3, _4 to fields in arrays (always representing four arms)
 	csv_db=open('reductions/results/%s/db/%s.csv' % (date, date), 'w')
@@ -2764,11 +3386,230 @@ def create_database(date):
 		csv_db.write(','.join(str_to_write))
 		csv_db.write('\n')
 	csv_db.close()
+	hdul.close()
 					
 
-def analyze(date):
+def analyze_rv(args):
 	"""
-	Calculate radial velocity and atmospheric parameters
+	Calculate radial velocity and write it into headers
+	"""
+
+	def residual(pars, x, data=None):
+		model=pars['amp']*np.exp(-(x-pars['shift'])**2/(2*pars['sigma']**2))+pars['offset']
+		#model=gaussian(x, pars['amp'], pars['shift'], pars['sigma'])
+		if data is None:
+			return model
+		return model-data
+
+	#hipass filter in km/s
+	filter_limit={3500:250.0, 4000:250.0, 4750:280.0, 5000:300.0, 6000:450.0, 7000:550.0, 9000:800.0, 12000:1500.0, 25000:2500.0, 40000:2500.0}
+
+	#rvs=np.linspace(-3000,3000,3001)
+	#rvs=np.linspace(-1500,1500,1501)
+	rvs=np.linspace(-1010,1010,506)
+	dd=2.0*1010/506.0#step in rv
+
+	sobject, templates=args
+
+	ccf_global=np.zeros(len(rvs))
+	ccfs=[]
+	specs=[]
+	best_template=[]
+	for ccd in [1,2,3,4]:
+		# open spectrum
+		hdulist = fits.open('reductions/results/%s/spectra/com/%s%s.fits' % (date, sobject,ccd))
+		crval=hdulist[1].header['CRVAL1']
+		crdel=hdulist[1].header['CDELT1']
+		f=hdulist[1].data
+		hdulist.close()
+		l=np.linspace(crval, crval+crdel*(len(f)-1), len(f))
+		# ignore first 10 and last 10 pixels, just in case there are problems with normalisation. In CCD 4 ignore more because of telurics.
+		if ccd==4:
+			f=f[1500:-10]
+			l=l[1500:-10]
+		else:
+			f=f[10:-10]
+			l=l[10:-10]
+		spec=np.array(zip(l,f), dtype=[('l', 'f8'), ('f', 'f8')])
+
+		# Cross correlate
+		# Following S. Zucker, MNRAS, Volume 342, Issue 4, July 2003
+		max_ccv=0
+		max_ccf=[]
+		best_template_tmp=0
+		for t,template in enumerate(templates[ccd-1]):
+			ccf=[]
+			for rv in rvs:
+				# convert shift in rv to shift in wavelength
+				l=spec['l']*(1-rv/299792.458)
+				# normalize spectrum and template so their average is zero
+				f_spec=spec['f']-np.average(spec['f'])
+				f_temp=np.interp(l,template[4]['l'],template[4]['f'])-np.average(np.interp(l,template[4]['l'],template[4]['f']))
+				# calculate cross covariance
+				if np.all(f_spec==0): f_spec=f_spec+1
+				R=sum(f_temp*f_spec)/len(l)
+				# calculate cross corelation
+				sf2=np.sum(f_spec*f_spec)/len(f_spec)
+				st2=np.sum(f_temp*f_temp)/len(f_temp)
+				if sf2==0: sf2=1e-16
+				if st2==0: st2=1e-16
+				C=R/(np.sqrt(sf2)*np.sqrt(st2))
+				ccf.append(C)
+
+			# filter ccf of large trends
+			# there should be a separate filter limit for each template.
+			# watch out for units if you change rvs array.
+			b,a = signal.butter(3,1./filter_limit[template[2]]/2.,'hp', fs=0.5*2.)
+			ccf_filtered=signal.filtfilt(b, a, ccf)
+			ccf=ccf_filtered+np.average(ccf)-np.average(ccf_filtered)
+
+			#fig=figure(0)
+			#ax=fig.add_subplot(111)
+			#ax.plot(rvs,ccf,'r-')
+			#ax.plot(rvs,ccf_filtered,'g-')
+			#show()
+
+			#check if this template produces a better correlation peak
+			if max(ccf[50:-50])>max_ccv:
+				max_ccv=max(ccf[50:-50])
+				max_ccf=ccf
+				best_template_tmp=t
+
+		# only use CCF of the template with best correlation
+		ccfs.append(max_ccf)
+		best_template.append(best_template_tmp)
+
+		#fig=figure(0)
+		#ax=fig.add_subplot(211)
+		#ax.plot(spec['l'], spec['f'], 'k-')
+		#ax.plot(templates[ccd-1][best_template_tmp][4]['l'],templates[ccd-1][best_template_tmp][4]['f'], 'r-')
+		#ax=fig.add_subplot(212)
+		#ax.plot(rvs, max_ccf, 'k-')
+		#show()
+
+	# combine ccfs from all ccds into one ccf
+	ccf_global2=1-np.power(np.product(1-np.square(ccfs), axis=0),1.0/4.0)
+	ccf_global=np.sqrt(ccf_global2)
+	ccf_sgn=np.sign(np.sum(ccfs,axis=0))#FIX THIS. sign first, sum later
+
+	# find peaks
+	peaks,other_info=signal.find_peaks(ccf_global, width=5, distance=10, height=0.15, prominence=0.1)
+
+	# filter out valid peaks
+	peaks_ok=[]
+	if len(peaks)>0:
+		for peak,width,power,sgn in zip(peaks, other_info['widths'], other_info['peak_heights'],ccf_sgn[peaks]):
+			# valid peak has sgn>=0 (at least two CCDs produce correlation peak)
+			# valid peak is significantly stronger than any other peaks
+			if sgn>=0 and power/max(ccf_global)>0.5:
+				peaks_ok.append([peak,width,power])
+	
+	# fit only the main peak to get radial velocity
+	rv_ind_ar=[]
+	sigma_ind_ar=[]
+	flag_ind_ar=[]
+	if len(peaks_ok)>0:
+		# sort peaks by height
+		peaks_ok=np.array(peaks_ok)
+		peaks_ok=peaks_ok[peaks_ok[:,2].argsort()]
+		# fit
+		peak_prime=int(peaks_ok[0][0]) # index of peak
+		peak_max=peaks_ok[0][2] # height of peak
+		peak_width=int(peaks_ok[0][1]) # width of peak
+		if len(peaks_ok)>1: min_dist=min(np.diff(np.sort(peaks_ok[:,0]))) # region to fit (if there are two peaks close by, only one must be in the region)
+		else: min_dist=3000
+		if min_dist<peak_width*0.33: dist=min_dist*0.5
+		else: dist=peak_width*0.33
+		if dist<3: dist=3
+		fit_params = Parameters()
+		fit_params.add('amp', value=peak_max-np.median(ccf_global), max=(peak_max-np.median(ccf_global))*1.3, min=(peak_max-np.median(ccf_global))*0.7)
+		fit_params.add('sigma', value=peak_width*0.75)
+		fit_params.add('shift', value=rvs[peak_prime], max=rvs[peak_prime]+3.0, min=rvs[peak_prime]-3.0)
+		fit_params.add('offset', value=np.median(ccf_global))
+		out = minimize(residual, fit_params, args=(rvs[peak_prime-int(dist):peak_prime+int(dist)],), kws={'data': ccf_global[peak_prime-int(dist):peak_prime+int(dist)]})
+		rv_com=out.params['shift'].value
+		# calculate error around the main peak (following S. Zucker, MNRAS, Volume 342, Issue 4, July 2003)
+		#second derivative of the fitted gaussian
+		fit_second_derivative=np.diff(residual(out.params, rvs),2)
+		#ccf_second_derivative=np.diff(ccf_global, 2)
+		# factor MN (number of bins) is 4 times 4096 minus edge (10) we cut out minus 1500 for the IR arm = 14814
+		sigma2=-1.0/(14814*(fit_second_derivative[peak_prime-1]/dd/dd/dd)/ccf_global[peak_prime]*(ccf_global2[peak_prime])/(1.0-ccf_global2[peak_prime]))# watch derivative units if you change rvs
+		sigma_com=np.sqrt(sigma2)
+		if sigma_com>25: flag_com=0
+		else: flag_com=1
+		#report_fit(out)
+		#print 'com', rv_com, sigma_com
+		fit = residual(out.params, rvs[peak_prime-int(dist):peak_prime+int(dist)])
+
+		# fit individual CCDs
+		for ccd in [1,2,3,4]:
+			peak_max=ccfs[ccd-1][peak_prime] # height of peak
+			fit_params = Parameters()
+			fit_params.add('amp', value=peak_max-np.median(ccfs[ccd-1]), max=(peak_max-np.median(ccfs[ccd-1]))*2.0, min=0.0)
+			fit_params.add('sigma', value=peak_width*0.75)
+			fit_params.add('shift', value=rvs[peak_prime], max=rvs[peak_prime]+12.0, min=rvs[peak_prime]-12.0)
+			fit_params.add('offset', value=np.median(ccfs[ccd-1]))
+			out = minimize(residual, fit_params, args=(rvs[peak_prime-int(dist):peak_prime+int(dist)],), kws={'data': ccfs[ccd-1][peak_prime-int(dist):peak_prime+int(dist)]})
+			rv_ind=out.params['shift'].value
+			## calculate error
+			fit_second_derivative=np.diff(residual(out.params, rvs),2)
+			#ccf_second_derivative=np.diff(ccf_global, 2)
+			if ccd<4: sigma2=-1.0/(4076*(fit_second_derivative[peak_prime-1]/dd/dd/dd)/ccfs[ccd-1][peak_prime]*(ccfs[ccd-1][peak_prime])/(1.0-ccfs[ccd-1][peak_prime]))# watch derivative units if you change rvs
+			else: sigma2=-1.0/(2586*(fit_second_derivative[peak_prime-1]/dd/dd/dd)/ccfs[ccd-1][peak_prime]*(ccfs[ccd-1][peak_prime])/(1.0-ccfs[ccd-1][peak_prime]))# watch derivative units if you change rvs
+			sigma_ind=np.sqrt(sigma2)
+			if np.isnan(sigma_ind): sigma_ind='None'
+			#report_fit(out)
+			rv_ind_ar.append(rv_ind)
+			sigma_ind_ar.append(sigma_ind)
+			if ccfs[ccd-1][peak_prime]<0.15 or sigma_ind=='None' or np.isnan(sigma_ind) or sigma_ind>25: flag_ind_ar.append(0)
+			else: flag_ind_ar.append(1)
+
+	else:#if there are no peaks in the ccf
+		rv_com='None'
+		sigma_com='None'
+		flag_com=0
+		rv_ind_ar=['None', 'None', 'None', 'None']
+		sigma_ind_ar=['None', 'None', 'None', 'None']
+		flag_ind_ar=[0, 0, 0, 0]
+
+	#print rv_com, sigma_com, flag_com
+	#print rv_ind_ar, sigma_ind_ar, flag_ind_ar
+
+	for ccd in [1,2,3,4]:
+		# open fits file and write rvs into header
+		hdulist = fits.open('reductions/results/%s/spectra/com/%s%s.fits' % (date, sobject,ccd), mode='update')
+		for extension in range(8):
+			hdulist[extension].header['RV']=rv_ind_ar[ccd-1]
+			hdulist[extension].header['E_RV']=sigma_ind_ar[ccd-1]
+			hdulist[extension].header['RV_OK']=flag_ind_ar[ccd-1]
+			hdulist[extension].header['RVCOM']=rv_com
+			hdulist[extension].header['E_RVCOM']=sigma_com
+			hdulist[extension].header['RVCOM_OK']=flag_com
+		hdulist.close()
+	
+
+
+
+	"""
+	print rv_com, sigma_com
+	print rv_ind_ar, sigma_ind_ar
+	fig=figure(0)
+	ax=fig.add_subplot(111)
+	ax.plot(rvs, ccfs[0], 'b-')
+	ax.plot(rvs, ccfs[1], 'g-')
+	ax.plot(rvs, ccfs[2], 'r-')
+	ax.plot(rvs, ccfs[3], 'k-')
+	ax.plot(rvs, ccf_global, 'y')
+	#ax.plot(rvs, ccf_sgn)
+	if len(peaks_ok)>0:
+		ax.plot(rvs[peak_prime-int(dist):peak_prime+int(dist)], fit, 'm-')
+	#if rv_com!='None': ax.set_xlim(rv_com-100,rv_com+100)
+	show()
+	"""
+	
+def analyze(date, ncpu=1):
+	"""
+	Calculate radial velocity and atmospheric parameters. Should be done after the data is combined and before the database is generated. Caculated parameters can be written into headers.
 
 	Parameters:
 		date (str): date string (e.g. 190210)
@@ -2777,38 +3618,55 @@ def analyze(date):
 		none
 
 	To do:
-		Everything
+		Make rv calculations faster
+		Detect multiple rv peaks and create flag
 
 	"""
-	pass
 
-def min_red(dir):
-	"""
-	Make a minimal reduction to get 1D spectra. This is useful for a quick check during observations.
+	# calculate radial velocity
 
-	Parameters:
-		dir (str): path to raw data. Must end with date number-code
+	logging.info('Loading radial velocity template spectra.')
+	#load file with wavelengths for templates
+	w_file='rv_templates/LAMBDA_R20.DAT'
+	w=np.loadtxt(w_file, dtype=float)
 
-	Returns:
-		none
+	#GALAH wavelength ranges (as line numbers in w_file)
+	ranges={1:[30814,34458], 2:[39876,43524], 3:[46293,50326], 4:[56018,57630]}
 
-	ToDo:
-		Option to reduce just one COB or one image
-		Option to use whichever flat and arc are available, even, if they are from the previous field done with the same plate.
-	"""
+	#templates
+	templates=[]
 
-	date,cobs=inspect_dir(dir)
-	remove_bias(date)
-	fix_gain(date)
-	fix_bad_pixels(date)
-	prepare_flat_arc(date,cobs)
-	find_apertures(date)
-	#plot_apertures(190210, 1902100040, 4)
-	extract_spectra(date)
-	wav_calibration(date)
-	#plot_spectra(190210, 1902100016, 4)
+	#create templates
+	for ccd in [1, 2, 3, 4]:
+		templates_tmp=[]
+		for t,template_file in enumerate(['rv_templates/T03500G00P00V000K2ANWNVR20N.ASC','rv_templates/T03500G45P00V000K2ANWNVR20N.ASC','rv_templates/T04000G15P00V000K2ANWNVR20N.ASC','rv_templates/T04000G45P00V000K2ANWNVR20N.ASC','rv_templates/T04750G25P00V000K2ANWNVR20N.ASC','rv_templates/T05000G35P00V000K2ANWNVR20N.ASC','rv_templates/T05000G45P00V000K2ANWNVR20N.ASC','rv_templates/T06000G40P00V000K2ANWNVR20N.ASC','rv_templates/T07000G40P00V000K2ANWNVR20N.ASC','rv_templates/T09000G40P00V000K2ANWNVR20N.ASC','rv_templates/T12000G35P00V000K2SODNVR20N.ASC','rv_templates/T25000G35P00V000K2SODNVR20N.ASC','rv_templates/T40000G45P00V000K2SODNVR20N.ASC']):
+			template_raw=np.loadtxt(template_file, dtype=float)
+			template_ar=np.array(zip(w[ranges[ccd][0]:ranges[ccd][1]],template_raw[ranges[ccd][0]:ranges[ccd][1]]), dtype=[('l', 'f8'), ('f', 'f8')])
+			template_teff=float(template_file[14:19])
+			template_logg=float(template_file[20:22])/10.0
+			templates_tmp.append([t, template_file, template_teff, template_logg, template_ar])
 
-			
+		templates.append(templates_tmp)
+
+	files=glob.glob('reductions/results/%s/spectra/com/*.fits' % date)
+	sobjects=[file.split('/')[-1][:15] for file in files]
+	sobjects=set(sobjects)
+
+	logging.info('Calculating radial velocities.')
+
+	args=[]
+	for sobject in sobjects:
+		args.append([sobject, templates])
+
+	if ncpu>1:
+		pool = Pool(processes=ncpu)
+		pool.map(analyze_rv, args)
+		pool.close()
+	else:
+		for arg in args:
+			analyze_rv(arg)
+
+	# calculate stellar parameters
 
 
 if __name__ == "__main__":
@@ -2817,7 +3675,7 @@ if __name__ == "__main__":
 	From the command line you can run the pipeline with $ python extract6.0.py /path/to/files/. The pipeline was tested with python 2.7. 
 
 	The reduction pipeline is very read/write intensive. Run it from a folder on an SSD disk or create a RAM filesystem and run it from there. The latter option is also the fastest, but you need a lot of RAM for it. Running the pipeline on HDDs is not advised. 
-	When testing, always create a copy of your data in case it gets damaged. First function in the pipeline (inspect_dir) will copy all the data into a local folder (./reductions), but it is best to be careful anyways.
+	When testing, always create a copy of your data in case it gets damaged. First function in the pipeline (prepare_dir) will copy all the data into a local folder (./reductions), but it is best to be careful anyways.
 	
 	Possible errors:
 	- Not enough space in image header: Find login.cl file and raise the min_lenuserarea parameter (also uncomment it, if commented before).
@@ -2826,34 +3684,83 @@ if __name__ == "__main__":
 	- Memory error: You don't have enough memory to run the code with current settings. Change ncpu parameters to a lower value and try again. 
 	"""
 
-	global start_folder
-	start_folder=os.getcwd()
+	start_folder = os.getcwd()
 
+	# Set iraf variables that are otherwise defined in local login.cl. Will probably overwrite those settings
+	iraf.set(min_lenuserarea=128000)
+	iraf.set(uparm=start_folder + '/uparm')
+
+	# Set logging levels
 	logging.basicConfig(level=logging.DEBUG)
-	if len(sys.argv)==2:
-		#date,cobs=inspect_dir(sys.argv[1])
-		#remove_bias(date)
-		#fix_gain(date)
-		#fix_bad_pixels(date)
-		#prepare_flat_arc(date,cobs)
-		date='190210'
-		#remove_cosmics(date, ncpu=4)
-		#find_apertures(date)
-		#plot_apertures(190210, 1902100045, 3)
-		#remove_scattered(date, ncpu=4)
-		#measure_cross_on_flat(date)
-		#extract_spectra(date)
-		#wav_calibration(date)
-		os.system('cp -r reductions-test reductions')
-		remove_sky(date, method='nearest3', thr_method='flat', ncpu=7)
-		#plot_spectra(190210, 1902100045, 3)
-		remove_telurics(date)
-		v_bary_correction(date, quick=False, ncpu=8)
-		#os.system('cp -r reductions_bary reductions')
-		resolution_profile(date)
-		#os.system('cp -r reductions-test reductions')
-		#create_final_spectra(date)
-		#create_database(date)
-		
+	mpl_logger=logging.getLogger('matplotlib')
+	mpl_logger.setLevel(logging.WARNING)
+
+	# Parse command line arguments
+	parser = argparse.ArgumentParser()
+	parser.add_argument("night", help="Path to the data for one night.")
+	parser.add_argument("--list_cobs", help="Only list COBs.", action="store_true")
+	parser.add_argument("--initial", help="Do initial reduction.", action="store_true")
+	parser.add_argument("--cosmics", help="Remove cosmics.", action="store_true")
+	parser.add_argument("--trace", help="Trace apertures.", action="store_true")
+	parser.add_argument("--scattered", help="Remove scattered light.", action="store_true")
+	parser.add_argument("--xtalk", help="Measure and remove cross talk.", action="store_true")
+	parser.add_argument("--extract", help="Extract spectra.", action="store_true")
+	parser.add_argument("--wav", help="Do wavelength calibration.", action="store_true")
+	parser.add_argument("--sky", help="Remove sky.", action="store_true")
+	parser.add_argument("--telurics", help="Remove telurics.", action="store_true")
+	parser.add_argument("--bary", help="Correct for barycentric velocity.", action="store_true")
+	parser.add_argument("--resolution", help="Calculate resolution profile.", action="store_true")
+	parser.add_argument("--final", help="Create final spectra.", action="store_true")
+	parser.add_argument("--analyze", help="Analize spectra.", action="store_true")
+	parser.add_argument("--database", help="Create database.", action="store_true")
+	parser.add_argument("--n_cpu", help="Specify how many cpus you want to use.", default=1)
+	parser.add_argument("--runs", help="Which run numbers to use.", default='*')
+	parser.add_argument("--sky_method", help="Sky removal method.", default='nearest3')
+	parser.add_argument("--sky_thru", help="Fibre throughput measuring method.", default='flat')
+	parser.add_argument("--bary_quick", help="Quick v_bary correction", action="store_true")
+	args = parser.parse_args()
+
+	# if only COBs are to be listed, perform first function and then clean afterwards
+	if args.list_cobs:
+		date, cobs = prepare_dir(args.night, str_range=args.runs, list_cobs=args.list_cobs)
+		shutil.rmtree("reductions/%s" % (date))
+		sys.exit(0)
+	# otherwise perform required reduction steps
 	else:
-		logging.critical('Wrong number of command line arguments.')
+		if args.initial:
+			date, cobs = prepare_dir(args.night, str_range=args.runs, list_cobs=True)
+			remove_bias(date)
+			fix_gain(date)
+			fix_bad_pixels(date)
+			prepare_flat_arc(date, cobs)
+		else:
+			date=args.night.split('/')[-1]
+		if args.cosmics:
+			remove_cosmics(date, ncpu=int(args.n_cpu))
+		if args.trace:
+			find_apertures(date, start_folder)
+			#plot_apertures(190210, 1902100045, 3)
+		if args.scattered:
+			remove_scattered(date, start_folder, ncpu=int(args.n_cpu))
+		if args.xtalk:
+			measure_cross_on_flat(date)
+		if args.extract:
+			extract_spectra(date, start_folder)
+		if args.wav:
+			wav_calibration(date, start_folder)
+		if args.sky: 
+			remove_sky(date, method=args.sky_method, thr_method=args.sky_thru, ncpu=int(args.n_cpu))
+			#plot_spectra(190210, 1902100045, 3)
+		if args.telurics:
+			remove_telurics(date)
+		if args.bary:
+			v_bary_correction(date, quick=args.bary_quick, ncpu=int(args.n_cpu))
+		if args.resolution:
+			resolution_profile(date)
+		if args.final:
+			create_final_spectra(date, ncpu=int(args.n_cpu))
+		if args.analyze:
+			analyze(date, ncpu=int(args.n_cpu))
+		if args.database:
+			create_database(date)
+		sys.exit(0)
