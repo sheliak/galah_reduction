@@ -13,6 +13,9 @@
  - pylab
  - lmfit
  - ephem
+ - galah_tools
+ - keras
+ - tesndorflow
 
 **Iraf installation**
 
