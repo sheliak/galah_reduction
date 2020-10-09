@@ -82,9 +82,9 @@ def run_one_night(args):
 		if st.database: system('python extract6.0.py %s%s --database --n_cpu %s' % (data_folder, date, ncpu))
 
 	# Clear the reduction folder. Only keep reduced data.
-	system('rm -r reductions/%s' % date)
-	system('rm -r reductions/.backup_%s' % date)
-	sleep(3)
+# 	system('rm -r reductions/%s' % date)
+# 	system('rm -r reductions/.backup_%s' % date)
+# 	sleep(3)
 
 if __name__=="__main__":
 
