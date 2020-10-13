@@ -3694,14 +3694,12 @@ if __name__ == "__main__":
 
 
 	
-	# Set logging levels not sure what this thing does
+	# Set logging levels 
 	extract_log=logging.getLogger('extract_log')	
 	extract_log.setLevel(logging.INFO)
-	
-	#not sure this actually gets any logging from matplotlib
-# 	mpl_logger=logging.getLogger('matplotlib')
-# 	mpl_logger.setLevel(logging.WARNING)
-# 		
+ 	mpl_logger=logging.getLogger('matplotlib')
+ 	mpl_logger.setLevel(logging.WARNING)
+ 		
 	# Parse command line arguments
 	parser = argparse.ArgumentParser()
 	parser.add_argument("night", help="Path to the data for one night.")
