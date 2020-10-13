@@ -9,13 +9,14 @@
  - scipy
  - numpy
  - astropy
- - matplotlib
+ - matplotlib 
  - pylab
  - lmfit
+ - numdifftools
  - ephem
  - galah_tools
- - keras
- - tesndorflow
+ - tesndorflow 2.1.0 (the latest version working on python2.7)
+ - keras 2.3.1 (this is the latest version that works with tensorflow 2.1.0)
 
 **Iraf installation**
 
