@@ -483,6 +483,7 @@ def remove_bias(date):
 		files=glob.glob("reductions/%s/ccd%s/biases/*.fits" % (date,ccd))
 		
 		if len(files)>=3:
+			extract_log.info("Found more than 2 biases thus using them")
 			# create masterbias
 			biases=[]
 			for f in files:
@@ -501,15 +502,15 @@ def remove_bias(date):
 						hdu_c[0].data=hdu_c[0].data-masterbias
 						hdu_c.flush()
 		else: # if there are not enough biases, use overscan
+			extract_log.info("Found less than 3 biases thus using overscan")
 			files=glob.glob("reductions/%s/ccd%s/*/[01-31]*.fits" % (date,ccd))
 			for f in files:
 				if 'biases' in f: 
 					continue
 				else:
 					with fits.open(f, mode='update') as hdu_c:
-						pass
-						hdu_c.flush()
-						
+						hdu_c[0].data=hdu_c[0].data-np.transpose(np.ones([4146,4112])*np.mean(hdu_c[0].data[:,4096:],axis=1))			
+						hdu_c.flush()						
 		
 		shutil.rmtree("reductions/%s/ccd%s/biases" % (date,ccd))
 
@@ -3736,7 +3737,7 @@ if __name__ == "__main__":
 	consoleLog.setFormatter(formatter)
 	
 	#You can change file log to change the level of the log displayed on the log file. 
-	fileLog = logging.FileHandler('Reduce.log')
+	fileLog = logging.FileHandler('Reduce ' +date+'.log')
 	fileLog.setLevel(logging.DEBUG)	
 	fileLog.setFormatter(formatter)
 	extract_log.addHandler(consoleLog)	
