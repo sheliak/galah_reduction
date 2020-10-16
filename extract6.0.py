@@ -1066,20 +1066,263 @@ def remove_scattered(date, start_folder, ncpu=1):
 	iraf.flprcache()
 
 
-def measure_cross_on_flat(date):
+def measure_cross_on_flat(date, func='agauss'):
 	"""
 	Measure cross talk and use it to correct extracted spectra. We have to improve this, becasue the cross talk is very fibre dependant.
 
 	Parameters:
 		date (str): date string (e.g. 190210)
+		func (str): 'agauss' (default) or 'voigt'. Function use for spectral profile fitting. Agauss is an asymetric Gaussian. 
 	
 	Returns:
 		none
 
 	ToDo:
-		Everything.
+		add flag for large cross-talk
+		paralelize
 	"""
-	pass
+
+	def peak_profile_agauss(a,x):
+		lr=np.sign(x-a['pos'].value)
+		width=np.ones(len(lr))*a['widthl'].value
+		width[lr>0]=a['widthr'].value
+		return a['amp'].value*np.exp(-abs(x-a['pos'].value)**a['b'].value/(2.0*width**2))+a['offset'].value
+
+	def peak_profile_voigt(a, x):
+		lr=np.sign(x-a['pos'].value)
+		width=np.ones(len(lr))*a['widthl'].value
+		width[lr>0]=a['widthr'].value
+		return a['amp'].value*np.real(wofz(((x-a['pos'].value) + 1j*a['gamma'].value)/width))/width+a['offset'].value
+
+	def peak_residual_agauss(a,x,y):
+		return y-peak_profile_agauss(a,x)
+
+
+	def peak_residual_voigt(a,x,y):
+		return y-peak_profile_voigt(a,x)
+
+	def fit_profile_agauss(p0,y):
+		x=np.arange(len(y))
+		params = Parameters()
+		params.add('pos', value=p0[0], min=p0[0]-0.1, max=p0[0]+0.1)
+		params.add('amp', value=p0[1], min=p0[1]*0.0, max=max(y)*1.1)
+		params.add('widthl', value=p0[2], min=p0[2]*0.7, max=p0[2]*1.9)
+		params.add('widthr', value=p0[2], min=p0[2]*0.7, max=p0[2]*1.9)
+		params.add('offset', value=0.0, min=0.0, max=20.0, vary=False)
+		params.add('b', value=2.1, min=1.5, max=3.4, vary=True)
+		minner = Minimizer(peak_residual_agauss, params, fcn_args=(x,y))
+		result = minner.minimize()
+		return result.params
+
+	def fit_profile_voigt(p0,y):
+		x=np.arange(len(y))
+		params = Parameters()
+		params.add('pos', value=p0[0], min=p0[0]-0.1, max=p0[0]+0.1)
+		params.add('amp', value=p0[1], min=p0[1]*0.0)
+		params.add('widthl', value=p0[2], min=p0[2]*0.7, max=p0[2]*2.0)
+		params.add('widthr', value=p0[2], min=p0[2]*0.7, max=p0[2]*2.0)
+		params.add('gamma', value=1.0, min=0.0, max=10.0)
+		params.add('offset', value=0.0, min=0.0, max=2.0, vary=False)
+		minner = Minimizer(peak_residual_voigt, params, fcn_args=(x,y))
+		result = minner.minimize()
+		return result.params
+
+	def iraf_norm(a, max_, min_):
+		return (2.0*a-(max_+min_))/(max_-min_)
+	
+	for ccd in [1,2,3,4]:
+		cobs=glob.glob("reductions/%s/ccd%s/*" % (date,ccd))
+		for cob in cobs:
+			# open masterflat
+			hdul=fits.open(cob+'/masterflat.fits')
+			data=hdul[0].data
+			hdul.close()
+
+			# open apertures file
+			f=open(cob+"/apmasterflat", "r")
+			# dict of aperture positions
+			ap_dict={}
+			ap_dict_initial={}
+			ap=0
+			start=False
+			for line in f:
+				if len(line.strip())>0 and line.strip().split()[0]=='begin': 
+					ap=int(line.strip().split()[3])
+					pos=float(line.strip().split()[5])-1 # -1 is because iraf starts counting with 1 and python with 0.
+					ap_dict[ap]=[[pos], None, [], []] # items are default position and trace polynomials in apmasterflat file, fitted profile, two arrays for fitted crosstalk (p cross talk and m cross talk)
+					ap_dict_initial[ap]=pos
+				if len(line.strip())>0 and line.strip().split()[0]=='curve':
+					start=True
+				if start and len(line.strip().split())==1:
+					ap_dict[ap][0].append(float(line.strip().split()[0]))
+				if len(line.strip().split())==0:
+					start=False
+
+			for column in range(5, 4090, 200):
+				# calculate trace position at the column value
+				#print column
+
+				#find center of apertures at the column value and write it into ap_dict.
+				for ap in range(1,393):
+					column_norm=iraf_norm(column, ap_dict[ap][0][4], ap_dict[1][0][3])
+					ap_dict[ap][0][0]=ap_dict_initial[ap]+np.polynomial.legendre.legval(column_norm, np.array(ap_dict[ap][0][5:]))
+
+
+				# make initial fit
+				#fig=figure(str(cob)+str(ccd))
+				#ax=fig.add_subplot(211)
+				#ax2=fig.add_subplot(212, sharex=ax)
+				#ax.plot(np.sum(data[:,column-5:column+5], axis=1), 'k-')
+				
+				x=np.arange(len(np.sum(data[:,column-5:column+5], axis=1)))
+
+				for ap in range(1,393):
+					lower=int(ap_dict[ap][0][0])-6
+					if lower<0: lower=0
+					upper=int(ap_dict[ap][0][0])+6
+					if upper>len(np.sum(data[:,column-5:column+5], axis=1)): upper=len(np.sum(data[:,column-5:column+5], axis=1))
+					if func=='agauss': 
+						res=fit_profile_agauss([ap_dict[ap][0][0]-lower,100000,1.6], np.sum(data[:,column-5:column+5], axis=1)[lower:upper])
+					elif func=='voigt': 
+						res=fit_profile_voigt([ap_dict[ap][0][0]-lower,100000,1.5], np.sum(data[:,column-5:column+5], axis=1)[lower:upper])
+					else:
+						logging.error('Select a valid func parameter')
+					res['pos']=Parameter(name='pos', value=res['pos'].value+lower)
+					ap_dict[ap][1]=res
+
+				#model=np.zeros(len(x))
+				#for ap_model in range(1,393):
+				#	model+=peak_profile_agauss(ap_dict[ap_model][1], x)
+				#ax.plot(model, 'r-')
+
+				# iterate by removing a model for all apertures, except the one that will be fitted.
+				for n in range(10):
+					#print n
+					# for first few steps use a small region around the peak to fit it. Then increase it to fit the wings better
+					if n<5: limit=3
+					elif n<7: limit=6
+					else: limit=10
+					for ap in range(1,393):
+						lower=int(ap_dict[ap][0][0])-limit
+						if lower<0: lower=0
+						upper=int(ap_dict[ap][0][0])+limit
+						if upper>len(np.sum(data[:,column-5:column+5], axis=1)): upper=len(np.sum(data[:,column-5:column+5], axis=1))
+
+						# calculate best model without the ap line
+						model=np.zeros(len(x))
+						for ap_model in range(1,393):
+							if ap!=ap_model and abs(ap-ap_model)<4:
+								if func=='agauss':
+									model+=peak_profile_agauss(ap_dict[ap_model][1], x)
+								elif func=='voigt':
+									model+=peak_profile_voigt(ap_dict[ap_model][1], x)
+								else:
+									logging.error('Select a valid func parameter')
+
+						# fit one line
+						if func=='agauss':
+							res=fit_profile_agauss([ap_dict[ap][0][0]-lower,100000,1.6], np.sum(data[:,column-5:column+5], axis=1)[lower:upper]-model[lower:upper])
+						elif func=='voigt':
+							res=fit_profile_voigt([ap_dict[ap][0][0]-lower,100000,1.5], np.sum(data[:,column-5:column+5], axis=1)[lower:upper]-model[lower:upper])
+						else:
+							logging.error('Select a valid func parameter')
+						res['pos']=Parameter(name='pos', value=res['pos'].value+lower)
+						ap_dict[ap][1]=res
+
+
+					# print residuals
+					#model=np.zeros(len(x))
+					#for ap_model in range(1,393):
+					#	model+=peak_profile_agauss(ap_dict[ap_model][1], x)
+					#print np.sum(abs(model-np.sum(data[:,column-5:column+5], axis=1)))
+				
+				# calculate cross talk (integrate the profile over two neighbouring apertures and divide)
+				for ap in range(1,393):
+					xx=np.linspace(ap_dict[ap][0][0]-16, ap_dict[ap][0][0]+16, 32*100)
+					if func=='agauss':
+						model=peak_profile_agauss(ap_dict[ap][1], xx)
+					elif func=='voigt':
+						model=peak_profile_voigt(ap_dict[ap][1], xx)
+					else:
+						logging.error('Select a valid func parameter')
+
+					aperture_lower=ap_dict[ap][0][0]-3.0
+					aperture_upper=ap_dict[ap][0][0]+3.0
+					flux_aperture=np.sum(model[(xx>aperture_lower)&(xx<aperture_upper)])
+					if ap>1:
+						aperture_m_lower=ap_dict[ap-1][0][0]-3.0
+						aperture_m_upper=ap_dict[ap-1][0][0]+3.0
+						flux_aperture_m=np.sum(model[(xx>aperture_m_lower)&(xx<aperture_m_upper)])
+					else:
+						flux_aperture_m=0.0
+					if ap<392:
+						aperture_p_lower=ap_dict[ap+1][0][0]-3.0
+						aperture_p_upper=ap_dict[ap+1][0][0]+3.0
+						flux_aperture_p=np.sum(model[(xx>aperture_p_lower)&(xx<aperture_p_upper)])
+					else:
+						flux_aperture_p=0.0
+
+					ct_m=flux_aperture_m/flux_aperture
+					ct_p=flux_aperture_p/flux_aperture
+					ap_dict[ap][2].append([column, ct_m])
+					ap_dict[ap][3].append([column, ct_p])
+
+					#ax2.plot(ap_dict[ap][0][0], flux_aperture_m/flux_aperture, 'ro')
+					#ax2.plot(ap_dict[ap][0][0], flux_aperture_p/flux_aperture, 'go')
+					#ax2.text(ap_dict[ap][0][0], -0.002, str(ap))
+					
+
+				#model=np.zeros(len(x))
+				#for ap_model in range(1,393):
+				#	model+=peak_profile_agauss(ap_dict[ap_model][1], x)
+				#ax.plot(model, 'g-')
+				#show()
+
+			# model cross talk and create cross talk images
+			# create a zeros filled array. xtalk signal will be added into it
+			os.chdir(cob)
+			files=glob.glob("./[01-31]*.ms.fits")
+			#open extracted flat
+			hdul_flat=fits.open('masterflat.ms.fits')
+			data_flat=hdul_flat[0].data
+			hdul_flat.close()
+			flux_flat=np.average(data_flat, axis=1)
+			flux_max=np.percentile(flux_flat, 90)
+			for f in files:
+				hdul_o=fits.open(f, mode='update')
+				data=hdul_o[0].data
+				ct_image=np.zeros((392,4096))
+				for ap in range(1,393):
+					ct_m=np.array(ap_dict[ap][2])
+					ct_p=np.array(ap_dict[ap][3])
+					ct_m=np.polyfit(ct_m[:,0], ct_m[:,1], 5)
+					ct_m=np.poly1d(ct_m)
+					ct_p=np.polyfit(ct_p[:,0], ct_p[:,1], 5)
+					ct_p=np.poly1d(ct_p)
+					ap_i=ap-1
+					#fig=figure('check ct')
+					#ax=fig.add_subplot(111)
+					#ax.plot(np.arange(0,4096), ct_m(np.arange(0,4096)), 'r-')
+					#ax.plot(np.arange(0,4096), ct_p(np.arange(0,4096)), 'g-')
+					#ax.set_title(str(ap))
+					#show()
+					# only apply cross-talk correction for apertures where flux is not close to zero. If flux is low, the cross-talk can be wrong, beacuse of dividing by small numbers.
+					if flux_flat[ap_i]>0.1*flux_max:
+						if ap_i!=0:
+							ct_image[ap_i-1]+=data[ap_i]*ct_m(range(0,4096))
+						if ap_i!=391: 
+							ct_image[ap_i+1]+=data[ap_i]*ct_p(range(0,4096))
+				# filter ct image. It is better to reduce the resolution a little bit than to subtract remaining cosmic rays.
+				ct_image=signal.medfilt(ct_image, kernel_size=(1,5))
+				#save cross talk image
+				hdu=fits.PrimaryHDU(ct_image)
+				hdul = fits.HDUList([hdu])
+				hdul.writeto('cross_'+f.split('/')[-1])
+				#save spectra with cross talk removed
+				hdul_o[0].data=data-ct_image
+				hdul_o.flush()
+				hdul_o.close()
+			os.chdir('../../../..')
 
 
 def extract_spectra(date, start_folder):
