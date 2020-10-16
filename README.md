@@ -6,6 +6,7 @@
 
  - Python 2.7
  - iraf
+ - pyraf
  - scipy
  - numpy
  - astropy
@@ -14,15 +15,18 @@
  - lmfit
  - numdifftools
  - ephem
- - galah_tools
+ - json
+ - joblib
+ - galah_tools (included in this repository)
  - tesndorflow 2.1.0 (the latest version working on python2.7)
  - keras 2.3.1 (this is the latest version that works with tensorflow 2.1.0)
 
 **Iraf installation**
 
-Under Ubuntu >= 18.04 or Debian >= 10 iraf can be installed directly from the command line using the following command:
+Under Ubuntu >= 18.04 or Debian >= 10 iraf and pyraf can be installed directly from the command line using the following command:
 ```
 $ apt-get install iraf
+$ pip install pyraf
 ```
 
 **Iraf installation with conda**

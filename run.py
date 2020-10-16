@@ -16,7 +16,7 @@ def run_one_night(args):
 	st,date=args
 
 	data_folder=st.data_folder
-	if data_folder[-1]!='/': data_fodler=data_folder+'/'
+	if data_folder[-1]!='/': data_folder=data_folder+'/'
 	# Check whether this is a reduction of one night or multiple nights and set ncpu accordingly (one nmight is reduced with ncpu threads, multiple nights are not)
 	ncpu=st.ncpu
 	if isinstance(st.nights, (int, long)):
@@ -32,18 +32,26 @@ def run_one_night(args):
 		logging.error('Nights parameter must be int or iterable.')
 		return -1
 
+	plot_set = ''
+	if st.plot_apertures:
+		plot_set += ' --plot_apertures'
+	if st.plot_spectra:
+		plot_set += ' --plot_spectra'
+	if st.plot_diagnostics:
+		plot_set += ' --plot_diagnostics'
+
 	try:
 		# Start first batch of reduction steps
 		if st.initial: system('python extract6.0.py %s%s --initial --n_cpu %s --runs \'%s\'' % (data_folder, date, ncpu, st.runs))
 		if st.cosmics: system('python extract6.0.py %s%s --cosmic --n_cpu %s' % (data_folder, date, ncpu))
-		if st.trace: system('python extract6.0.py %s%s --trace --n_cpu %s' % (data_folder, date, ncpu))
+		if st.trace: system('python extract6.0.py %s%s --trace --n_cpu %s' % (data_folder, date, ncpu) + plot_set)
 		if st.scattered: system('python extract6.0.py %s%s --scattered --n_cpu %s' % (data_folder, date, ncpu))
 		if st.cross: system('python extract6.0.py %s%s --xtalk --n_cpu %s' % (data_folder, date, ncpu))
 		if st.extract: system('python extract6.0.py %s%s --extract --n_cpu %s' % (data_folder, date, ncpu))
 		if st.wav_cal: system('python extract6.0.py %s%s --wav --n_cpu %s' % (data_folder, date, ncpu))
-		if st.sky: system('python extract6.0.py %s%s --sky --sky_method %s --sky_thru %s --n_cpu %s' % (data_folder, date, st.method, st.throughput_method, ncpu))
+		if st.sky: system('python extract6.0.py %s%s --sky --sky_method %s --sky_thru %s --n_cpu %s' % (data_folder, date, st.method, st.throughput_method, ncpu) + plot_set)
 		if st.teluric: system('python extract6.0.py %s%s --telurics --n_cpu %s' % (data_folder, date, ncpu))
-		if st.v_bary and st.quick: system('python extract6.0.py %s%s --bary --quick --n_cpu %s' % (data_folder, date, ncpu))
+		if st.v_bary and st.quick: system('python extract6.0.py %s%s --bary --bary_quick --n_cpu %s' % (data_folder, date, ncpu))
 		elif st.v_bary: system('python extract6.0.py %s%s --bary --n_cpu %s' % (data_folder, date, ncpu))
 		if st.resolution: system('python extract6.0.py %s%s --resolution --n_cpu %s' % (data_folder, date, ncpu))
 	except:
@@ -51,14 +59,14 @@ def run_one_night(args):
 		system('rm -r reductions/%s' % date)
 		if st.initial: system('python extract6.0.py %s%s --initial --n_cpu %s --runs \'%s\'' % (data_folder, date, ncpu, st.runs))
 		if st.cosmics: system('python extract6.0.py %s%s --cosmic --n_cpu %s' % (data_folder, date, ncpu))
-		if st.trace: system('python extract6.0.py %s%s --trace --n_cpu %s' % (data_folder, date, ncpu))
+		if st.trace: system('python extract6.0.py %s%s --trace --n_cpu %s' % (data_folder, date, ncpu) + plot_set)
 		if st.scattered: system('python extract6.0.py %s%s --scattered --n_cpu %s' % (data_folder, date, ncpu))
 		if st.cross: system('python extract6.0.py %s%s --xtalk --n_cpu %s' % (data_folder, date, ncpu))
 		if st.extract: system('python extract6.0.py %s%s --extract --n_cpu %s' % (data_folder, date, ncpu))
 		if st.wav_cal: system('python extract6.0.py %s%s --wav --n_cpu %s' % (data_folder, date, ncpu))
-		if st.sky: system('python extract6.0.py %s%s --sky --sky_method %s --sky_thru %s --n_cpu %s' % (data_folder, date, st.method, st.throughput_method, ncpu))
+		if st.sky: system('python extract6.0.py %s%s --sky --sky_method %s --sky_thru %s --n_cpu %s' % (data_folder, date, st.method, st.throughput_method, ncpu) + plot_set)
 		if st.teluric: system('python extract6.0.py %s%s --telurics --n_cpu %s' % (data_folder, date, ncpu))
-		if st.v_bary and st.quick: system('python extract6.0.py %s%s --bary --quick --n_cpu %s' % (data_folder, date, ncpu))
+		if st.v_bary and st.quick: system('python extract6.0.py %s%s --bary --bary_quick --n_cpu %s' % (data_folder, date, ncpu))
 		elif st.v_bary: system('python extract6.0.py %s%s --bary --n_cpu %s' % (data_folder, date, ncpu))
 		if st.resolution: system('python extract6.0.py %s%s --resolution --n_cpu %s' % (data_folder, date, ncpu))
 
@@ -68,7 +76,7 @@ def run_one_night(args):
 
 	try:
 		# Start second batch of reduction steps
-		if st.final: system('python extract6.0.py %s%s --final --n_cpu %s' % (data_folder, date, ncpu))
+		if st.final: system('python extract6.0.py %s%s --final --n_cpu %s' % (data_folder, date, ncpu) + plot_set)
 		if st.analyse: system('python extract6.0.py %s%s --analyze --n_cpu %s' % (data_folder, date, ncpu))
 		if st.database: system('python extract6.0.py %s%s --database --n_cpu %s' % (data_folder, date, ncpu))
 	except:
@@ -77,7 +85,7 @@ def run_one_night(args):
 		sleep(3)
 		system('cp -r reductions/.backup_%s reductions/%s' % date, date)
 		sleep(3)
-		if st.final: system('python extract6.0.py %s%s --final --n_cpu %s' % (data_folder, date, ncpu))
+		if st.final: system('python extract6.0.py %s%s --final --n_cpu %s' % (data_folder, date, ncpu) + plot_set)
 		if st.analyse: system('python extract6.0.py %s%s --analyze --n_cpu %s' % (data_folder, date, ncpu))
 		if st.database: system('python extract6.0.py %s%s --database --n_cpu %s' % (data_folder, date, ncpu))
 
@@ -85,6 +93,7 @@ def run_one_night(args):
 	system('rm -r reductions/%s' % date)
 	system('rm -r reductions/.backup_%s' % date)
 	sleep(3)
+
 
 if __name__=="__main__":
 
@@ -94,7 +103,6 @@ if __name__=="__main__":
 
 	settings_file=args.settings
 	if settings_file[-3:]=='.py': settings_file=settings_file[:-3]
-
 	settings= __import__(settings_file)
 
 	if isinstance(settings.nights, collections.Iterable) and len(settings.nights)>1:

@@ -28,6 +28,7 @@ import time
 import ephem
 from scipy.optimize import curve_fit
 import argparse
+from parameters_nn import get_parameters_nn
 
 # possible NDFCLASS values in human readable form
 ndfclass_types={'MFFFF':'fibre flat', 'MFARC':'arc', 'MFOBJECT':'object', 'BIAS':'bias'}
@@ -187,7 +188,7 @@ def correct_ndfclass(hdul):
 			new_class = 'DARK'  # or bias or something else
 
 	if new_class == 'UNKNOWN':
-		print t_coord, f_coord, sun_alt, t_coord.separation(f_coord)
+		print h_head['FILEORIG'], t_coord, f_coord, sun_alt, t_coord.separation(f_coord)
 
 	return new_class
 
@@ -303,7 +304,6 @@ def prepare_dir(dir, str_range='*', list_cobs=True):
 
 			# iterate over the list of files and break it into cobs
 			cob_id=date+list_of_fits[0][0].split('/')[-1][6:10]
-			list_of_cob_ids.append(cob_id)
 			current_cob=cob_id
 			current_field=list_of_fits[0][3]
 			current_plate=list_of_fits[0][4]
@@ -312,13 +312,6 @@ def prepare_dir(dir, str_range='*', list_cobs=True):
 			current_t_coord = SkyCoord(ra=hdul[0].header['MEANRA'] * u.deg, dec=hdul[0].header['MEANDEC'] * u.deg)
 			hdul.close()
 
-			# t_ra =
-			# t_dec =
-			# f_data = Table(hdul['STRUCT.MORE.FIBRES'].data)
-			# f_ra = np.rad2deg(np.median(f_data['RA']))
-			# f_dec = np.rad2deg(np.median(f_data['DEC']))
-			# t_coord = SkyCoord(ra=t_ra * u.deg, dec=t_dec * u.deg)
-			# f_coord = SkyCoord(ra=f_ra * u.deg, dec=f_dec * u.deg)
 			cobs=[]
 			cob_content=[]
 			for f in list_of_fits:
@@ -330,9 +323,9 @@ def prepare_dir(dir, str_range='*', list_cobs=True):
 				if f[3]!=current_field or f[4]!=current_plate or current_t_coord.separation(new_t_coord) > 1 * u.deg:
 					if _has_cob_all_frames(cob_content, current_cob, ccd):
 						cobs.append([current_cob,cob_content])
+						list_of_cob_ids.append(cob_id)
 					date=dir.split('/')[-1]
 					cob_id=date+f[0].split('/')[-1][6:10]
-					list_of_cob_ids.append(cob_id)
 					cob_content=[]
 					current_cob=cob_id
 					current_field=f[3]
@@ -344,6 +337,7 @@ def prepare_dir(dir, str_range='*', list_cobs=True):
 
 			if _has_cob_all_frames(cob_content, current_cob, ccd):
 				cobs.append([current_cob,cob_content])
+				list_of_cob_ids.append(cob_id)
 
 			cobs_all.append(cobs)
 			biases_all.append(list_of_biases)
@@ -785,6 +779,7 @@ def find_apertures(date, start_folder):
 			# clear cache, or IRAF will have problems with files with the same name
 			iraf.flprcache()
 
+
 def plot_apertures(date,cob_id,ccd):
 	"""
 	Plots an image and marks where apertures are in column 2000. Red marks mean that the trace was lost at some point.
@@ -904,9 +899,8 @@ def plot_apertures(date,cob_id,ccd):
 	else:
 		logging.error('Cannot display Figure \"Apertures date=%s, cob_id=%s, ccd=%s\" in full screen mode.' % (date,cob_id,ccd))
 
-
-
 	show()
+
 
 def remove_scattered_proc(arg):
 	"""
@@ -1085,6 +1079,7 @@ def measure_cross_on_flat(date):
 	"""
 	pass
 
+
 def extract_spectra(date, start_folder):
 	"""
 	Takes *.fits images and creates *.ms.fits images with 392 spectra in them.
@@ -1145,6 +1140,7 @@ def extract_spectra(date, start_folder):
 
 			# clear cache, or IRAF will have problems with files with the same name
 			iraf.flprcache()
+
 
 def wav_calibration(date, start_folder):
 	"""
@@ -1563,6 +1559,11 @@ def resolution_profile(date):
 			logging.info('Calculating resolution profile for COB %s.' % cob)
 			files=glob.glob("%s/[01-31]*.ms.fits" % cob)
 			arc=cob+"/masterarc.ms.fits"
+
+			if not os.path.isfile(arc):
+				logging.warning('Masterarc was not found in ccd %d of COB %s, resolution profile will not be computed.' % (ccd, cob))
+				continue
+
 			# linearize arc
 			iraf.disptrans(input=arc, output='', linearize='yes', units='angstroms', Stdout="/dev/null")
 			# remove baseline (we want to measure lines with zero continuum level)
@@ -1574,7 +1575,7 @@ def resolution_profile(date):
 			res_points=[]
 			b_values=[]
 			for ap in range(1,393):
-				line=ap-1 # line in array is different than aperture number
+				line=ap-1  # line in array is different than aperture number
 				#fig=figure(0)
 				#ax=fig.add_subplot(311)
 				#ax.plot(data[line], 'k-')
@@ -1617,8 +1618,8 @@ def resolution_profile(date):
 				widths=np.array(widths_fit)
 				# remember peaks widths and B values
 				b_values.append(b_median)
-				if len(sorted_ind)>2*n_of_lines_dict[ccd]:# there must be at least
-					for i,j in zip(peaks[(peaks>20)&(peaks<4076)],widths[(peaks>20)&(peaks<4076)]):#20 px at each edge are truncated, because width cannot be measured correctly
+				if len(sorted_ind)>2*n_of_lines_dict[ccd]:  # there must be at least
+					for i,j in zip(peaks[(peaks>20)&(peaks<4076)],widths[(peaks>20)&(peaks<4076)]):  # 20 px at each edge are truncated, because width cannot be measured correctly
 						res_points.append([ap,i,j])
 
 				#ax2.set_ylim(4,6)
@@ -1704,8 +1705,6 @@ def resolution_profile(date):
 				hdul.close()
 
 			os.remove('/'.join(arc.split('/')[:-1])+'/nobaseline_'+arc.split('/')[-1])
-
-			
 
 			#y=np.arange(392)
 			#x=np.arange(4096)
@@ -2432,6 +2431,8 @@ def remove_telurics(date):
 	# create a dictionary of fitted parameters
 	trans_params={}
 
+	logging.info('Removing telluric absorption.')
+
 	# we start fitting with ccd4 where telluric lines are strongest. Fitted parameters are then saved and used for telluric correction in other three bands. Parameters in other three bands can either be improved with a new fit of left fixed.
 	for ccd in [4,3,2,1]:
 		# load telluric spectra
@@ -2597,11 +2598,14 @@ def create_final_spectra_proc(args):
 	"""
 	Multiprocessing wrapper for create_final_spectra
 	"""
-	ccd, cob, files=args
+	ccd, cob, files, plot_diag = args
 	date=cob.split('/')[1]
 
 	# copy wavelength solution diagnostics plot
-	shutil.copyfile(cob+'/wav_'+cob.split('/')[-1]+'00xxx'+str(ccd)+'.png', 'reductions/results/'+date+'/diagnostics/'+'wav_'+cob.split('/')[-1]+'00xxx'+str(ccd)+'.png')
+	wvl_file = cob+'/wav_'+cob.split('/')[-1]+'00xxx'+str(ccd)+'.png'
+	# initiate copy only if the file exists - handle missing ccds in some cobs
+	if plot_diag and os.path.isfile(wvl_file):
+		shutil.copyfile(wvl_file, 'reductions/results/'+date+'/diagnostics/'+'wav_'+cob.split('/')[-1]+'00xxx'+str(ccd)+'.png')
 
 	# save individual spectra
 	for file in files:
@@ -2645,8 +2649,8 @@ def create_final_spectra_proc(args):
 		iraf.flprcache()
 
 		#save scattered light image into a png file for diagnostics
-		logging.info('Saving diagnostic plots (scattered light).')
-		if os.path.exists('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1]):
+		if plot_diag and os.path.exists('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1]):
+			logging.info('Saving diagnostic plots (scattered light).')
 			hdul=fits.open('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1][:-8]+'.fits')
 			scat_image=hdul[0].data
 			hdul.close()
@@ -2663,8 +2667,8 @@ def create_final_spectra_proc(args):
 			fig.clf()
 
 		#save resolution profile image into a png file for diagnostics
-		logging.info('Saving diagnostic plots (resolution profile).')
-		if os.path.exists('/'.join(file.split('/')[:-1])+'/res_'+file.split('/')[-1]):
+		if plot_diag and os.path.exists('/'.join(file.split('/')[:-1])+'/res_'+file.split('/')[-1]):
+			logging.info('Saving diagnostic plots (resolution profile).')
 			hdul=fits.open('/'.join(file.split('/')[:-1])+'/res_'+file.split('/')[-1])
 			res_image=hdul[0].data
 			hdul.close()
@@ -2928,6 +2932,7 @@ def create_final_spectra_proc(args):
 
 				iraf.flprcache()
 
+	logging.info('Combining individual spectra.')
 	#save combined spectra
 	for ap in range(1,393):
 		if fibre_table_dict[ap][8]=='P':
@@ -2988,12 +2993,25 @@ def create_final_spectra_proc(args):
 				filenames.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits[6]')
 			to_combine=','.join(filenames)
 			iraf.scombine(input=to_combine, output='reductions/results/%s/spectra/com/%s[append]' % (date,filename), aperture='', group='all', combine='sum', reject='none', first='no', scale='none', Stdout="/dev/null")
-			#resolution profile
+			# resolution profile
 			filenames=[]
 			for file in files:
-				filenames.append('reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits[7]')
-			to_combine=','.join(filenames)
-			iraf.scombine(input=to_combine, output='reductions/results/%s/spectra/com/%s[append]' % (date,filename), aperture='', group='all', combine='average', reject='none', first='no', scale='none', weight='!EXPOSED', Stdout="/dev/null")
+				res_filename = 'reductions/results/'+str(date)+'/spectra/all/'+str(date)+file.split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits'
+				# check if resolution profile is in the individual uncombined spectrum
+				hdul = fits.open(res_filename)
+				len_res_prof = len(hdul['resolution_profile'].data)
+				hdul.close()
+				if len_res_prof > 1:
+					filenames.append(res_filename + '[7]')
+			ref_final_filename = 'reductions/results/%s/spectra/com/%s' % (date, filename)
+			if len(filenames) > 0:
+				to_combine = ','.join(filenames)
+				iraf.scombine(input=to_combine, output=ref_final_filename + '[append]', aperture='', group='all', combine='average', reject='none', first='no', scale='none', weight='!EXPOSED', Stdout="/dev/null")
+			else:
+				hdul = fits.open(ref_final_filename, mode='update')
+				hdul.append(fits.ImageHDU([0]))
+				hdul.close()
+				iraf.hedit(images=ref_final_filename + '[7]', fields="EXTNAME", value='resolution_profile', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
 			#add data
 			filenames=[]
 			for file in files:
@@ -3071,20 +3089,20 @@ def create_final_spectra_proc(args):
 			iraf.flprcache()
 
 
-
-
-def create_final_spectra(date, ncpu=1):
+def create_final_spectra(date, ncpu=1, plot_diagnostics=False):
 	"""
 	Turn reduced spectra into final output and combine consecutive exposures.
 
 	Parameters:
 		date (str): date string (e.g. 190210)
+		ncpu (int):
+		plot_diagnostics(bool):
 
 	Returns:
 		none
 
 	To do:
-		CHeck if headers are in accordance with Datacentral requirements
+		Check if headers are in accordance with Datacentral requirements
 
 	"""
 
@@ -3121,7 +3139,9 @@ def create_final_spectra(date, ncpu=1):
 		cobs=glob.glob("reductions/%s/ccd%s/*" % (date,ccd))
 		for cob in cobs:	
 			files=glob.glob("%s/[01-31]*.ms.fits" % cob)
-			args.append([ccd,cob,files])
+			# use only COBS with availible spectral data, some ccds could be missing
+			if len(files) > 0:
+				args.append([ccd,cob,files, plot_diagnostics])
 
 	if ncpu>1:
 		pool = Pool(processes=ncpu)
@@ -3144,6 +3164,7 @@ def create_database(date):
 
 	To do:
 		Add fibre throughput into the db and add flags for poor throughput
+		Add checks for possible missing ccds
 
 	"""
 
@@ -3187,6 +3208,7 @@ def create_database(date):
 	cols.append(fits.Column(name='teff', format='E', unit='K', null=None))
 	cols.append(fits.Column(name='logg', format='E', unit='cm / s^-2', null=None))
 	cols.append(fits.Column(name='met', format='E', null=None))
+	cols.append(fits.Column(name='fe_h', format='E', null=None))
 	cols.append(fits.Column(name='obs_comment', format='A56'))
 	cols.append(fits.Column(name='pipeline_version', format='A5'))
 	cols.append(fits.Column(name='reduction_flags', format='I'))
@@ -3417,7 +3439,15 @@ def analyze_rv(args):
 	best_template=[]
 	for ccd in [1,2,3,4]:
 		# open spectrum
-		hdulist = fits.open('reductions/results/%s/spectra/com/%s%s.fits' % (date, sobject,ccd))
+		fits_path = 'reductions/results/%s/spectra/com/%s%s.fits' % (date, sobject,ccd)
+		if not os.path.isfile(fits_path):
+			# in the case of missing ccd data
+			# CCF is equal to zero and select one of the templates as that are all equally good/bad
+			ccfs.append(np.full_like(rvs, 0.))
+			best_template.append(0)
+			continue
+
+		hdulist = fits.open(fits_path)
 		crval=hdulist[1].header['CRVAL1']
 		crdel=hdulist[1].header['CDELT1']
 		f=hdulist[1].data
@@ -3543,7 +3573,13 @@ def analyze_rv(args):
 
 		# fit individual CCDs
 		for ccd in [1,2,3,4]:
-			peak_max=ccfs[ccd-1][peak_prime] # height of peak
+			peak_max=ccfs[ccd-1][peak_prime]  # height of peak
+			if np.median(ccfs[ccd-1]) == 0:
+				# skip ccds for which the correlation was not computed, set RV values to not evaluated
+				rv_ind_ar.append('None')
+				sigma_ind_ar.append('None')
+				flag_ind_ar.append(0)
+				continue
 			fit_params = Parameters()
 			fit_params.add('amp', value=peak_max-np.median(ccfs[ccd-1]), max=(peak_max-np.median(ccfs[ccd-1]))*2.0, min=0.0)
 			fit_params.add('sigma', value=peak_width*0.75)
@@ -3577,7 +3613,11 @@ def analyze_rv(args):
 
 	for ccd in [1,2,3,4]:
 		# open fits file and write rvs into header
-		hdulist = fits.open('reductions/results/%s/spectra/com/%s%s.fits' % (date, sobject,ccd), mode='update')
+		fits_path = 'reductions/results/%s/spectra/com/%s%s.fits' % (date, sobject, ccd)
+		if not os.path.isfile(fits_path):
+			continue
+		hdulist = fits.open(fits_path, mode='update')
+
 		for extension in range(8):
 			hdulist[extension].header['RV']=rv_ind_ar[ccd-1]
 			hdulist[extension].header['E_RV']=sigma_ind_ar[ccd-1]
@@ -3586,9 +3626,6 @@ def analyze_rv(args):
 			hdulist[extension].header['E_RVCOM']=sigma_com
 			hdulist[extension].header['RVCOM_OK']=flag_com
 		hdulist.close()
-	
-
-
 
 	"""
 	print rv_com, sigma_com
@@ -3606,7 +3643,8 @@ def analyze_rv(args):
 	#if rv_com!='None': ax.set_xlim(rv_com-100,rv_com+100)
 	show()
 	"""
-	
+
+
 def analyze(date, ncpu=1):
 	"""
 	Calculate radial velocity and atmospheric parameters. Should be done after the data is combined and before the database is generated. Caculated parameters can be written into headers.
@@ -3667,6 +3705,8 @@ def analyze(date, ncpu=1):
 			analyze_rv(arg)
 
 	# calculate stellar parameters
+	logging.info('Calculating stellar parameters and abundances.')
+	get_parameters_nn(sobjects, logging, processes=ncpu)
 
 
 if __name__ == "__main__":
@@ -3718,6 +3758,9 @@ if __name__ == "__main__":
 	parser.add_argument("--sky_method", help="Sky removal method.", default='nearest3')
 	parser.add_argument("--sky_thru", help="Fibre throughput measuring method.", default='flat')
 	parser.add_argument("--bary_quick", help="Quick v_bary correction", action="store_true")
+	parser.add_argument("--plot_apertures", help="Plot all appertures", action="store_true")
+	parser.add_argument("--plot_spectra", help="Plot all spectra", action="store_true")
+	parser.add_argument("--plot_diagnostics", help="Plot diagnostic plots", action="store_true")
 	args = parser.parse_args()
 
 	# if only COBs are to be listed, perform first function and then clean afterwards
@@ -3739,7 +3782,10 @@ if __name__ == "__main__":
 			remove_cosmics(date, ncpu=int(args.n_cpu))
 		if args.trace:
 			find_apertures(date, start_folder)
-			#plot_apertures(190210, 1902100045, 3)
+			if args.plot_apertures:
+				pass
+				# TODO: run plotting for all possible combinations
+				# plot_apertures(190210, 1902100045, 3)
 		if args.scattered:
 			remove_scattered(date, start_folder, ncpu=int(args.n_cpu))
 		if args.xtalk:
@@ -3748,9 +3794,12 @@ if __name__ == "__main__":
 			extract_spectra(date, start_folder)
 		if args.wav:
 			wav_calibration(date, start_folder)
-		if args.sky: 
+		if args.sky:
 			remove_sky(date, method=args.sky_method, thr_method=args.sky_thru, ncpu=int(args.n_cpu))
-			#plot_spectra(190210, 1902100045, 3)
+			if args.plot_spectra:
+				pass
+				# TODO: run plotting for all possible combinations
+				# plot_spectra(190210, 1902100045, 3)
 		if args.telurics:
 			remove_telurics(date)
 		if args.bary:
@@ -3758,7 +3807,7 @@ if __name__ == "__main__":
 		if args.resolution:
 			resolution_profile(date)
 		if args.final:
-			create_final_spectra(date, ncpu=int(args.n_cpu))
+			create_final_spectra(date, ncpu=int(args.n_cpu), plot_diagnostics=args.plot_diagnostics)
 		if args.analyze:
 			analyze(date, ncpu=int(args.n_cpu))
 		if args.database:
