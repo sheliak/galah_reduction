@@ -1,4 +1,4 @@
-#Parameter estimation
+# Parameter estimation
 
 In this folder we have all files that are need for running a predetermined (convolutional) neural network that will determine stellar parameters and abundances from the normalised input spectra. Currentlly no quality flags are supplied allong the determined values.
 

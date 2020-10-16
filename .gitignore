@@ -21,6 +21,7 @@
 logfile
 
 # Other
+settings.py
 login.cl
 pyraf
 reductions
