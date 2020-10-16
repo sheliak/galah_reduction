@@ -1,5 +1,6 @@
 import logging
 import sys
+from sys import stdout
 import glob
 from astropy.io import fits
 from astropy.time import Time
@@ -222,7 +223,7 @@ def prepare_dir(dir, str_range='*', list_cobs=True):
 			runs=range_to_list(str_range)
 			runs=np.array(runs, dtype=int)
 		except:
-			logging.error('List of runs (%s) cannot be converted into a list. Check formatting.' % str_range)
+			extract_log.error('List of runs (%s) cannot be converted into a list. Check formatting.' % str_range)
 			runs=range(10000)
 
 	# function that checks if cob has all three types of science frames
@@ -233,10 +234,10 @@ def prepare_dir(dir, str_range='*', list_cobs=True):
 		if len(np.unique(types_in_cob)) == 3:
 			return True
 		else:
-			logging.warning('CCD %d of COB %s is missing some science frames and will be skipped' % (ccd_i, cob_str))
+			extract_log.warning('CCD %d of COB %s is missing some science frames and will be skipped' % (ccd_i, cob_str))
 			return False
 
-	logging.info('Checking contents of the given folder.')
+	extract_log.info('Checking contents of the given folder.')
 
 	if dir[-1]=='/': dir=dir[:-1]
 
@@ -263,7 +264,7 @@ def prepare_dir(dir, str_range='*', list_cobs=True):
 			try:
 				run_num = int(fits_name[6:10])
 			except ValueError as err:
-				logging.warning('Skipping file %s as it has no valid run number in filename' % fits_name)
+				extract_log.warning('Skipping file %s as it has no valid run number in filename' % fits_name)
 				continue
 
 			# accept file if obstatus is >0. Also add comment from comments.txt into the header
@@ -276,7 +277,7 @@ def prepare_dir(dir, str_range='*', list_cobs=True):
 		files=np.array(files)
 
 		if len(files)==0:
-			logging.error('No data for CCD %s exists.' % ccd)
+			extract_log.error('No data for CCD %s exists.' % ccd)
 			cobs_all.append([])
 		else:
 			list_of_fits=[]
@@ -295,7 +296,7 @@ def prepare_dir(dir, str_range='*', list_cobs=True):
 			# check if we found any science image
 			if len(list_of_fits) == 0:
 				error_str = 'No science data found for night ' + date
-				logging.error(error_str)
+				extract_log.error(error_str)
 				raise RuntimeError(error_str)
 
 			# order list of files in timely order
@@ -353,7 +354,7 @@ def prepare_dir(dir, str_range='*', list_cobs=True):
 	if cob_lens[0]==cob_lens[1]==cob_lens[2]==cob_lens[3]:
 		pass
 	else:
-		logging.warning('There is a different number of images made with each CCD.')
+		extract_log.warning('There is a different number of images made with each CCD.')
 
 	#create folder structure
 
@@ -392,7 +393,7 @@ def prepare_dir(dir, str_range='*', list_cobs=True):
 			os.makedirs('reductions/%s/ccd4/%s' % (date,i))
 
 	# copy fits files into correct folders
-	logging.info('Copying files into correct folders for the reduction.')
+	extract_log.info('Copying files into correct folders for the reduction.')
 
 	for biases_all_ccd in biases_all:
 		for bias_info in biases_all_ccd:
@@ -471,11 +472,12 @@ def remove_bias(date):
 		Use overscan if there are no biases (or <3 biases)
 
 	"""
-	logging.info('Correcting bias.')
+	extract_log.info('Correcting bias.')
 	for ccd in [1,2,3,4]:
 		files=glob.glob("reductions/%s/ccd%s/biases/*.fits" % (date,ccd))
 		
 		if len(files)>=3:
+			extract_log.info("Found more than 2 biases thus using them")
 			# create masterbias
 			biases=[]
 			for f in files:
@@ -494,15 +496,15 @@ def remove_bias(date):
 						hdu_c[0].data=hdu_c[0].data-masterbias
 						hdu_c.flush()
 		else: # if there are not enough biases, use overscan
+			extract_log.info("Found less than 3 biases thus using overscan")
 			files=glob.glob("reductions/%s/ccd%s/*/[01-31]*.fits" % (date,ccd))
 			for f in files:
 				if 'biases' in f: 
 					continue
 				else:
 					with fits.open(f, mode='update') as hdu_c:
-						pass
-						hdu_c.flush()
-						
+						hdu_c[0].data=hdu_c[0].data-np.transpose(np.ones([4146,4112])*np.mean(hdu_c[0].data[:,4096:],axis=1))			
+						hdu_c.flush()						
 		
 		shutil.rmtree("reductions/%s/ccd%s/biases" % (date,ccd))
 
@@ -517,7 +519,7 @@ def fix_gain(date):
 		none
 
 	"""
-	logging.info('Normalizing gain')
+	extract_log.info('Normalizing gain')
 	for ccd in [1,2,3,4]:
 		files=glob.glob("reductions/%s/ccd%s/*/[01-31]*.fits" % (date,ccd))
 		for f in files:
@@ -543,7 +545,7 @@ def fix_bad_pixels(date):
 		none
 
 	"""
-	logging.info('Fixing bad columns.')
+	extract_log.info('Fixing bad columns.')
 
 	iraf.noao(_doprint=0,Stdout="/dev/null")
 	iraf.imred(_doprint=0,Stdout="/dev/null")
@@ -618,7 +620,7 @@ def prepare_flat_arc(date, cobs):
 
 	"""
 	# Check if there are multiple flats and arcs for each cob. If yes, combine them into a masterflat and masterarc.
-	logging.info('Preparing flats and arcs.')
+	extract_log.info('Preparing flats and arcs.')
 	for ccd in [1,2,3,4]:
 		for i in cobs[ccd-1]:
 			flats=[]
@@ -634,7 +636,7 @@ def prepare_flat_arc(date, cobs):
 			if len(flats)==1:#if there is only one flat, just rename it into masterflat
 				shutil.move(flats[0], 'reductions/'+date+'/ccd%s/' % ccd+i[0]+'/masterflat.fits')
 			elif len(flats)==0:
-				logging.error('Flat missing for COB %s. This COB will be skipped.' % i[0])
+				extract_log.error('Flat missing for COB %s. This COB will be skipped.' % i[0])
 				shutil.rmtree("reductions/%s/ccd%s/%s" % (date,ccd,i[0]))
 			else:
 				iraf.imcombine(input=','.join(flats), output='reductions/'+date+'/ccd%s/' % ccd+i[0]+'/masterflat.fits', combine='average', reject='none', Stdout="/dev/null")
@@ -642,7 +644,7 @@ def prepare_flat_arc(date, cobs):
 			if len(arcs)==1:#if there is only one arc, just rename it into masterarc
 				shutil.move(arcs[0], 'reductions/'+date+'/ccd%s/' % ccd+i[0]+'/masterarc.fits')
 			elif len(arcs)==0:
-				logging.error('Arc missing for COB %s. This COB will be skipped.' % i[0])
+				extract_log.error('Arc missing for COB %s. This COB will be skipped.' % i[0])
 				shutil.rmtree("reductions/%s/ccd%s/%s" % (date,ccd,i[0]))
 			else:
 				iraf.imcombine(input=','.join(arcs), output='reductions/'+date+'/ccd%s/' % ccd+i[0]+'/masterarc.fits', combine='average', reject='none', Stdout="/dev/null")
@@ -741,7 +743,7 @@ def find_apertures(date, start_folder):
 			try:
 				hdul=fits.open(cob+'/masterflat.fits')
 			except IOError as err:
-				logging.warning('Masterflat was not found in ccd %d of COB %s' % (ccd, cob.split('/')[-1]))
+				extract_log.warning('Masterflat was not found in ccd %d of COB %s' % (ccd, cob.split('/')[-1]))
 				continue
 
 			plate= hdul[0].header['SOURCE']
@@ -889,7 +891,7 @@ def plot_apertures(date,cob_id,ccd):
 			try:
 				mng.resize(*mng.window.maxsize())
 			except:
-				logging.error('Cannot display Figure \"Apertures date=%s, cob_id=%s, ccd=%s\" in full screen mode.' % (date,cob_id,ccd))
+				extract_log.error('Cannot display Figure \"Apertures date=%s, cob_id=%s, ccd=%s\" in full screen mode.' % (date,cob_id,ccd))
 	elif matplotlib_backend=='wxAgg':
 		mng=plt.get_current_fig_manager()
 		mng.frame.Maximize(True)
@@ -897,7 +899,7 @@ def plot_apertures(date,cob_id,ccd):
 		mng=plt.get_current_fig_manager()
 		mng.window.showMaximized()
 	else:
-		logging.error('Cannot display Figure \"Apertures date=%s, cob_id=%s, ccd=%s\" in full screen mode.' % (date,cob_id,ccd))
+		extract_log.error('Cannot display Figure \"Apertures date=%s, cob_id=%s, ccd=%s\" in full screen mode.' % (date,cob_id,ccd))
 
 	show()
 
@@ -966,7 +968,7 @@ def remove_scattered_proc(arg):
 	# supress some very high pixels. They can't be right.
 	data_full[data_full>np.percentile(data_full,95)]=np.percentile(data_full,95)
 	# if scattered light is very high, display a warning
-	if np.max(data_full)>50: logging.warning('Scattered light is larger than 50 e in image %s' % file)
+	if np.max(data_full)>50: extract_log.warning('Scattered light is larger than 50 e in image %s' % file)
 	# write back to fits
 	hdul[0].data=data_full
 	hdul.close()
@@ -1015,7 +1017,7 @@ def remove_scattered(date, start_folder, ncpu=1):
 		poly=polyval2d(xx, yy, m)
 		return np.nansum(abs(image-poly))
 
-	logging.info('Removing scattered light.')
+	extract_log.info('Removing scattered light.')
 
 	iraf.noao(_doprint=0,Stdout="/dev/null")
 	iraf.twodspec(_doprint=0,Stdout="/dev/null")
@@ -1035,7 +1037,7 @@ def remove_scattered(date, start_folder, ncpu=1):
 				shutil.move('crop.tmp.fits', 'masterarc.fits')
 				iraf.flprcache()
 			except:
-				logging.warning('Masterarc was not found in ccd %d of COB %s' % (ccd, cob.split('/')[-1]))
+				extract_log.warning('Masterarc was not found in ccd %d of COB %s' % (ccd, cob.split('/')[-1]))
 
 			files=glob.glob("./[01-31]*.fits")
 			for f in files:
@@ -1110,7 +1112,7 @@ def extract_spectra(date, start_folder):
 				shutil.move('crop.tmp.fits', 'masterarc.fits')
 				iraf.flprcache()
 			except:
-				logging.warning('Masterarc was not found in ccd %d of COB %s' % (ccd, cob))
+				extract_log.warning('Masterarc was not found in ccd %d of COB %s' % (ccd, cob))
 
 			files=glob.glob("./[01-31]*.fits")
 			for f in files:
@@ -1294,7 +1296,7 @@ def wav_calibration(date, start_folder):
 		cobs=glob.glob("reductions/%s/ccd%s/*" % (date,ccd))
 		for cob in cobs:
 			if not os.path.isfile(cob+'/masterarc.ms.fits'):
-				logging.warning('Masterarc was not found in ccd %d of COB %s, wavelength calibration will be skipped for this ccd-COB combination' % (ccd, cob.split('/')[-1]))
+				extract_log.warning('Masterarc was not found in ccd %d of COB %s, wavelength calibration will be skipped for this ccd-COB combination' % (ccd, cob.split('/')[-1]))
 				continue
 
 			hdul=fits.open(cob+'/masterarc.ms.fits')
@@ -1556,7 +1558,7 @@ def resolution_profile(date):
 	for ccd in [1,2,3,4]:
 		cobs=glob.glob("reductions/%s/ccd%s/*" % (date,ccd))
 		for cob in cobs:
-			logging.info('Calculating resolution profile for COB %s.' % cob)
+			extract_log.info('Calculating resolution profile for COB %s.' % cob)
 			files=glob.glob("%s/[01-31]*.ms.fits" % cob)
 			arc=cob+"/masterarc.ms.fits"
 
@@ -1741,7 +1743,7 @@ def v_bary_correction_proc(args):
 	if os.path.exists('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1]): 
 		hdul_scat=fits.open('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1], mode='update')
 	n=0 # n counts apertures (increase whenever fibre type!='F')
-	logging.info('Processing (v_bary correction) file %s.' % file)
+	extract_log.info('Processing (v_bary correction) file %s.' % file)
 	for i in fibre_table:
 		if i[8]!='F':
 			n+=1
@@ -1799,7 +1801,7 @@ def v_bary_correction(date, quick=False, ncpu=1):
 	iraf.noao(_doprint=0,Stdout="/dev/null")
 	iraf.onedspec(_doprint=0,Stdout="/dev/null")
 
-	logging.info('Calculating barycentric velocity corrections. This might take some time, if quick=False option is used (default).')
+	extract_log.info('Calculating barycentric velocity corrections. This might take some time, if quick=False option is used (default).')
 	AAT_lon = 149.0658
 	AAT_lat = -31.2769
 	AAT_elevation = 1164
@@ -1974,7 +1976,7 @@ def plot_spectra(date, cob_id, ccd):
 			try:
 				mng.resize(*mng.window.maxsize())
 			except:
-				logging.error('Cannot display Figure \"Apertures date=%s, cob_id=%s, ccd=%s\" in full screen mode.' % (date,cob_id,ccd))
+				extract_log.error('Cannot display Figure \"Apertures date=%s, cob_id=%s, ccd=%s\" in full screen mode.' % (date,cob_id,ccd))
 	elif matplotlib_backend=='wxAgg':
 		mng=plt.get_current_fig_manager()
 		mng.frame.Maximize(True)
@@ -1982,7 +1984,7 @@ def plot_spectra(date, cob_id, ccd):
 		mng=plt.get_current_fig_manager()
 		mng.window.showMaximized()
 	else:
-		logging.error('Cannot display Figure \"Apertures date=%s, cob_id=%s, ccd=%s\" in full screen mode.' % (date,cob_id,ccd))
+		extract_log.error('Cannot display Figure \"Apertures date=%s, cob_id=%s, ccd=%s\" in full screen mode.' % (date,cob_id,ccd))
 
 	show()
 
@@ -2002,7 +2004,7 @@ def remove_sky_nearest(arg):
 
 	cob,file,fibre_throughputs_dict_use,fibre_table_dict=arg
 
-	logging.info('Processing (removing sky) file %s' % file)
+	extract_log.info('Processing (removing sky) file %s' % file)
 
 	os.chdir(cob)
 	file=file.split('/')[-1]
@@ -2011,7 +2013,7 @@ def remove_sky_nearest(arg):
 	for ap in range(1,393):
 		sky_ap=nearest_sky(ap)
 		if sky_ap==-1:
-			logging.error('There are no sky fibres in image %s.' % file)
+			extract_log.error('There are no sky fibres in image %s.' % file)
 		if sky_ap_old!=sky_ap:
 			if os.path.exists(file+'sky.fits'):	os.remove(file+'sky.fits')
 			iraf.scopy(input=file, output=file+'sky.fits', apertures=sky_ap, Stdout="/dev/null")
@@ -2081,7 +2083,7 @@ def remove_sky_nearest3(arg):
 
 	cob,file,fibre_throughputs_dict_use,fibre_table_dict=arg
 
-	logging.info('Processing (removing sky) file %s' % file)
+	extract_log.info('Processing (removing sky) file %s' % file)
 
 	os.chdir(cob)
 	file=file.split('/')[-1]
@@ -2089,7 +2091,7 @@ def remove_sky_nearest3(arg):
 	for ap in range(1,393):
 		sky_aps=nearest_3_sky(ap)
 		if sky_aps==-1:
-			logging.error('There are no sky fibres in image %s.' % file)
+			extract_log.error('There are no sky fibres in image %s.' % file)
 		if os.path.exists(file+'sky1.fits'):	
 			os.remove(file+'sky1.fits')
 		if os.path.exists(file+'sky2.fits'):	
@@ -2181,14 +2183,14 @@ def remove_sky(date, method='nearest', thr_method='flat', ncpu=1):
 	iraf.noao(_doprint=0,Stdout="/dev/null")
 	iraf.onedspec(_doprint=0,Stdout="/dev/null")
 
-	logging.info('Removing sky.')
+	extract_log.info('Removing sky.')
 	for ccd in [4,3,2,1]:
 		# This first part calculates fibre throughputs based on magnitudes
 		fibre_throughputs_dict_mags={}
 		cobs=glob.glob("reductions/%s/ccd%s/*" % (date,ccd))
 		for cob in cobs:
 			if not os.path.isfile(cob+'/masterarc.ms.fits'):
-				logging.warning('Masterarc was not found in ccd %d of COB %s, fibre throughput will not be estimated for this ccd-COB combination' % (ccd, cob.split('/')[-1]))
+				extract_log.warning('Masterarc was not found in ccd %d of COB %s, fibre throughput will not be estimated for this ccd-COB combination' % (ccd, cob.split('/')[-1]))
 				continue
 
 			files=glob.glob("%s/[01-31]*.fits" % cob)
@@ -2233,7 +2235,7 @@ def remove_sky(date, method='nearest', thr_method='flat', ncpu=1):
 		for ap in fibre_throughputs_dict_mags:
 			fibre_throughputs_dict_mags[ap]=np.median(fibre_throughputs_dict_mags[ap])
 
-		logging.info('Fibre throughputs calculated for ccd %s.' % ccd)
+		extract_log.info('Fibre throughputs calculated for ccd %s.' % ccd)
 
 		# The second part removes sky
 		cobs=glob.glob("reductions/%s/ccd%s/*" % (date,ccd))
@@ -2247,7 +2249,7 @@ def remove_sky(date, method='nearest', thr_method='flat', ncpu=1):
 
 			if len(valid_files) == 0:
 				error_str = 'No spectra files found for sky removal in ccd %d of COB %s' % (ccd, cob.split('/')[-1])
-				logging.error(error_str)
+				extract_log.error(error_str)
 				continue
 
 			#create a dict from fibre table
@@ -2638,7 +2640,7 @@ def create_final_spectra_proc(args):
 		iraf.sarith(input1=file, op='*', input2='0.0', output='/'.join(file.split('/')[:-1])+'/cross_'+file.split('/')[-1], apertures='', Stdout="/dev/null")
 
 		#linearize all spectra
-		logging.info('Linearizing spectra.')
+		extract_log.info('Linearizing spectra.')
 		iraf.disptrans(input=file, output='', linearize='yes', units='angstroms', Stdout="/dev/null")
 		iraf.disptrans(input='/'.join(file.split('/')[:-1])+'/norm_'+file.split('/')[-1], output='', linearize='yes', units='angstroms', Stdout="/dev/null")
 		if os.path.exists('/'.join(file.split('/')[:-1])+'/sky_'+file.split('/')[-1]): iraf.disptrans(input='/'.join(file.split('/')[:-1])+'/sky_'+file.split('/')[-1], output='', linearize='yes', units='angstroms', Stdout="/dev/null")
@@ -2650,7 +2652,7 @@ def create_final_spectra_proc(args):
 
 		#save scattered light image into a png file for diagnostics
 		if plot_diag and os.path.exists('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1]):
-			logging.info('Saving diagnostic plots (scattered light).')
+			extract_log.info('Saving diagnostic plots (scattered light).')
 			hdul=fits.open('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1][:-8]+'.fits')
 			scat_image=hdul[0].data
 			hdul.close()
@@ -2668,7 +2670,7 @@ def create_final_spectra_proc(args):
 
 		#save resolution profile image into a png file for diagnostics
 		if plot_diag and os.path.exists('/'.join(file.split('/')[:-1])+'/res_'+file.split('/')[-1]):
-			logging.info('Saving diagnostic plots (resolution profile).')
+			extract_log.info('Saving diagnostic plots (resolution profile).')
 			hdul=fits.open('/'.join(file.split('/')[:-1])+'/res_'+file.split('/')[-1])
 			res_image=hdul[0].data
 			hdul.close()
@@ -3106,7 +3108,7 @@ def create_final_spectra(date, ncpu=1, plot_diagnostics=False):
 
 	"""
 
-	logging.info('Preparing folders to save final spectra')
+	extract_log.info('Preparing folders to save final spectra')
 
 	# Create folder structure for final data
 	if not os.path.exists('reductions/results'):
@@ -3663,7 +3665,7 @@ def analyze(date, ncpu=1):
 
 	# calculate radial velocity
 
-	logging.info('Loading radial velocity template spectra.')
+	extract_log.info('Loading radial velocity template spectra.')
 	#load file with wavelengths for templates
 	w_file='rv_templates/LAMBDA_R20.DAT'
 	w=np.loadtxt(w_file, dtype=float)
@@ -3690,7 +3692,7 @@ def analyze(date, ncpu=1):
 	sobjects=[file.split('/')[-1][:15] for file in files]
 	sobjects=set(sobjects)
 
-	logging.info('Calculating radial velocities.')
+	extract_log.info('Calculating radial velocities.')
 
 	args=[]
 	for sobject in sobjects:
@@ -3730,11 +3732,15 @@ if __name__ == "__main__":
 	iraf.set(min_lenuserarea=128000)
 	iraf.set(uparm=start_folder + '/uparm')
 
-	# Set logging levels
-	logging.basicConfig(level=logging.DEBUG)
-	mpl_logger=logging.getLogger('matplotlib')
-	mpl_logger.setLevel(logging.WARNING)
 
+
+	
+	# Set logging levels 
+	extract_log=logging.getLogger('extract_log')	
+	extract_log.setLevel(logging.INFO)
+ 	mpl_logger=logging.getLogger('matplotlib')
+ 	mpl_logger.setLevel(logging.WARNING)
+ 		
 	# Parse command line arguments
 	parser = argparse.ArgumentParser()
 	parser.add_argument("night", help="Path to the data for one night.")
@@ -3762,7 +3768,24 @@ if __name__ == "__main__":
 	parser.add_argument("--plot_spectra", help="Plot all spectra", action="store_true")
 	parser.add_argument("--plot_diagnostics", help="Plot diagnostic plots", action="store_true")
 	args = parser.parse_args()
-
+	
+	#Changes the format of the logger to include the night being reduced
+	date=args.night.split('/')[-1]
+	format_string='%(levelname)s:%(name)s '+date+': %(message)s'
+	formatter = logging.Formatter(format_string)
+	
+	#You can change console log to change the level of the log displayed on your console
+	consoleLog = logging.StreamHandler()
+	consoleLog.setLevel(logging.DEBUG)
+	consoleLog.setFormatter(formatter)
+	
+	#You can change file log to change the level of the log displayed on the log file. 
+	fileLog = logging.FileHandler('Reduce ' +date+'.log')
+	fileLog.setLevel(logging.DEBUG)	
+	fileLog.setFormatter(formatter)
+	extract_log.addHandler(consoleLog)	
+	extract_log.addHandler(fileLog)	
+	
 	# if only COBs are to be listed, perform first function and then clean afterwards
 	if args.list_cobs:
 		date, cobs = prepare_dir(args.night, str_range=args.runs, list_cobs=args.list_cobs)
