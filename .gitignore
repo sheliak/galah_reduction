@@ -8,7 +8,6 @@
 *.csv
 *.fits
 *.vot
-*.dat
 
 # Images
 *.jpg
@@ -22,6 +21,7 @@
 logfile
 
 # Other
+settings.py
 login.cl
 pyraf
 reductions

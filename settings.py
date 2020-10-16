@@ -6,7 +6,7 @@
 
 # Number of processes to use
 # If reducing one night, this many threads will be used for the reduction. If reducing multiple night this many nights will be reduced in parallel.
-ncpu = 3
+ncpu = 16
 
 # Data folder
 data_folder = "/home/kevin/Documents/Reduction_pipe/"
@@ -19,6 +19,7 @@ nights = [190223]
 # Runs to be reduced 
 # Runs with obtatus=0 in the comments file will not be reduced, even if they are included in this list.
 # Use runs = '*' to reduce all runs
+# runs = "0-23"
 runs = "*"
 
 
@@ -84,10 +85,10 @@ database = False
 # DISPLAYED PLOTS
 
 # Plot apertures
-
 plot_apertures = False
 
 # Plot spectra
-
 plot_spectra = False
 
+# Plot diagnostic files
+plot_diagnostics = False
