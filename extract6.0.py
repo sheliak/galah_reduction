@@ -21,7 +21,7 @@ import csv
 from scipy import optimize, signal, ndimage
 from scipy.interpolate import griddata
 from astropy.convolution import Gaussian1DKernel, convolve, CustomKernel
-from lmfit import Minimizer, Parameters, report_fit, minimize
+from lmfit import Minimizer, Parameters, Parameter, report_fit, minimize
 from multiprocessing import Pool
 from datetime import datetime
 import cosmics
