@@ -30,6 +30,8 @@ import ephem
 from scipy.optimize import curve_fit
 import argparse
 from parameters_nn import get_parameters_nn
+import h5py
+import inspect
 
 # possible NDFCLASS values in human readable form
 ndfclass_types={'MFFFF':'fibre flat', 'MFARC':'arc', 'MFOBJECT':'object', 'BIAS':'bias'}
@@ -1080,6 +1082,7 @@ def measure_cross_on_flat(date, func='agauss'):
 	ToDo:
 		add flag for large cross-talk
 		paralelize
+                add outputs to logger as the function is curently silent
 	"""
 
 	def peak_profile_agauss(a,x):
@@ -3397,6 +3400,80 @@ def create_final_spectra(date, ncpu=1, plot_diagnostics=False):
 			create_final_spectra_proc(arg)
 
 
+def create_hdf5_database(date):
+	"""
+	Create a spectral database in the form an HDF5 file.
+
+	Parameters:
+		date (str): date string (e.g. 190210)
+
+	Returns:
+		none
+
+	To do:
+		Write in parallel if possible.
+
+	"""
+	extract_log.info('Creating an HDF5 spectral database')
+
+	# read final combined spectra
+	spec_files = glob.glob('reductions/results/%s/spectra/com/*.fits' % (date))
+
+	hdf5_file = 'reductions/results/%s/spectra/%s_com.hdf5' % (date, date)
+	hdf5_f = h5py.File(hdf5_file, 'w')
+
+	for spec_file in spec_files:
+		fits_name = spec_file.split('/')[-1][:-5]
+		ccd = 'ccd' + fits_name[-1]
+		sobj = fits_name[:-1]
+
+		# create the group for a given sobjectid
+		if sobj not in hdf5_f.keys():
+			sobj_data = hdf5_f.create_group(sobj)
+		else:
+			sobj_data = hdf5_f[sobj]
+
+		# create the group for a given ccd
+		if ccd not in sobj_data.keys():
+			ccd_data = sobj_data.create_group(ccd)
+		else:
+			ccd_data = sobj_data[ccd]
+
+		# fill the group with the data from all extenstions of fits file
+		fits_data = fits.open(spec_file)
+
+		for ext in fits_data:
+			ext_name = ext.name
+			ext_data = ext.data
+		
+			if ext_name not in ccd_data.keys():
+				ccd_data.create_dataset(ext_name, 
+										shape=(len(ext_data),), 
+										dtype=np.float32,
+										data=ext_data, 
+										compression=None)
+
+		# copy metadata onyl from the extension 0 as they are mostlly repated in every extension
+		fits_header = fits_data[0].header
+		for head_key in fits_header.keys():
+			if head_key not in ccd_data.keys():
+				if head_key != 'COMMENT':
+					ccd_data.create_dataset(head_key, 
+											shape=(1,), 
+											# dtype=np.float,
+											data=fits_header[head_key])
+			else:
+				# skip entries with the same name
+				pass
+
+		# close spectral fits file
+		fits_data.close()
+
+	# close the spectral database file
+	extract_log.info('HDF5 creation finished')
+	hdf5_f.close()
+
+
 def create_database(date):
 	"""
 	Create databse
@@ -3409,9 +3486,11 @@ def create_database(date):
 
 	To do:
 		Add fibre throughput into the db and add flags for poor throughput
-		Add checks for possible missing ccds
+		Add checks for possible missing ccds, DONE - added initial checks and hamdling of casses when ccd4 is missing, can other ccds also be missing?, have to properlly add those exceptions where needed
 
 	"""
+
+	extract_log.info('Creating an database with information about spectra')
 
 	# Create empty table for this night
 	cols=[]
@@ -3468,22 +3547,36 @@ def create_database(date):
 
 	for sobject in sobjects:
 		#open all four (for four ccds) headers.
+		headers = []
 		file1="reductions/results/%s/spectra/com/%s1.fits" % (date, sobject)
-		hdul1=fits.open(file1)
-		header1=hdul1[0].header
-		hdul1.close()
+		if os.path.isfile(file1):
+			hdul1=fits.open(file1)
+			header1=hdul1[0].header
+			hdul1.close()
+			headers.append(header1)
+
 		file2="reductions/results/%s/spectra/com/%s2.fits" % (date, sobject)
-		hdul2=fits.open(file2)
-		header2=hdul2[0].header
-		hdul2.close()
+		if os.path.isfile(file2):
+			hdul2=fits.open(file2)
+			header2=hdul2[0].header
+			hdul2.close()
+			headers.append(header2)
+
 		file3="reductions/results/%s/spectra/com/%s3.fits" % (date, sobject)
-		hdul3=fits.open(file3)
-		header3=hdul3[0].header
-		hdul3.close()
+		if os.path.isfile(file3):
+			hdul3=fits.open(file3)
+			header3=hdul3[0].header
+			hdul3.close()
+			headers.append(header3)
+
 		file4="reductions/results/%s/spectra/com/%s4.fits" % (date, sobject)
-		hdul4=fits.open(file4)
-		header4=hdul4[0].header
-		hdul4.close()
+		has_ccd4 = os.path.isfile(file4)
+		if has_ccd4:
+			hdul4=fits.open(file4)
+			header4=hdul4[0].header
+			hdul4.close()
+			headers.append(header4)
+
 
 		#read parameters from headers
 		ra=header1['RA_OBJ']
@@ -3503,7 +3596,7 @@ def create_database(date):
 		fibre_theta=header1['THETA']
 		plate=header1['PLATE']
 		if plate=='None': plate=None
-		aperture_position=[header1['AP_POS'], header2['AP_POS'], header3['AP_POS'], header4['AP_POS']]
+		aperture_position = [header_ccd['AP_POS'] for header_ccd in headers]
 		cfg_file=header1['CFG_FILE'].replace(',', ';')#replace commas, so the don't interfere with a csv version of the database
 		if cfg_file=='None': cfg_file=None
 		cfg_field_name=header1['OBJECT'].replace(',', ';')
@@ -3513,26 +3606,26 @@ def create_database(date):
 		galah_id=header1['GALAH_ID']
 		if galah_id=='None': galah_id=-1#not sure why None is not working here
 		mag=header1['mag']
-		wav_rms=[header1['WAV_RMS'], header2['WAV_RMS'], header3['WAV_RMS'], header4['WAV_RMS']]
+		wav_rms = [header_ccd['WAV_RMS'] for header_ccd in headers]
 		wav_rms=[None if i=='None' else i for i in wav_rms]
-		wav_n_lines=[header1['WAVLINES'], header2['WAVLINES'], header3['WAVLINES'], header4['WAVLINES']]
+		wav_n_lines = [header_ccd['WAVLINES'] for header_ccd in headers]
 		wav_n_lines_arr=[None if i=='None' else i for i in wav_n_lines]
 		wav_n_lines=''.join([i.ljust(7, ' ') for i in wav_n_lines_arr])#weird formating because of astropy bugs
-		snr=[header1['SNR'], header2['SNR'], header3['SNR'], header4['SNR']]
+		snr = [header_ccd['SNR'] for header_ccd in headers]
 		snr=[None if i=='None' else i for i in snr]
-		fibre_throughput=[header1['FIB_THR'], header2['FIB_THR'], header3['FIB_THR'], header4['FIB_THR']]
+		fibre_throughput = [header_ccd['FIB_THR'] for header_ccd in headers]
 		fibre_throughput=[None if i=='None' else i for i in fibre_throughput]
-		res=[header1['RES'], header2['RES'], header3['RES'], header4['RES']]
+		res = [header_ccd['RES'] for header_ccd in headers]
 		res=[None if i=='None' else i for i in res]
-		b=[header1['B'], header2['B'], header3['B'], header4['B']]
+		b = [header_ccd['B'] for header_ccd in headers]
 		b=[None if i=='None' else i for i in b]
 		v_bary_eff=header1['BARYEFF']
 		if v_bary_eff=='None': v_bary_eff=None
 		exposed=header1['EXPOSED']
 		if exposed=='None': exposed=None
-		rv=[header1['rv'], header2['rv'], header3['rv'], header4['rv']]
+		rv = [header_ccd['rv'] for header_ccd in headers]
 		rv=[None if i=='None' else i for i in rv]
-		e_rv=[header1['E_RV'], header2['E_RV'], header3['E_RV'], header4['E_RV']]
+		e_rv = [header_ccd['E_RV'] for header_ccd in headers]
 		e_rv=[None if i=='None' else i for i in e_rv]
 		rv_com=header1['rvcom']
 		if rv_com=='None': rv_com=None
@@ -3544,6 +3637,8 @@ def create_database(date):
 		if logg=='None': logg=None
 		met=header1['MET']
 		if met=='None': met=None
+		feh=header1['FE_H']
+		if feh=='None': feh=None
 		pipeline_version=header1['PIPE_VER']
 		obs_comment=header1['COMM_OBS'].replace(',', ';')
 		#bin mask reduction flags
@@ -3551,26 +3646,27 @@ def create_database(date):
 		if header1['TRACE_OK']==0: flag+=1
 		if header2['TRACE_OK']==0: flag+=2
 		if header3['TRACE_OK']==0: flag+=4
-		if header4['TRACE_OK']==0: flag+=8
 		if header1['WAV_OK']==0: flag+=16
 		if header2['WAV_OK']==0: flag+=32
 		if header3['WAV_OK']==0: flag+=64
-		if header4['WAV_OK']==0: flag+=128
 		if header1['RV_OK']==0: flag+=256
 		if header2['RV_OK']==0: flag+=512
 		if header3['RV_OK']==0: flag+=1024
-		if header4['RV_OK']==0: flag+=2048
+		if has_ccd4:
+			if header4['TRACE_OK']==0: flag+=8
+			if header4['WAV_OK']==0: flag+=128
+			if header4['RV_OK']==0: flag+=2048
 		if header1['RVCOM_OK']==0: flag+=4096#this one is the same in all 4 ccds
 		if header1['PAR_OK']==0: flag+=8192#parameters are calculated over all arms, so this flag is the same for all 4 ccds
 
 		#add parameters into the table
-		table.add_row([sobject, ra, dec, mjd, utdate, epoch, aperture, pivot, fibre, fibre_x, fibre_y, fibre_theta, plate, aperture_position, mean_ra, mean_dec, mean_zd, mean_ha, cfg_file, cfg_field_name, obj_name, galah_id, snr, fibre_throughput, res, b, v_bary_eff, exposed, mag, wav_rms, wav_n_lines, rv, e_rv, rv_com, e_rv_com, teff, logg, met, obs_comment, pipeline_version, flag])
+		table.add_row([sobject, ra, dec, mjd, utdate, epoch, aperture, pivot, fibre, fibre_x, fibre_y, fibre_theta, plate, aperture_position, mean_ra, mean_dec, mean_zd, mean_ha, cfg_file, cfg_field_name, obj_name, galah_id, snr, fibre_throughput, res, b, v_bary_eff, exposed, mag, wav_rms, wav_n_lines, rv, e_rv, rv_com, e_rv_com, teff, logg, met, feh, obs_comment, pipeline_version, flag])
 
 	#write table to hdu
 	hdu=fits.BinTableHDU(table)
 
 	#write hdu to file
-	hdu.writeto('reductions/results/%s/db/%s.fits' % (date, date))
+	hdu.writeto('reductions/results/%s/db/%s.fits' % (date, date), overwrite=True)
 
 	#open table again and add comments to all columns. MAKE SURE THESE ARE IN THE RIGHT ORDER
 	hdul=fits.open('reductions/results/%s/db/%s.fits' % (date, date), mode='update')
@@ -3974,9 +4070,6 @@ if __name__ == "__main__":
 	# Set iraf variables that are otherwise defined in local login.cl. Will probably overwrite those settings
 	iraf.set(min_lenuserarea=128000)
 	iraf.set(uparm=start_folder + '/uparm')
-
-
-
 	
 	# Set logging levels 
 	extract_log=logging.getLogger('extract_log')	
@@ -4074,8 +4167,10 @@ if __name__ == "__main__":
 			resolution_profile(date)
 		if args.final:
 			create_final_spectra(date, ncpu=int(args.n_cpu), plot_diagnostics=args.plot_diagnostics)
+			# check_spectra_quality(date)
 		if args.analyze:
 			analyze(date, ncpu=int(args.n_cpu))
 		if args.database:
+			create_hdf5_database(date)
 			create_database(date)
 		sys.exit(0)

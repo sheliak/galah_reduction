@@ -17,6 +17,7 @@
  - ephem
  - json
  - joblib
+ - h5py
  - galah_tools (included in this repository)
  - tesndorflow 2.1.0 (the latest version working on python2.7)
  - keras 2.3.1 (this is the latest version that works with tensorflow 2.1.0)
