@@ -1072,13 +1072,12 @@ def measure_cross_on_flat(date, func='agauss'):
 
 	Parameters:
 		date (str): date string (e.g. 190210)
-		func (str): 'agauss' (default) or 'voigt'. Function use for spectral profile fitting. Agauss is an asymetric Gaussian. 
+		func (str): 'agauss' (default) or 'voigt'. Function used for spectral profile fitting. Agauss is an asymetric generalised Gaussian. 
 	
 	Returns:
 		none
 
 	ToDo:
-		add flag for large cross-talk
 		paralelize
 	"""
 
@@ -1105,9 +1104,9 @@ def measure_cross_on_flat(date, func='agauss'):
 		x=np.arange(len(y))
 		params = Parameters()
 		params.add('pos', value=p0[0], min=p0[0]-0.1, max=p0[0]+0.1)
-		params.add('amp', value=p0[1], min=p0[1]*0.0, max=max(y)*1.1)
-		params.add('widthl', value=p0[2], min=p0[2]*0.7, max=p0[2]*1.9)
-		params.add('widthr', value=p0[2], min=p0[2]*0.7, max=p0[2]*1.9)
+		params.add('amp', value=y[int(round(p0[0]))], min=0.0, max=max(y)*1.2)
+		params.add('widthl', value=1.6, min=1.6*0.6, max=1.6*2.0)
+		params.add('widthr', value=1.6, min=1.6*0.6, max=1.6*2.0)
 		params.add('offset', value=0.0, min=0.0, max=20.0, vary=False)
 		params.add('b', value=2.1, min=1.5, max=3.4, vary=True)
 		minner = Minimizer(peak_residual_agauss, params, fcn_args=(x,y))
@@ -1133,6 +1132,7 @@ def measure_cross_on_flat(date, func='agauss'):
 	for ccd in [1,2,3,4]:
 		cobs=glob.glob("reductions/%s/ccd%s/*" % (date,ccd))
 		for cob in cobs:
+			extract_log.info('Calculating cross talk for COB %s.' % cob)
 			# open masterflat
 			hdul=fits.open(cob+'/masterflat.fits')
 			data=hdul[0].data
@@ -1186,7 +1186,8 @@ def measure_cross_on_flat(date, func='agauss'):
 					elif func=='voigt': 
 						res=fit_profile_voigt([ap_dict[ap][0][0]-lower,100000,1.5], np.sum(data[:,column-5:column+5], axis=1)[lower:upper])
 					else:
-						logging.error('Select a valid func parameter')
+						extract_log.error('Select a valid func parameter')
+
 					res['pos']=Parameter(name='pos', value=res['pos'].value+lower)
 					ap_dict[ap][1]=res
 
@@ -1217,7 +1218,7 @@ def measure_cross_on_flat(date, func='agauss'):
 								elif func=='voigt':
 									model+=peak_profile_voigt(ap_dict[ap_model][1], x)
 								else:
-									logging.error('Select a valid func parameter')
+									extract_log.error('Select a valid func parameter')
 
 						# fit one line
 						if func=='agauss':
@@ -1225,7 +1226,7 @@ def measure_cross_on_flat(date, func='agauss'):
 						elif func=='voigt':
 							res=fit_profile_voigt([ap_dict[ap][0][0]-lower,100000,1.5], np.sum(data[:,column-5:column+5], axis=1)[lower:upper]-model[lower:upper])
 						else:
-							logging.error('Select a valid func parameter')
+							extract_log.error('Select a valid func parameter')
 						res['pos']=Parameter(name='pos', value=res['pos'].value+lower)
 						ap_dict[ap][1]=res
 
@@ -1244,7 +1245,7 @@ def measure_cross_on_flat(date, func='agauss'):
 					elif func=='voigt':
 						model=peak_profile_voigt(ap_dict[ap][1], xx)
 					else:
-						logging.error('Select a valid func parameter')
+						extract_log.error('Select a valid func parameter')
 
 					aperture_lower=ap_dict[ap][0][0]-3.0
 					aperture_upper=ap_dict[ap][0][0]+3.0
@@ -1288,7 +1289,9 @@ def measure_cross_on_flat(date, func='agauss'):
 			hdul_flat.close()
 			flux_flat=np.average(data_flat, axis=1)
 			flux_max=np.percentile(flux_flat, 90)
-			for f in files:
+			large_crosstalk=[]
+			for n,f in enumerate(files):
+				#open image file to save data with cross-talk subtracted
 				hdul_o=fits.open(f, mode='update')
 				data=hdul_o[0].data
 				ct_image=np.zeros((392,4096))
@@ -1300,6 +1303,9 @@ def measure_cross_on_flat(date, func='agauss'):
 					ct_p=np.polyfit(ct_p[:,0], ct_p[:,1], 5)
 					ct_p=np.poly1d(ct_p)
 					ap_i=ap-1
+					#save array with apertures having large cross talk. This only needs to be done once per cob/ccd
+					if n==0:
+						if max(ct_m)>0.05 or max(ct_p)>0.05: large_crosstalk.append(ap)
 					#fig=figure('check ct')
 					#ax=fig.add_subplot(111)
 					#ax.plot(np.arange(0,4096), ct_m(np.arange(0,4096)), 'r-')
@@ -1312,12 +1318,18 @@ def measure_cross_on_flat(date, func='agauss'):
 							ct_image[ap_i-1]+=data[ap_i]*ct_m(range(0,4096))
 						if ap_i!=391: 
 							ct_image[ap_i+1]+=data[ap_i]*ct_p(range(0,4096))
+				#save array with apertures having large cross talk. This only needs to be done once per cob/ccd
+				if n==0:
+					np.save('large_cross-talk', np.array(large_crosstalk))
 				# filter ct image. It is better to reduce the resolution a little bit than to subtract remaining cosmic rays.
 				ct_image=signal.medfilt(ct_image, kernel_size=(1,5))
 				#save cross talk image
-				hdu=fits.PrimaryHDU(ct_image)
-				hdul = fits.HDUList([hdu])
-				hdul.writeto('cross_'+f.split('/')[-1])
+				#create a copy of the original image, so the header stays the same
+				shutil.copy(f, 'cross_'+f.split('/')[-1])
+				hdul=fits.open('cross_'+f.split('/')[-1], mode='update')
+				hdul[0].data=ct_image
+				hdul.flush()
+				hdul.close()
 				#save spectra with cross talk removed
 				hdul_o[0].data=data-ct_image
 				hdul_o.flush()
@@ -1563,6 +1575,7 @@ def wav_calibration(date, start_folder):
 			np.save('wav_fit', np.array(wav_good))
 			files=glob.glob("./[01-31]*.ms.fits")
 			files_scat=glob.glob("./scat_[01-31]*.ms.fits")
+			files_cross=glob.glob("./cross_[01-31]*.ms.fits")
 			#wavelength calibrate object files
 			for file in files:
 				hdul=fits.open(file, mode='update')
@@ -1572,6 +1585,13 @@ def wav_calibration(date, start_folder):
 				iraf.dispcor(input=file, lineari='no', databas=start_folder+'/'+cob, output="", samedis='no', ignorea='yes',Stdout="/dev/null")
 			#wavelength calibrate scattered light files
 			for file in files_scat:
+				hdul=fits.open(file, mode='update')
+				hdr=hdul[0].header
+				hdr['REFSPEC1']='masterarc.ms'
+				hdul.close()
+				iraf.dispcor(input=file, lineari='no', databas=start_folder+'/'+cob, output="", samedis='no', ignorea='yes',Stdout="/dev/null")
+			#wavelength calibrate cross-talk files
+			for file in files_cross:
 				hdul=fits.open(file, mode='update')
 				hdr=hdul[0].header
 				hdr['REFSPEC1']='masterarc.ms'
@@ -1806,7 +1826,7 @@ def resolution_profile(date):
 			arc=cob+"/masterarc.ms.fits"
 
 			if not os.path.isfile(arc):
-				logging.warning('Masterarc was not found in ccd %d of COB %s, resolution profile will not be computed.' % (ccd, cob))
+				extract_log.warning('Masterarc was not found in ccd %d of COB %s, resolution profile will not be computed.' % (ccd, cob))
 				continue
 
 			# linearize arc
@@ -1985,6 +2005,8 @@ def v_bary_correction_proc(args):
 		hdul_tel=fits.open('/'.join(file.split('/')[:-1])+'/telurics_'+file.split('/')[-1], mode='update')
 	if os.path.exists('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1]): 
 		hdul_scat=fits.open('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1], mode='update')
+	if os.path.exists('/'.join(file.split('/')[:-1])+'/cross_'+file.split('/')[-1]): 
+		hdul_cross=fits.open('/'.join(file.split('/')[:-1])+'/cross_'+file.split('/')[-1], mode='update')
 	n=0 # n counts apertures (increase whenever fibre type!='F')
 	extract_log.info('Processing (v_bary correction) file %s.' % file)
 	for i in fibre_table:
@@ -2002,6 +2024,8 @@ def v_bary_correction_proc(args):
 				hdul_tel[0].header['BARY_%s' % str(n)]=v_bary
 			if os.path.exists('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1]):
 				hdul_scat[0].header['BARY_%s' % str(n)]=v_bary
+			if os.path.exists('/'.join(file.split('/')[:-1])+'/cross_'+file.split('/')[-1]):
+				hdul_cross[0].header['BARY_%s' % str(n)]=v_bary
 			
 			iraf.dopcor(input=file, output='', redshift='-%s' % v_bary, isveloc='yes', add='yes', dispers='yes', apertures=n, flux='no')
 			if os.path.exists('/'.join(file.split('/')[:-1])+'/sky_'+file.split('/')[-1]): 
@@ -2010,6 +2034,9 @@ def v_bary_correction_proc(args):
 				iraf.dopcor(input='/'.join(file.split('/')[:-1])+'/telurics_'+file.split('/')[-1], output='', redshift='-%s' % v_bary, isveloc='yes', add='yes', dispers='yes', apertures=n, flux='no')
 			if os.path.exists('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1]): 
 				iraf.dopcor(input='/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1], output='', redshift='-%s' % v_bary, isveloc='yes', add='yes', dispers='yes', apertures=n, flux='no')
+			if os.path.exists('/'.join(file.split('/')[:-1])+'/cross_'+file.split('/')[-1]): 
+				iraf.dopcor(input='/'.join(file.split('/')[:-1])+'/cross_'+file.split('/')[-1], output='', redshift='-%s' % v_bary, isveloc='yes', add='yes', dispers='yes', apertures=n, flux='no')
+
 	hdul.close()
 	if os.path.exists('/'.join(file.split('/')[:-1])+'/sky_'+file.split('/')[-1]):
 		hdul_sky.close()
@@ -2017,6 +2044,8 @@ def v_bary_correction_proc(args):
 		hdul_tel.close()
 	if os.path.exists('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1]): 
 		hdul_scat.close()
+	if os.path.exists('/'.join(file.split('/')[:-1])+'/cross_'+file.split('/')[-1]): 
+		hdul_cross.close()
 
 
 def v_bary_correction(date, quick=False, ncpu=1):
@@ -2089,6 +2118,10 @@ def v_bary_correction(date, quick=False, ncpu=1):
 				hdul_scat=fits.open('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1], mode='update')
 				hdul_scat[0].header['BARYEFF']=v_bary_mean
 				hdul_scat.close()
+			if os.path.exists('/'.join(file.split('/')[:-1])+'/cross_'+file.split('/')[-1]): 
+				hdul_cross=fits.open('/'.join(file.split('/')[:-1])+'/cross_'+file.split('/')[-1], mode='update')
+				hdul_cross[0].header['BARYEFF']=v_bary_mean
+				hdul_cross.close()
 
 			iraf.dopcor(input=file, output='', redshift='-%s' % v_bary_mean, isveloc='yes', add='yes', dispers='yes', apertures='', flux='no')
 			if os.path.exists('/'.join(file.split('/')[:-1])+'/sky_'+file.split('/')[-1]): 
@@ -2097,6 +2130,8 @@ def v_bary_correction(date, quick=False, ncpu=1):
 				iraf.dopcor(input='/'.join(file.split('/')[:-1])+'/telurics_'+file.split('/')[-1], output='', redshift='-%s' % v_bary_mean, isveloc='yes', add='yes', dispers='yes', apertures='', flux='no')
 			if os.path.exists('/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1]): 
 				iraf.dopcor(input='/'.join(file.split('/')[:-1])+'/scat_'+file.split('/')[-1], output='', redshift='-%s' % v_bary_mean, isveloc='yes', add='yes', dispers='yes', apertures='', flux='no')
+			if os.path.exists('/'.join(file.split('/')[:-1])+'/cross_'+file.split('/')[-1]): 
+				iraf.dopcor(input='/'.join(file.split('/')[:-1])+'/cross_'+file.split('/')[-1], output='', redshift='-%s' % v_bary_mean, isveloc='yes', add='yes', dispers='yes', apertures='', flux='no')
 		else:
 			# Otherwise do it aperture by aperture. Downloading is currently turned off. 
 			args.append([file, fibre_table, obstime, AAT])
@@ -2676,7 +2711,7 @@ def remove_telurics(date):
 	# create a dictionary of fitted parameters
 	trans_params={}
 
-	logging.info('Removing telluric absorption.')
+	extract_log.info('Removing telluric absorption.')
 
 	# we start fitting with ccd4 where telluric lines are strongest. Fitted parameters are then saved and used for telluric correction in other three bands. Parameters in other three bands can either be improved with a new fit of left fixed.
 	for ccd in [4,3,2,1]:
@@ -2879,9 +2914,6 @@ def create_final_spectra_proc(args):
 		#make a sqrt spectrum for adding errors to it
 		iraf.sarith(input1=file, op='^', input2='-0.5', output='/'.join(file.split('/')[:-1])+'/err_'+file.split('/')[-1], apertures='', Stdout="/dev/null")
 
-		#make a cross_talk spectrum placeholder
-		iraf.sarith(input1=file, op='*', input2='0.0', output='/'.join(file.split('/')[:-1])+'/cross_'+file.split('/')[-1], apertures='', Stdout="/dev/null")
-
 		#linearize all spectra
 		extract_log.info('Linearizing spectra.')
 		iraf.disptrans(input=file, output='', linearize='yes', units='angstroms', Stdout="/dev/null")
@@ -3023,15 +3055,25 @@ def create_final_spectra_proc(args):
 				aperture_flags_dict={}
 				a=open('%s/aplast' % (cob))
 				failed_apertures=np.load('%s/failed_apertures.npy' % (cob))
+				if os.path.exists('%s/large_cross-talk.npy' % (cob)): 
+					large_crosstalk=np.load('%s/large_cross-talk.npy' % (cob))
+				else:
+					large_crosstalk=[]
 				for line in a:
 					l=line.split()
 					if len(l)>0 and l[0]=='begin':
 						y=float(l[5])
 						n=int(l[3])
 						if n in failed_apertures:
-							aperture_flags_dict[n]=(y,0)
+							if n in large_crosstalk:
+								aperture_flags_dict[n]=(y,0,0)
+							else:
+								aperture_flags_dict[n]=(y,0,1)
 						else:
-							aperture_flags_dict[n]=(y,1)
+							if n in large_crosstalk:
+								aperture_flags_dict[n]=(y,1,0)
+							else:
+								aperture_flags_dict[n]=(y,1,1)
 				#load fitting results for wavelength solution
 				wav_dict=np.load(cob+'/wav_fit.npy')
 				#load fibre throughputs
@@ -3141,6 +3183,8 @@ def create_final_spectra_proc(args):
 					#fibre throughput
 					fibre_throughput=fib_thr[ap]
 					hdul[extension].header['FIB_THR']=(fibre_throughput, 'Fibre throughput relative to best fibre in field')
+					#cross-talk
+					hdul[extension].header['CROSS_OK']=(aperture_flags_dict[ap][2], 'is cross-talk calculated reliably? 1=yes, 0=no')
 					#write down the LSF 
 					hdul[extension].header['LSF']=('exp(-0.693147|2x/fwhm|^B)', 'Line spread function')
 					hdul[extension].header['LSF_FULL']=('exp(-0.693147|2x/fwhm|^%s)' % round(b_values[ap-1],3), 'Line spread function')
@@ -3177,7 +3221,7 @@ def create_final_spectra_proc(args):
 
 				iraf.flprcache()
 
-	logging.info('Combining individual spectra.')
+	extract_log.info('Combining individual spectra.')
 	#save combined spectra
 	for ap in range(1,393):
 		if fibre_table_dict[ap][8]=='P':
@@ -3556,12 +3600,16 @@ def create_database(date):
 		if header2['WAV_OK']==0: flag+=32
 		if header3['WAV_OK']==0: flag+=64
 		if header4['WAV_OK']==0: flag+=128
-		if header1['RV_OK']==0: flag+=256
-		if header2['RV_OK']==0: flag+=512
-		if header3['RV_OK']==0: flag+=1024
-		if header4['RV_OK']==0: flag+=2048
-		if header1['RVCOM_OK']==0: flag+=4096#this one is the same in all 4 ccds
-		if header1['PAR_OK']==0: flag+=8192#parameters are calculated over all arms, so this flag is the same for all 4 ccds
+		if header1['CROSS_OK']==0: flag+=256
+		if header2['CROSS_OK']==0: flag+=512
+		if header3['CROSS_OK']==0: flag+=1024
+		if header4['CROSS_OK']==0: flag+=2048
+		if header1['RV_OK']==0: flag+=4096
+		if header2['RV_OK']==0: flag+=8192
+		if header3['RV_OK']==0: flag+=16384
+		if header4['RV_OK']==0: flag+=32768
+		if header1['RVCOM_OK']==0: flag+=65536#this one is the same in all 4 ccds
+		if header1['PAR_OK']==0: flag+=131072#parameters are calculated over all arms, so this flag is the same for all 4 ccds
 
 		#add parameters into the table
 		table.add_row([sobject, ra, dec, mjd, utdate, epoch, aperture, pivot, fibre, fibre_x, fibre_y, fibre_theta, plate, aperture_position, mean_ra, mean_dec, mean_zd, mean_ha, cfg_file, cfg_field_name, obj_name, galah_id, snr, fibre_throughput, res, b, v_bary_eff, exposed, mag, wav_rms, wav_n_lines, rv, e_rv, rv_com, e_rv_com, teff, logg, met, obs_comment, pipeline_version, flag])
@@ -3950,7 +3998,7 @@ def analyze(date, ncpu=1):
 			analyze_rv(arg)
 
 	# calculate stellar parameters
-	logging.info('Calculating stellar parameters and abundances.')
+	extract_log.info('Calculating stellar parameters and abundances.')
 	get_parameters_nn(sobjects, logging, processes=ncpu)
 
 

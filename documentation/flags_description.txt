@@ -9,12 +9,17 @@ Bit	Decimal value	Description
 5	+32	Bad wavelength solution in green CCD
 6	+64	Bad wavelength solution in red CCD
 7	+128	Bad wavelength solution in IR CCD
-8	+256	Radial velocity in blue CCD could not be calculated**
-9	+512	Radial velocity in green CCD could not be calculated**
-10	+1024	Radial velocity in red CCD could not be calculated**
-11	+2048	Radial velocity in IR CCD could not be calculated**
-12	+4096	Radial velocity could not be calculated from the combination of all four CCDs**
-13	+8192	Atmospheric parameters could not be calculated
+8	+256	Cross-talk in blue CCD is large, probably didn't fit properly
+9	+512	Cross-talk in green CCD is large, probably didn't fit properly
+10	+1024	Cross-talk in red CCD is large, probably didn't fit properly
+11	+2048	Cross-talk in IR CCD is large, probably didn't fit properly
+12	+4096	Radial velocity in blue CCD could not be calculated**
+13	+8192	Radial velocity in green CCD could not be calculated**
+14	+16384	Radial velocity in red CCD could not be calculated**
+15	+32768	Radial velocity in IR CCD could not be calculated**
+16	+65536	Radial velocity could not be calculated from the combination of all four CCDs**
+17	+131072	Atmospheric parameters could not be calculated
 
-*A trace that didn't fit correctly might still produce useful spectra.
+
+*A trace that didn't fit correctly might still produce useful spectra. Although it usually won't have cross-talk calculated properly.
 **In this case the radial velocity can be None/NULL or have some value. If the flag is raised, the value is very unreliable.
