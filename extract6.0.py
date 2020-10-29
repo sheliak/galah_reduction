@@ -31,7 +31,6 @@ from scipy.optimize import curve_fit
 import argparse
 from parameters_nn import get_parameters_nn
 import h5py
-import inspect
 
 # possible NDFCLASS values in human readable form
 ndfclass_types={'MFFFF':'fibre flat', 'MFARC':'arc', 'MFOBJECT':'object', 'BIAS':'bias'}
@@ -2593,6 +2592,9 @@ def remove_telurics(date):
 	
 	Returns:
 		none
+
+	To do:
+		Remove tellurics for the nights when ccd4 is missing
 	"""
 
 
@@ -3554,6 +3556,8 @@ def create_database(date):
 			header1=hdul1[0].header
 			hdul1.close()
 			headers.append(header1)
+		else:
+			headers.append(None)
 
 		file2="reductions/results/%s/spectra/com/%s2.fits" % (date, sobject)
 		if os.path.isfile(file2):
@@ -3561,6 +3565,8 @@ def create_database(date):
 			header2=hdul2[0].header
 			hdul2.close()
 			headers.append(header2)
+		else:
+			headers.append(None)
 
 		file3="reductions/results/%s/spectra/com/%s3.fits" % (date, sobject)
 		if os.path.isfile(file3):
@@ -3568,6 +3574,8 @@ def create_database(date):
 			header3=hdul3[0].header
 			hdul3.close()
 			headers.append(header3)
+		else:
+			headers.append(None)
 
 		file4="reductions/results/%s/spectra/com/%s4.fits" % (date, sobject)
 		has_ccd4 = os.path.isfile(file4)
@@ -3576,7 +3584,8 @@ def create_database(date):
 			header4=hdul4[0].header
 			hdul4.close()
 			headers.append(header4)
-
+		else:
+			headers.append(None)
 
 		#read parameters from headers
 		ra=header1['RA_OBJ']
@@ -3596,7 +3605,7 @@ def create_database(date):
 		fibre_theta=header1['THETA']
 		plate=header1['PLATE']
 		if plate=='None': plate=None
-		aperture_position = [header_ccd['AP_POS'] for header_ccd in headers]
+		aperture_position = [header_ccd['AP_POS'] if header_ccd is not None else None for header_ccd in headers]
 		cfg_file=header1['CFG_FILE'].replace(',', ';')#replace commas, so the don't interfere with a csv version of the database
 		if cfg_file=='None': cfg_file=None
 		cfg_field_name=header1['OBJECT'].replace(',', ';')
@@ -3606,26 +3615,26 @@ def create_database(date):
 		galah_id=header1['GALAH_ID']
 		if galah_id=='None': galah_id=-1#not sure why None is not working here
 		mag=header1['mag']
-		wav_rms = [header_ccd['WAV_RMS'] for header_ccd in headers]
+		wav_rms = [header_ccd['WAV_RMS'] if header_ccd is not None else None for header_ccd in headers]
 		wav_rms=[None if i=='None' else i for i in wav_rms]
-		wav_n_lines = [header_ccd['WAVLINES'] for header_ccd in headers]
+		wav_n_lines = [header_ccd['WAVLINES'] if header_ccd is not None else '0/0' for header_ccd in headers]
 		wav_n_lines_arr=[None if i=='None' else i for i in wav_n_lines]
-		wav_n_lines=''.join([i.ljust(7, ' ') for i in wav_n_lines_arr])#weird formating because of astropy bugs
-		snr = [header_ccd['SNR'] for header_ccd in headers]
+		wav_n_lines=''.join([i.ljust(7, ' ') for i in wav_n_lines_arr]) #weird formating because of astropy bugs
+		snr = [header_ccd['SNR'] if header_ccd is not None else None for header_ccd in headers]
 		snr=[None if i=='None' else i for i in snr]
-		fibre_throughput = [header_ccd['FIB_THR'] for header_ccd in headers]
+		fibre_throughput = [header_ccd['FIB_THR'] if header_ccd is not None else None for header_ccd in headers]
 		fibre_throughput=[None if i=='None' else i for i in fibre_throughput]
-		res = [header_ccd['RES'] for header_ccd in headers]
+		res = [header_ccd['RES'] if header_ccd is not None else None for header_ccd in headers]
 		res=[None if i=='None' else i for i in res]
-		b = [header_ccd['B'] for header_ccd in headers]
+		b = [header_ccd['B'] if header_ccd is not None else None for header_ccd in headers]
 		b=[None if i=='None' else i for i in b]
 		v_bary_eff=header1['BARYEFF']
 		if v_bary_eff=='None': v_bary_eff=None
 		exposed=header1['EXPOSED']
 		if exposed=='None': exposed=None
-		rv = [header_ccd['rv'] for header_ccd in headers]
+		rv = [header_ccd['rv'] if header_ccd is not None else None for header_ccd in headers]
 		rv=[None if i=='None' else i for i in rv]
-		e_rv = [header_ccd['E_RV'] for header_ccd in headers]
+		e_rv = [header_ccd['E_RV'] if header_ccd is not None else None for header_ccd in headers]
 		e_rv=[None if i=='None' else i for i in e_rv]
 		rv_com=header1['rvcom']
 		if rv_com=='None': rv_com=None
