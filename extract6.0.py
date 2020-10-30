@@ -151,6 +151,7 @@ def correct_ndfclass(hdul):
 	t_ra = h_head['MEANRA']
 	t_dec = h_head['MEANDEC']
 	f_data = Table(hdul['STRUCT.MORE.FIBRES'].data)
+	f_data = f_data[np.logical_and(f_data['RA'] != 0, f_data['DEC'] != 0)]
 	f_ra = np.rad2deg(np.median(f_data['RA']))
 	f_dec = np.rad2deg(np.median(f_data['DEC']))
 	t_coord = SkyCoord(ra=t_ra*u.deg, dec=t_dec*u.deg)
@@ -2592,9 +2593,6 @@ def remove_telurics(date):
 	
 	Returns:
 		none
-
-	To do:
-		Remove tellurics for the nights when ccd4 is missing
 	"""
 
 
@@ -2695,6 +2693,11 @@ def remove_telurics(date):
 		cobs=glob.glob("reductions/%s/ccd%s/*" % (date,ccd))
 		for cob in cobs:	
 			files=glob.glob("%s/[01-31]*.fits" % cob)
+
+			if len(files) == 0:
+				extract_log.warning('Teluric fit and removal will not be performed for ccd %d of COB %s.' % (ccd, cob.split('/')[-1]))
+				continue
+
 			valid_files=[]
 			for f in files:
 				if '.ms' not in f: valid_files.append(f)
@@ -2769,7 +2772,11 @@ def remove_telurics(date):
 					# if this is the first time fitting this exposure, start from arbitrary initial conditions
 					params = Parameters()
 					params.add('scale_h2o', value=0.9, min=0.01, max=2.0)
-					params.add('scale_o2', value=0.1, min=0.01, max=2.0)
+					# O2 can only be estimated on certain ccds
+					if ccd == 4 or ccd == 2:
+						params.add('scale_o2', value=0.1, min=0.01, max=2.0, vary=True)
+					else:
+						params.add('scale_o2', value=0.1, min=0.01, max=2.0, vary=False)
 					params.add('vr', value=0.0, min=-0.05, max=0.05)
 					if ccd==4: 
 						params.add('res', value=98.0, min=85, max=110)
