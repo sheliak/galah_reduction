@@ -13,6 +13,7 @@ from astropy.table import vstack, Table
 import time
 import numpy as np
 import argparse
+import h5py
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -20,14 +21,18 @@ parser=argparse.ArgumentParser()
 parser.add_argument("date", help="Date you want to merge into the global DB (in format yymmdd).")
 args=parser.parse_args()
 
-date=args.date
+date = args.date
 
-if isinstance(date, (int, long)):
+if len(date) == 6 and 10 < int(date[:2]) < 30 and 1 <= int(date[2:4]) <= 12 and 1 <= int(date[4:6]) <= 31:
 	pass
 else:
 	logging.error('Date must be an intiger in format yymmdd.')
 	sys.exit(-1)
 
+os.chdir('..')
+
+hdf5_orig = 'reductions/results/%s/spectra/%s_com.hdf5' % (date,date)
+hdf5_targ = 'reductions/dr6.0_com.hdf5'
 
 if os.path.isfile('reductions/dr6.0.fits'):
 	# check if global database exists and open it if it does
@@ -85,6 +90,20 @@ if os.path.isfile('reductions/dr6.0.fits'):
 	csv_db.close()
 	hdul.close()
 
+	# add spectra to the final hdf5 file that contains all combined spectra
+	hdf5_orig_h = h5py.File(hdf5_orig, 'r')
+	hdf5_targ_h = h5py.File(hdf5_targ, 'a')
+
+	in_hdf5 = np.array(hdf5_targ_h.keys())
+	to_hdf5 = np.array(hdf5_orig_h.keys())
+	# select only new spectra files to be added to the final file
+
+	for sobj_key in to_hdf5[np.in1d(to_hdf5, in_hdf5, invert=True)]:
+		hdf5_orig_h[sobj_key].copy(hdf5_orig_h[sobj_key], hdf5_targ_h)
+		
+	hdf5_orig_h.close()
+	hdf5_targ_h.close()
+
 	#save results
 	os.remove('reductions/.dblock')
 
@@ -131,4 +150,8 @@ else:
 		csv_db.write('\n')
 	csv_db.close()
 	hdul.close()
+
+	# copy hdf5 file with combined spectra
+	shutil.copy(hdf5_orig, hdf5_targ)
+
 	os.remove('reductions/.dblock')
