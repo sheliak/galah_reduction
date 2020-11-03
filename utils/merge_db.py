@@ -3,6 +3,7 @@ This script merges a database for one night with a global database. If global da
 
 TO DO:
 	Add command line arguments
+	Remove .dblock when procedure fails
 """
 import os
 import shutil

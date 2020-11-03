@@ -3130,7 +3130,7 @@ def create_final_spectra_proc(args):
 					hdul[extension].header['RVCOM_OK']=('None', 'Did RV pipeline converge? 1=yes, 0=no')
 					hdul[extension].header['TEFF']=('None', 'T_eff in K')
 					hdul[extension].header['LOGG']=('None', 'log g in log cm/s^2')
-					hdul[extension].header['MET']=('None', 'Metallicity in dex')#more parameters?
+					hdul[extension].header['FE_H']=('None', 'Iron abundance in dex')#more parameters?
 					hdul[extension].header['PAR_OK']=('None', 'Are parameters trustworthy? 1=yes, 0=no')
 					#set exposure of the resolution profile to the same value as for spectra
 					hdul[extension].header['EXPOSED']=hdul[0].header['EXPOSED']
