@@ -3409,80 +3409,6 @@ def create_final_spectra(date, ncpu=1, plot_diagnostics=False):
 			create_final_spectra_proc(arg)
 
 
-def create_hdf5_database(date):
-	"""
-	Create a spectral database in the form an HDF5 file.
-
-	Parameters:
-		date (str): date string (e.g. 190210)
-
-	Returns:
-		none
-
-	To do:
-		Write in parallel if possible.
-
-	"""
-	extract_log.info('Creating an HDF5 spectral database')
-
-	# read final combined spectra
-	spec_files = glob.glob('reductions/results/%s/spectra/com/*.fits' % (date))
-
-	hdf5_file = 'reductions/results/%s/spectra/%s_com.hdf5' % (date, date)
-	hdf5_f = h5py.File(hdf5_file, 'w')
-
-	for spec_file in spec_files:
-		fits_name = spec_file.split('/')[-1][:-5]
-		ccd = 'ccd' + fits_name[-1]
-		sobj = fits_name[:-1]
-
-		# create the group for a given sobjectid
-		if sobj not in hdf5_f.keys():
-			sobj_data = hdf5_f.create_group(sobj)
-		else:
-			sobj_data = hdf5_f[sobj]
-
-		# create the group for a given ccd
-		if ccd not in sobj_data.keys():
-			ccd_data = sobj_data.create_group(ccd)
-		else:
-			ccd_data = sobj_data[ccd]
-
-		# fill the group with the data from all extenstions of fits file
-		fits_data = fits.open(spec_file)
-
-		for ext in fits_data:
-			ext_name = ext.name
-			ext_data = ext.data
-		
-			if ext_name not in ccd_data.keys():
-				ccd_data.create_dataset(ext_name, 
-										shape=(len(ext_data),), 
-										dtype=np.float32,
-										data=ext_data, 
-										compression=None)
-
-		# copy metadata onyl from the extension 0 as they are mostlly repated in every extension
-		fits_header = fits_data[0].header
-		for head_key in fits_header.keys():
-			if head_key not in ccd_data.keys():
-				if head_key != 'COMMENT':
-					ccd_data.create_dataset(head_key, 
-											shape=(1,), 
-											# dtype=np.float,
-											data=fits_header[head_key])
-			else:
-				# skip entries with the same name
-				pass
-
-		# close spectral fits file
-		fits_data.close()
-
-	# close the spectral database file
-	extract_log.info('HDF5 creation finished')
-	hdf5_f.close()
-
-
 def create_database(date):
 	"""
 	Create databse
@@ -3540,7 +3466,6 @@ def create_database(date):
 	cols.append(fits.Column(name='e_rv_com', format='E', unit='km/s', null=None))
 	cols.append(fits.Column(name='teff', format='E', unit='K', null=None))
 	cols.append(fits.Column(name='logg', format='E', unit='cm / s^-2', null=None))
-	cols.append(fits.Column(name='met', format='E', null=None))
 	cols.append(fits.Column(name='fe_h', format='E', null=None))
 	cols.append(fits.Column(name='obs_comment', format='A56'))
 	cols.append(fits.Column(name='pipeline_version', format='A5'))
@@ -3651,8 +3576,6 @@ def create_database(date):
 		if teff=='None': teff=None
 		logg=header1['LOGG']
 		if logg=='None': logg=None
-		met=header1['MET']
-		if met=='None': met=None
 		feh=header1['FE_H']
 		if feh=='None': feh=None
 		pipeline_version=header1['PIPE_VER']
@@ -3676,7 +3599,7 @@ def create_database(date):
 		if header1['PAR_OK']==0: flag+=8192#parameters are calculated over all arms, so this flag is the same for all 4 ccds
 
 		#add parameters into the table
-		table.add_row([sobject, ra, dec, mjd, utdate, epoch, aperture, pivot, fibre, fibre_x, fibre_y, fibre_theta, plate, aperture_position, mean_ra, mean_dec, mean_zd, mean_ha, cfg_file, cfg_field_name, obj_name, galah_id, snr, fibre_throughput, res, b, v_bary_eff, exposed, mag, wav_rms, wav_n_lines, rv, e_rv, rv_com, e_rv_com, teff, logg, met, feh, obs_comment, pipeline_version, flag])
+		table.add_row([sobject, ra, dec, mjd, utdate, epoch, aperture, pivot, fibre, fibre_x, fibre_y, fibre_theta, plate, aperture_position, mean_ra, mean_dec, mean_zd, mean_ha, cfg_file, cfg_field_name, obj_name, galah_id, snr, fibre_throughput, res, b, v_bary_eff, exposed, mag, wav_rms, wav_n_lines, rv, e_rv, rv_com, e_rv_com, teff, logg, feh, obs_comment, pipeline_version, flag])
 
 	#write table to hdu
 	hdu=fits.BinTableHDU(table)
@@ -3724,7 +3647,7 @@ def create_database(date):
 	header['TTYPE35']=(header['TTYPE35'], 'combined rv uncertainty')
 	header['TTYPE36']=(header['TTYPE36'], 'effective tmperature')
 	header['TTYPE37']=(header['TTYPE37'], 'log of surface gravitational acceleration')
-	header['TTYPE38']=(header['TTYPE38'], 'metallicity ([M/H])')
+	header['TTYPE38']=(header['TTYPE38'], 'iron abundance ([Fe/H])')
 	header['TTYPE39']=(header['TTYPE39'], 'comments by observer')
 	header['TTYPE40']=(header['TTYPE40'], 'pipeline evrsion')
 	header['TTYPE41']=(header['TTYPE41'], 'reduction flags given as a binary mask')
@@ -4187,6 +4110,5 @@ if __name__ == "__main__":
 		if args.analyze:
 			analyze(date, ncpu=int(args.n_cpu))
 		if args.database:
-			create_hdf5_database(date)
 			create_database(date)
 		sys.exit(0)
