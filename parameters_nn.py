@@ -1,5 +1,6 @@
 import os
 os.environ['KERAS_BACKEND'] = 'tensorflow'
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 from keras.models import model_from_json
 from tools import galah_tools as gt
 from astropy.io import fits
