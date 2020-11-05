@@ -30,7 +30,6 @@ import ephem
 from scipy.optimize import curve_fit
 import argparse
 from parameters_nn import get_parameters_nn
-import h5py
 
 # possible NDFCLASS values in human readable form
 ndfclass_types={'MFFFF':'fibre flat', 'MFARC':'arc', 'MFOBJECT':'object', 'BIAS':'bias'}
@@ -151,7 +150,6 @@ def correct_ndfclass(hdul):
 	t_ra = h_head['MEANRA']
 	t_dec = h_head['MEANDEC']
 	f_data = Table(hdul['STRUCT.MORE.FIBRES'].data)
-	f_data = f_data[np.logical_and(f_data['RA'] != 0, f_data['DEC'] != 0)]
 	f_ra = np.rad2deg(np.median(f_data['RA']))
 	f_dec = np.rad2deg(np.median(f_data['DEC']))
 	t_coord = SkyCoord(ra=t_ra*u.deg, dec=t_dec*u.deg)
@@ -253,10 +251,13 @@ def prepare_dir(dir, str_range='*', list_cobs=True):
 		files_all=glob.glob("%s/data/ccd_%s/*.fits" % (dir,ccd))
 		# check obstatus
 		obstatus_dict={}
-		for line in open("%s/comments/comments_%s.txt" % (dir, dir.split('/')[-1])):
-			if len(line)>0 and line[0]!='#' and line.split(',')>2 and line.split(',')[0]!='\n':
-				l=line.split(',')
-				obstatus_dict[int(l[0])]=[int(l[1]),l[-1].replace('\n','')]
+		if os.path.exists("%s/comments/comments_%s.txt" % (dir, dir.split('/')[-1])):
+			for line in open("%s/comments/comments_%s.txt" % (dir, dir.split('/')[-1])):
+				if len(line)>0 and line[0]!='#' and line.split(',')>2 and line.split(',')[0]!='\n':
+					l=line.split(',')
+					obstatus_dict[int(l[0])]=[int(l[1]),l[-1].replace('\n','')]
+		else:
+			extract_log.warning('Night %s has no comments file. Assuming all runs have obstatus 1.' % dir.split('/')[-1])
 		obstatus_dict=defaultdict(lambda:[1, ''], obstatus_dict)
 		files=[]
 
@@ -1067,21 +1068,9 @@ def remove_scattered(date, start_folder, ncpu=1):
 
 	iraf.flprcache()
 
-
-def measure_cross_on_flat(date, func='agauss'):
+def measure_cross_on_flat_proc(arg):
 	"""
-	Measure cross talk and use it to correct extracted spectra. We have to improve this, becasue the cross talk is very fibre dependant.
-
-	Parameters:
-		date (str): date string (e.g. 190210)
-		func (str): 'agauss' (default) or 'voigt'. Function used for spectral profile fitting. Agauss is an asymetric generalised Gaussian. 
-	
-	Returns:
-		none
-
-	ToDo:
-		paralelize
-                add outputs to logger as the function is curently silent
+	Wrapper for the cross talk calculation. Enables use of multiprocessing.
 	"""
 
 	def peak_profile_agauss(a,x):
@@ -1131,213 +1120,241 @@ def measure_cross_on_flat(date, func='agauss'):
 
 	def iraf_norm(a, max_, min_):
 		return (2.0*a-(max_+min_))/(max_-min_)
+
+	cob,func=arg
+
+	extract_log.info('Calculating cross talk for COB %s.' % cob)
+	# open masterflat
+	hdul=fits.open(cob+'/masterflat.fits')
+	data=hdul[0].data
+	hdul.close()
+
+	# open apertures file
+	f=open(cob+"/apmasterflat", "r")
+	# dict of aperture positions
+	ap_dict={}
+	ap_dict_initial={}
+	ap=0
+	start=False
+	for line in f:
+		if len(line.strip())>0 and line.strip().split()[0]=='begin': 
+			ap=int(line.strip().split()[3])
+			pos=float(line.strip().split()[5])-1 # -1 is because iraf starts counting with 1 and python with 0.
+			ap_dict[ap]=[[pos], None, [], []] # items are default position and trace polynomials in apmasterflat file, fitted profile, two arrays for fitted crosstalk (p cross talk and m cross talk)
+			ap_dict_initial[ap]=pos
+		if len(line.strip())>0 and line.strip().split()[0]=='curve':
+			start=True
+		if start and len(line.strip().split())==1:
+			ap_dict[ap][0].append(float(line.strip().split()[0]))
+		if len(line.strip().split())==0:
+			start=False
+
+	for column in range(5, 4090, 200):
+		# calculate trace position at the column value
+		#print column
+
+		#find center of apertures at the column value and write it into ap_dict.
+		for ap in range(1,393):
+			column_norm=iraf_norm(column, ap_dict[ap][0][4], ap_dict[1][0][3])
+			ap_dict[ap][0][0]=ap_dict_initial[ap]+np.polynomial.legendre.legval(column_norm, np.array(ap_dict[ap][0][5:]))
+
+
+		# make initial fit
+		#fig=figure(str(cob)+str(ccd))
+		#ax=fig.add_subplot(211)
+		#ax2=fig.add_subplot(212, sharex=ax)
+		#ax.plot(np.sum(data[:,column-5:column+5], axis=1), 'k-')
+		
+		x=np.arange(len(np.sum(data[:,column-5:column+5], axis=1)))
+
+		for ap in range(1,393):
+			lower=int(ap_dict[ap][0][0])-6
+			if lower<0: lower=0
+			upper=int(ap_dict[ap][0][0])+6
+			if upper>len(np.sum(data[:,column-5:column+5], axis=1)): upper=len(np.sum(data[:,column-5:column+5], axis=1))
+			if func=='agauss': 
+				res=fit_profile_agauss([ap_dict[ap][0][0]-lower,100000,1.6], np.sum(data[:,column-5:column+5], axis=1)[lower:upper])
+			elif func=='voigt': 
+				res=fit_profile_voigt([ap_dict[ap][0][0]-lower,100000,1.5], np.sum(data[:,column-5:column+5], axis=1)[lower:upper])
+			else:
+				extract_log.error('Select a valid func parameter')
+
+			res['pos']=Parameter(name='pos', value=res['pos'].value+lower)
+			ap_dict[ap][1]=res
+
+		#model=np.zeros(len(x))
+		#for ap_model in range(1,393):
+		#	model+=peak_profile_agauss(ap_dict[ap_model][1], x)
+		#ax.plot(model, 'r-')
+
+		# iterate by removing a model for all apertures, except the one that will be fitted.
+		for n in range(10):
+			#print n
+			# for first few steps use a small region around the peak to fit it. Then increase it to fit the wings better
+			if n<5: limit=3
+			elif n<7: limit=6
+			else: limit=10
+			for ap in range(1,393):
+				lower=int(ap_dict[ap][0][0])-limit
+				if lower<0: lower=0
+				upper=int(ap_dict[ap][0][0])+limit
+				if upper>len(np.sum(data[:,column-5:column+5], axis=1)): upper=len(np.sum(data[:,column-5:column+5], axis=1))
+
+				# calculate best model without the ap line
+				model=np.zeros(len(x))
+				for ap_model in range(1,393):
+					if ap!=ap_model and abs(ap-ap_model)<4:
+						if func=='agauss':
+							model+=peak_profile_agauss(ap_dict[ap_model][1], x)
+						elif func=='voigt':
+							model+=peak_profile_voigt(ap_dict[ap_model][1], x)
+						else:
+							extract_log.error('Select a valid func parameter')
+
+				# fit one line
+				if func=='agauss':
+					res=fit_profile_agauss([ap_dict[ap][0][0]-lower,100000,1.6], np.sum(data[:,column-5:column+5], axis=1)[lower:upper]-model[lower:upper])
+				elif func=='voigt':
+					res=fit_profile_voigt([ap_dict[ap][0][0]-lower,100000,1.5], np.sum(data[:,column-5:column+5], axis=1)[lower:upper]-model[lower:upper])
+				else:
+					extract_log.error('Select a valid func parameter')
+				res['pos']=Parameter(name='pos', value=res['pos'].value+lower)
+				ap_dict[ap][1]=res
+
+
+			# print residuals
+			#model=np.zeros(len(x))
+			#for ap_model in range(1,393):
+			#	model+=peak_profile_agauss(ap_dict[ap_model][1], x)
+			#print np.sum(abs(model-np.sum(data[:,column-5:column+5], axis=1)))
+		
+		# calculate cross talk (integrate the profile over two neighbouring apertures and divide)
+		for ap in range(1,393):
+			xx=np.linspace(ap_dict[ap][0][0]-16, ap_dict[ap][0][0]+16, 32*100)
+			if func=='agauss':
+				model=peak_profile_agauss(ap_dict[ap][1], xx)
+			elif func=='voigt':
+				model=peak_profile_voigt(ap_dict[ap][1], xx)
+			else:
+				extract_log.error('Select a valid func parameter')
+
+			aperture_lower=ap_dict[ap][0][0]-3.0
+			aperture_upper=ap_dict[ap][0][0]+3.0
+			flux_aperture=np.sum(model[(xx>aperture_lower)&(xx<aperture_upper)])
+			if ap>1:
+				aperture_m_lower=ap_dict[ap-1][0][0]-3.0
+				aperture_m_upper=ap_dict[ap-1][0][0]+3.0
+				flux_aperture_m=np.sum(model[(xx>aperture_m_lower)&(xx<aperture_m_upper)])
+			else:
+				flux_aperture_m=0.0
+			if ap<392:
+				aperture_p_lower=ap_dict[ap+1][0][0]-3.0
+				aperture_p_upper=ap_dict[ap+1][0][0]+3.0
+				flux_aperture_p=np.sum(model[(xx>aperture_p_lower)&(xx<aperture_p_upper)])
+			else:
+				flux_aperture_p=0.0
+
+			ct_m=flux_aperture_m/flux_aperture
+			ct_p=flux_aperture_p/flux_aperture
+			ap_dict[ap][2].append([column, ct_m])
+			ap_dict[ap][3].append([column, ct_p])
+
+			#ax2.plot(ap_dict[ap][0][0], flux_aperture_m/flux_aperture, 'ro')
+			#ax2.plot(ap_dict[ap][0][0], flux_aperture_p/flux_aperture, 'go')
+			#ax2.text(ap_dict[ap][0][0], -0.002, str(ap))
+			
+
+		#model=np.zeros(len(x))
+		#for ap_model in range(1,393):
+		#	model+=peak_profile_agauss(ap_dict[ap_model][1], x)
+		#ax.plot(model, 'g-')
+		#show()
+
+	# model cross talk and create cross talk images
+	# create a zeros filled array. xtalk signal will be added into it
+	os.chdir(cob)
+	files=glob.glob("./[01-31]*.ms.fits")
+	#open extracted flat
+	hdul_flat=fits.open('masterflat.ms.fits')
+	data_flat=hdul_flat[0].data
+	hdul_flat.close()
+	flux_flat=np.average(data_flat, axis=1)
+	flux_max=np.percentile(flux_flat, 90)
+	large_crosstalk=[]
+	for n,f in enumerate(files):
+		#open image file to save data with cross-talk subtracted
+		hdul_o=fits.open(f, mode='update')
+		data=hdul_o[0].data
+		ct_image=np.zeros((392,4096))
+		for ap in range(1,393):
+			ct_m=np.array(ap_dict[ap][2])
+			ct_p=np.array(ap_dict[ap][3])
+			ct_m=np.polyfit(ct_m[:,0], ct_m[:,1], 5)
+			ct_m=np.poly1d(ct_m)
+			ct_p=np.polyfit(ct_p[:,0], ct_p[:,1], 5)
+			ct_p=np.poly1d(ct_p)
+			ap_i=ap-1
+			#save array with apertures having large cross talk. This only needs to be done once per cob/ccd
+			if n==0:
+				if max(ct_m)>0.05 or max(ct_p)>0.05: large_crosstalk.append(ap)
+			#fig=figure('check ct')
+			#ax=fig.add_subplot(111)
+			#ax.plot(np.arange(0,4096), ct_m(np.arange(0,4096)), 'r-')
+			#ax.plot(np.arange(0,4096), ct_p(np.arange(0,4096)), 'g-')
+			#ax.set_title(str(ap))
+			#show()
+			# only apply cross-talk correction for apertures where flux is not close to zero. If flux is low, the cross-talk can be wrong, beacuse of dividing by small numbers.
+			if flux_flat[ap_i]>0.1*flux_max:
+				if ap_i!=0:
+					ct_image[ap_i-1]+=data[ap_i]*ct_m(range(0,4096))
+				if ap_i!=391: 
+					ct_image[ap_i+1]+=data[ap_i]*ct_p(range(0,4096))
+		#save array with apertures having large cross talk. This only needs to be done once per cob/ccd
+		if n==0:
+			np.save('large_cross-talk', np.array(large_crosstalk))
+		# filter ct image. It is better to reduce the resolution a little bit than to subtract remaining cosmic rays.
+		ct_image=signal.medfilt(ct_image, kernel_size=(1,5))
+		#save cross talk image
+		#create a copy of the original image, so the header stays the same
+		shutil.copy(f, 'cross_'+f.split('/')[-1])
+		hdul=fits.open('cross_'+f.split('/')[-1], mode='update')
+		hdul[0].data=ct_image
+		hdul.flush()
+		hdul.close()
+		#save spectra with cross talk removed
+		hdul_o[0].data=data-ct_image
+		hdul_o.flush()
+		hdul_o.close()
+	os.chdir('../../../..')
+
+
+def measure_cross_on_flat(date, func='agauss', ncpu=1):
+	"""
+	Measure cross talk and use it to correct extracted spectra. We have to improve this, becasue the cross talk is very fibre dependant.
+
+	Parameters:
+		date (str): date string (e.g. 190210)
+		func (str): 'agauss' (default) or 'voigt'. Function used for spectral profile fitting. Agauss is an asymetric generalised Gaussian.
+		ncpu (int): number of processes to use for parallelization (default is 1, so no parallelization)
 	
+	Returns:
+		none
+
+	"""
+
+	args=[]
 	for ccd in [1,2,3,4]:
 		cobs=glob.glob("reductions/%s/ccd%s/*" % (date,ccd))
 		for cob in cobs:
-			extract_log.info('Calculating cross talk for COB %s.' % cob)
-			# open masterflat
-			hdul=fits.open(cob+'/masterflat.fits')
-			data=hdul[0].data
-			hdul.close()
+			args.append([cob,func])
 
-			# open apertures file
-			f=open(cob+"/apmasterflat", "r")
-			# dict of aperture positions
-			ap_dict={}
-			ap_dict_initial={}
-			ap=0
-			start=False
-			for line in f:
-				if len(line.strip())>0 and line.strip().split()[0]=='begin': 
-					ap=int(line.strip().split()[3])
-					pos=float(line.strip().split()[5])-1 # -1 is because iraf starts counting with 1 and python with 0.
-					ap_dict[ap]=[[pos], None, [], []] # items are default position and trace polynomials in apmasterflat file, fitted profile, two arrays for fitted crosstalk (p cross talk and m cross talk)
-					ap_dict_initial[ap]=pos
-				if len(line.strip())>0 and line.strip().split()[0]=='curve':
-					start=True
-				if start and len(line.strip().split())==1:
-					ap_dict[ap][0].append(float(line.strip().split()[0]))
-				if len(line.strip().split())==0:
-					start=False
-
-			for column in range(5, 4090, 200):
-				# calculate trace position at the column value
-				#print column
-
-				#find center of apertures at the column value and write it into ap_dict.
-				for ap in range(1,393):
-					column_norm=iraf_norm(column, ap_dict[ap][0][4], ap_dict[1][0][3])
-					ap_dict[ap][0][0]=ap_dict_initial[ap]+np.polynomial.legendre.legval(column_norm, np.array(ap_dict[ap][0][5:]))
-
-
-				# make initial fit
-				#fig=figure(str(cob)+str(ccd))
-				#ax=fig.add_subplot(211)
-				#ax2=fig.add_subplot(212, sharex=ax)
-				#ax.plot(np.sum(data[:,column-5:column+5], axis=1), 'k-')
-				
-				x=np.arange(len(np.sum(data[:,column-5:column+5], axis=1)))
-
-				for ap in range(1,393):
-					lower=int(ap_dict[ap][0][0])-6
-					if lower<0: lower=0
-					upper=int(ap_dict[ap][0][0])+6
-					if upper>len(np.sum(data[:,column-5:column+5], axis=1)): upper=len(np.sum(data[:,column-5:column+5], axis=1))
-					if func=='agauss': 
-						res=fit_profile_agauss([ap_dict[ap][0][0]-lower,100000,1.6], np.sum(data[:,column-5:column+5], axis=1)[lower:upper])
-					elif func=='voigt': 
-						res=fit_profile_voigt([ap_dict[ap][0][0]-lower,100000,1.5], np.sum(data[:,column-5:column+5], axis=1)[lower:upper])
-					else:
-						extract_log.error('Select a valid func parameter')
-
-					res['pos']=Parameter(name='pos', value=res['pos'].value+lower)
-					ap_dict[ap][1]=res
-
-				#model=np.zeros(len(x))
-				#for ap_model in range(1,393):
-				#	model+=peak_profile_agauss(ap_dict[ap_model][1], x)
-				#ax.plot(model, 'r-')
-
-				# iterate by removing a model for all apertures, except the one that will be fitted.
-				for n in range(10):
-					#print n
-					# for first few steps use a small region around the peak to fit it. Then increase it to fit the wings better
-					if n<5: limit=3
-					elif n<7: limit=6
-					else: limit=10
-					for ap in range(1,393):
-						lower=int(ap_dict[ap][0][0])-limit
-						if lower<0: lower=0
-						upper=int(ap_dict[ap][0][0])+limit
-						if upper>len(np.sum(data[:,column-5:column+5], axis=1)): upper=len(np.sum(data[:,column-5:column+5], axis=1))
-
-						# calculate best model without the ap line
-						model=np.zeros(len(x))
-						for ap_model in range(1,393):
-							if ap!=ap_model and abs(ap-ap_model)<4:
-								if func=='agauss':
-									model+=peak_profile_agauss(ap_dict[ap_model][1], x)
-								elif func=='voigt':
-									model+=peak_profile_voigt(ap_dict[ap_model][1], x)
-								else:
-									extract_log.error('Select a valid func parameter')
-
-						# fit one line
-						if func=='agauss':
-							res=fit_profile_agauss([ap_dict[ap][0][0]-lower,100000,1.6], np.sum(data[:,column-5:column+5], axis=1)[lower:upper]-model[lower:upper])
-						elif func=='voigt':
-							res=fit_profile_voigt([ap_dict[ap][0][0]-lower,100000,1.5], np.sum(data[:,column-5:column+5], axis=1)[lower:upper]-model[lower:upper])
-						else:
-							extract_log.error('Select a valid func parameter')
-						res['pos']=Parameter(name='pos', value=res['pos'].value+lower)
-						ap_dict[ap][1]=res
-
-
-					# print residuals
-					#model=np.zeros(len(x))
-					#for ap_model in range(1,393):
-					#	model+=peak_profile_agauss(ap_dict[ap_model][1], x)
-					#print np.sum(abs(model-np.sum(data[:,column-5:column+5], axis=1)))
-				
-				# calculate cross talk (integrate the profile over two neighbouring apertures and divide)
-				for ap in range(1,393):
-					xx=np.linspace(ap_dict[ap][0][0]-16, ap_dict[ap][0][0]+16, 32*100)
-					if func=='agauss':
-						model=peak_profile_agauss(ap_dict[ap][1], xx)
-					elif func=='voigt':
-						model=peak_profile_voigt(ap_dict[ap][1], xx)
-					else:
-						extract_log.error('Select a valid func parameter')
-
-					aperture_lower=ap_dict[ap][0][0]-3.0
-					aperture_upper=ap_dict[ap][0][0]+3.0
-					flux_aperture=np.sum(model[(xx>aperture_lower)&(xx<aperture_upper)])
-					if ap>1:
-						aperture_m_lower=ap_dict[ap-1][0][0]-3.0
-						aperture_m_upper=ap_dict[ap-1][0][0]+3.0
-						flux_aperture_m=np.sum(model[(xx>aperture_m_lower)&(xx<aperture_m_upper)])
-					else:
-						flux_aperture_m=0.0
-					if ap<392:
-						aperture_p_lower=ap_dict[ap+1][0][0]-3.0
-						aperture_p_upper=ap_dict[ap+1][0][0]+3.0
-						flux_aperture_p=np.sum(model[(xx>aperture_p_lower)&(xx<aperture_p_upper)])
-					else:
-						flux_aperture_p=0.0
-
-					ct_m=flux_aperture_m/flux_aperture
-					ct_p=flux_aperture_p/flux_aperture
-					ap_dict[ap][2].append([column, ct_m])
-					ap_dict[ap][3].append([column, ct_p])
-
-					#ax2.plot(ap_dict[ap][0][0], flux_aperture_m/flux_aperture, 'ro')
-					#ax2.plot(ap_dict[ap][0][0], flux_aperture_p/flux_aperture, 'go')
-					#ax2.text(ap_dict[ap][0][0], -0.002, str(ap))
-					
-
-				#model=np.zeros(len(x))
-				#for ap_model in range(1,393):
-				#	model+=peak_profile_agauss(ap_dict[ap_model][1], x)
-				#ax.plot(model, 'g-')
-				#show()
-
-			# model cross talk and create cross talk images
-			# create a zeros filled array. xtalk signal will be added into it
-			os.chdir(cob)
-			files=glob.glob("./[01-31]*.ms.fits")
-			#open extracted flat
-			hdul_flat=fits.open('masterflat.ms.fits')
-			data_flat=hdul_flat[0].data
-			hdul_flat.close()
-			flux_flat=np.average(data_flat, axis=1)
-			flux_max=np.percentile(flux_flat, 90)
-			large_crosstalk=[]
-			for n,f in enumerate(files):
-				#open image file to save data with cross-talk subtracted
-				hdul_o=fits.open(f, mode='update')
-				data=hdul_o[0].data
-				ct_image=np.zeros((392,4096))
-				for ap in range(1,393):
-					ct_m=np.array(ap_dict[ap][2])
-					ct_p=np.array(ap_dict[ap][3])
-					ct_m=np.polyfit(ct_m[:,0], ct_m[:,1], 5)
-					ct_m=np.poly1d(ct_m)
-					ct_p=np.polyfit(ct_p[:,0], ct_p[:,1], 5)
-					ct_p=np.poly1d(ct_p)
-					ap_i=ap-1
-					#save array with apertures having large cross talk. This only needs to be done once per cob/ccd
-					if n==0:
-						if max(ct_m)>0.05 or max(ct_p)>0.05: large_crosstalk.append(ap)
-					#fig=figure('check ct')
-					#ax=fig.add_subplot(111)
-					#ax.plot(np.arange(0,4096), ct_m(np.arange(0,4096)), 'r-')
-					#ax.plot(np.arange(0,4096), ct_p(np.arange(0,4096)), 'g-')
-					#ax.set_title(str(ap))
-					#show()
-					# only apply cross-talk correction for apertures where flux is not close to zero. If flux is low, the cross-talk can be wrong, beacuse of dividing by small numbers.
-					if flux_flat[ap_i]>0.1*flux_max:
-						if ap_i!=0:
-							ct_image[ap_i-1]+=data[ap_i]*ct_m(range(0,4096))
-						if ap_i!=391: 
-							ct_image[ap_i+1]+=data[ap_i]*ct_p(range(0,4096))
-				#save array with apertures having large cross talk. This only needs to be done once per cob/ccd
-				if n==0:
-					np.save('large_cross-talk', np.array(large_crosstalk))
-				# filter ct image. It is better to reduce the resolution a little bit than to subtract remaining cosmic rays.
-				ct_image=signal.medfilt(ct_image, kernel_size=(1,5))
-				#save cross talk image
-				#create a copy of the original image, so the header stays the same
-				shutil.copy(f, 'cross_'+f.split('/')[-1])
-				hdul=fits.open('cross_'+f.split('/')[-1], mode='update')
-				hdul[0].data=ct_image
-				hdul.flush()
-				hdul.close()
-				#save spectra with cross talk removed
-				hdul_o[0].data=data-ct_image
-				hdul_o.flush()
-				hdul_o.close()
-			os.chdir('../../../..')
+	if ncpu>1:
+		pool = Pool(processes=ncpu)
+		pool.map(measure_cross_on_flat_proc, args)
+		pool.close()
+	else:
+		for arg in args:
+			measure_cross_on_flat_proc(arg)
 
 
 def extract_spectra(date, start_folder):
@@ -1779,19 +1796,9 @@ def wav_calibration(date, start_folder):
 			os.chdir('../../../..')
 			iraf.flprcache()
 
-def resolution_profile(date):
+def resolution_profile_proc(arg):
 	"""
-	Calculates the resolution profile of each spectrum. Produces an image with ''res_'' prefix with FWHM in Angstroms.
-
-	Parameters:
-		date (str): date string (e.g. 190210)
-	
-	Returns:
-		none
-
-	To do:
-		Do some cleaning
-		Paralelize
+	Wrapper for resolution profile calculation. Enables use of multiprocessing.
 	"""
 
 	def peak_profile(a,x,y):
@@ -1821,178 +1828,210 @@ def resolution_profile(date):
 	# number of lines to be found that give best resolution profile:
 	n_of_lines_dict={1:45, 2:45, 3:45, 4:40}
 
+	cob,ccd=arg
+
+	extract_log.info('Calculating resolution profile for COB %s.' % cob)
+	files=glob.glob("%s/[01-31]*.ms.fits" % cob)
+	arc=cob+"/masterarc.ms.fits"
+
+	if not os.path.isfile(arc):
+		extract_log.warning('Masterarc was not found in ccd %d of COB %s, resolution profile will not be computed.' % (ccd, cob))
+		return 0
+
+	# linearize arc
+	iraf.disptrans(input=arc, output='', linearize='yes', units='angstroms', Stdout="/dev/null")
+	# remove baseline (we want to measure lines with zero continuum level)
+	iraf.continuum(input=arc, output='/'.join(arc.split('/')[:-1])+'/nobaseline_'+arc.split('/')[-1], type='difference', lines='*', bands='*', function='cheb', order='5', low_rej='4.0', high_rej='2.0', niter='8', interac='no', Stdout="/dev/null")
+	hdul=fits.open('/'.join(arc.split('/')[:-1])+'/nobaseline_'+arc.split('/')[-1])
+	data=hdul[0].data
+	hdul.close()
+
+	res_points=[]
+	b_values=[]
+	for ap in range(1,393):
+		line=ap-1  # line in array is different than aperture number
+		#fig=figure(0)
+		#ax=fig.add_subplot(311)
+		#ax.plot(data[line], 'k-')
+		# find peaks positions
+		peaks,properties=signal.find_peaks(data[line], width=(3.0,8.0), distance=10, height=100.0, prominence=1.0)
+		widths=properties['widths']
+		heights=properties['peak_heights']
+		# accept only some strongest peaks
+		sorted_ind=heights.argsort()
+		peaks=peaks[sorted_ind]
+		widths=widths[sorted_ind]
+		heights=heights[sorted_ind]
+		peaks=peaks[-n_of_lines_dict[ccd]:]
+		widths=widths[-n_of_lines_dict[ccd]:]
+		heights=heights[-n_of_lines_dict[ccd]:]
+		#ax.plot(peaks, data[line][peaks], 'rx')
+		#ax2=fig.add_subplot(312, sharex=ax)
+		#ax3=fig.add_subplot(313, sharex=ax)
+		#ax2.plot(peaks,widths, 'ko')
+		# fit peaks with a modified gaussian function and calculate mean B parameter for each fibre
+		bs=[]
+		for i,j,k in zip(peaks, widths, heights):
+			res=fit_profile([i,k,j], data[line])
+			#ax2.plot(res[0],res[2], 'ro')
+			#ax.plot(np.arange(len(data[line])), res[1]*np.exp(-(abs(2*(np.arange(len(data[line]))-res[0])/res[2])**res[3])*0.693147), 'r-')
+			#ax3.plot(res[0],res[3], 'ro')
+			bs.append(res[3])
+		b_median=np.nanmedian(bs)
+		# in case B cannot be calculated use a typical value
+		if np.isnan(b_median) or len(bs)<10:
+			if ccd==1: b_median=2.40
+			if ccd==2: b_median=2.25
+			if ccd==3: b_median=2.15
+			if ccd==4: b_median=2.05
+		# fit peaks again to get their fwhm, given a fixed B
+		widths_fit=[]
+		for i,j,k in zip(peaks, widths, heights):
+			res=fit_profile([i,k,j], data[line], vary_B=False)
+			widths_fit.append(res[2])
+		widths=np.array(widths_fit)
+		# remember peaks widths and B values
+		b_values.append(b_median)
+		if len(sorted_ind)>2*n_of_lines_dict[ccd]:  # there must be at least
+			for i,j in zip(peaks[(peaks>20)&(peaks<4076)],widths[(peaks>20)&(peaks<4076)]):  # 20 px at each edge are truncated, because width cannot be measured correctly
+				res_points.append([ap,i,j])
+
+		#ax2.set_ylim(4,6)
+		#ax3.set_ylim(2.0,3.8)
+		#show()
+
+	np.save(cob+'/b_values', np.array(b_values))
+	res_points=np.array(res_points)
+	#fig=figure(0)
+	#ax=fig.add_subplot(141)
+	cc=res_points[:,2]#-0.0005*res_points[:,1]
+	#ax.scatter(res_points[:,1], res_points[:,0], c=cc, vmin=np.percentile(cc,2), vmax=np.percentile(cc,85), s=3, lw=0)
+
+	# fit smooth model
+	mask=np.array([True]*len(cc), dtype=bool)
+	for n in range(10):
+		p_init = polynomial.Chebyshev2D(x_degree=3, y_degree=3)
+		fit_p = fitting.LevMarLSQFitter()
+		p = fit_p(p_init, res_points[:,1][mask], res_points[:,0][mask], cc[mask])
+		std=np.std(cc-p(res_points[:,1], res_points[:,0]))
+		mask=np.array([ True]*len(cc), dtype=bool)
+		mask[(cc-p(res_points[:,1], res_points[:,0])>1.5*std)|(cc-p(res_points[:,1], res_points[:,0])<-3.*std)]=False
+
+	# fit fibre model
+	mask=np.array([ True]*len(cc), dtype=bool)
+	for n in range(1):
+		f=[]
+		profile=cc-p(res_points[:,1], res_points[:,0])
+		for ap in range(1,393):
+			values=profile[res_points[:,0]==ap]
+			if len(values)==0:
+				f.append([0.0]*4096)
+			else:
+				f.append([np.median(values)]*4096)
+	f=np.array(f)
+
+	# refit smooth model
+	cc_new=[]
+	for x,y in zip(res_points[:,1], res_points[:,0]):
+		cc_new.append(f[int(y)-1,int(x)])
+	cc=cc-np.array(cc_new)
+	mask=np.array([True]*len(cc), dtype=bool)
+	for n in range(10):
+		p_init = polynomial.Chebyshev2D(x_degree=3, y_degree=3)
+		fit_p = fitting.LevMarLSQFitter()
+		p = fit_p(p_init, res_points[:,1][mask], res_points[:,0][mask], cc[mask])
+		std=np.std(cc-p(res_points[:,1], res_points[:,0]))
+		mask=np.array([ True]*len(cc), dtype=bool)
+		mask[(cc-p(res_points[:,1], res_points[:,0])>1.3*std)|(cc-p(res_points[:,1], res_points[:,0])<-3.*std)]=False
+
+	# refit fibre model
+	mask=np.array([ True]*len(cc), dtype=bool)
+	for n in range(1):
+		f=[]
+		profile=cc-p(res_points[:,1], res_points[:,0])+np.array(cc_new)
+		for ap in range(1,393):
+			values=profile[res_points[:,0]==ap]
+			if len(values)==0:
+				f.append([0.0]*4096)
+			else:
+				mask=np.array([True]*len(values), dtype=bool)
+				for n in range(5):#do sigma clipping
+					model=np.median(values[mask])
+					std=np.std(values-model)
+					mask=np.array([True]*len(values), dtype=bool)
+					mask[(values-model>1.3*std)|(values-model<-3.*std)]=False
+				f.append([np.median(values[mask])]*4096)
+	f=np.array(f)
+
+	y=np.arange(392)
+	x=np.arange(4096)
+	xx,yy=np.meshgrid(x,y)
+
+	for file in files:
+		disp=[]
+		dispersions=iraf.slist(images=file, apertures='', long_header='no', Stdout=1)
+		for line in dispersions:
+			disp.append(float(line.split()[6]))
+		iraf.scopy(input=file, output='/'.join(file.split('/')[:-1])+'/res_'+file.split('/')[-1])
+		hdul=fits.open('/'.join(file.split('/')[:-1])+'/res_'+file.split('/')[-1], mode='update')
+		hdul[0].data=f+p(xx,yy)#write FWHM in pixels
+		hdul[0].data=hdul[0].data*np.array(disp)[:,None]#convert FWHM in pixels to FWHM in A by multyping with dispersion
+		hdul.close()
+
+	os.remove('/'.join(arc.split('/')[:-1])+'/nobaseline_'+arc.split('/')[-1])
+
+	iraf.flprcache()
+
+	#y=np.arange(392)
+	#x=np.arange(4096)
+	#xx,yy=np.meshgrid(x,y)	
+
+	#ax2=fig.add_subplot(142)
+	#ax2.pcolormesh(xx, yy, p(xx,yy))
+
+	#ax3=fig.add_subplot(143)
+	#ax3.pcolormesh(xx,yy,f)
+
+	#ax4=fig.add_subplot(144)
+	#ax4.pcolormesh(xx,yy,p(xx,yy)+f, vmin=4.0,vmax=6.5)
+
+	#ax4.set_title('Combined model')
+	#ax3.set_title('Fibre model')
+	#ax2.set_title('Smooth model')
+	#ax.set_title('Measurements')
+
+	#show()
+
+def resolution_profile(date, ncpu=1):
+	"""
+	Calculates the resolution profile of each spectrum. Produces an image with ''res_'' prefix with FWHM in Angstroms.
+
+	Parameters:
+		date (str): date string (e.g. 190210)
+		ncpu (int): number of processes to use for parallelization (default is 1, so no parallelization)
+	
+	Returns:
+		none
+
+	To do:
+		Do some cleaning in resolution_profile_proc
+		Do something when not enough lines are found
+	"""
+
+	args=[]
 	for ccd in [1,2,3,4]:
 		cobs=glob.glob("reductions/%s/ccd%s/*" % (date,ccd))
 		for cob in cobs:
-			extract_log.info('Calculating resolution profile for COB %s.' % cob)
-			files=glob.glob("%s/[01-31]*.ms.fits" % cob)
-			arc=cob+"/masterarc.ms.fits"
+			args.append([cob,ccd])
 
-			if not os.path.isfile(arc):
-				extract_log.warning('Masterarc was not found in ccd %d of COB %s, resolution profile will not be computed.' % (ccd, cob))
-				continue
-
-			# linearize arc
-			iraf.disptrans(input=arc, output='', linearize='yes', units='angstroms', Stdout="/dev/null")
-			# remove baseline (we want to measure lines with zero continuum level)
-			iraf.continuum(input=arc, output='/'.join(arc.split('/')[:-1])+'/nobaseline_'+arc.split('/')[-1], type='difference', lines='*', bands='*', function='cheb', order='5', low_rej='4.0', high_rej='2.0', niter='8', interac='no', Stdout="/dev/null")
-			hdul=fits.open('/'.join(arc.split('/')[:-1])+'/nobaseline_'+arc.split('/')[-1])
-			data=hdul[0].data
-			hdul.close()
-
-			res_points=[]
-			b_values=[]
-			for ap in range(1,393):
-				line=ap-1  # line in array is different than aperture number
-				#fig=figure(0)
-				#ax=fig.add_subplot(311)
-				#ax.plot(data[line], 'k-')
-				# find peaks positions
-				peaks,properties=signal.find_peaks(data[line], width=(3.0,8.0), distance=10, height=100.0, prominence=1.0)
-				widths=properties['widths']
-				heights=properties['peak_heights']
-				# accept only some strongest peaks
-				sorted_ind=heights.argsort()
-				peaks=peaks[sorted_ind]
-				widths=widths[sorted_ind]
-				heights=heights[sorted_ind]
-				peaks=peaks[-n_of_lines_dict[ccd]:]
-				widths=widths[-n_of_lines_dict[ccd]:]
-				heights=heights[-n_of_lines_dict[ccd]:]
-				#ax.plot(peaks, data[line][peaks], 'rx')
-				#ax2=fig.add_subplot(312, sharex=ax)
-				#ax3=fig.add_subplot(313, sharex=ax)
-				#ax2.plot(peaks,widths, 'ko')
-				# fit peaks with a modified gaussian function and calculate mean B parameter for each fibre
-				bs=[]
-				for i,j,k in zip(peaks, widths, heights):
-					res=fit_profile([i,k,j], data[line])
-					#ax2.plot(res[0],res[2], 'ro')
-					#ax.plot(np.arange(len(data[line])), res[1]*np.exp(-(abs(2*(np.arange(len(data[line]))-res[0])/res[2])**res[3])*0.693147), 'r-')
-					#ax3.plot(res[0],res[3], 'ro')
-					bs.append(res[3])
-				b_median=np.nanmedian(bs)
-				# in case B cannot be calculated use a typical value
-				if np.isnan(b_median) or len(bs)<10:
-					if ccd==1: b_median=2.40
-					if ccd==2: b_median=2.25
-					if ccd==3: b_median=2.15
-					if ccd==4: b_median=2.05
-				# fit peaks again to get their fwhm, given a fixed B
-				widths_fit=[]
-				for i,j,k in zip(peaks, widths, heights):
-					res=fit_profile([i,k,j], data[line], vary_B=False)
-					widths_fit.append(res[2])
-				widths=np.array(widths_fit)
-				# remember peaks widths and B values
-				b_values.append(b_median)
-				if len(sorted_ind)>2*n_of_lines_dict[ccd]:  # there must be at least
-					for i,j in zip(peaks[(peaks>20)&(peaks<4076)],widths[(peaks>20)&(peaks<4076)]):  # 20 px at each edge are truncated, because width cannot be measured correctly
-						res_points.append([ap,i,j])
-
-				#ax2.set_ylim(4,6)
-				#ax3.set_ylim(2.0,3.8)
-				#show()
-
-			np.save(cob+'/b_values', np.array(b_values))
-			res_points=np.array(res_points)
-			#fig=figure(0)
-			#ax=fig.add_subplot(141)
-			cc=res_points[:,2]#-0.0005*res_points[:,1]
-			#ax.scatter(res_points[:,1], res_points[:,0], c=cc, vmin=np.percentile(cc,2), vmax=np.percentile(cc,85), s=3, lw=0)
-
-			# fit smooth model
-			mask=np.array([True]*len(cc), dtype=bool)
-			for n in range(10):
-				p_init = polynomial.Chebyshev2D(x_degree=3, y_degree=3)
-				fit_p = fitting.LevMarLSQFitter()
-				p = fit_p(p_init, res_points[:,1][mask], res_points[:,0][mask], cc[mask])
-				std=np.std(cc-p(res_points[:,1], res_points[:,0]))
-				mask=np.array([ True]*len(cc), dtype=bool)
-				mask[(cc-p(res_points[:,1], res_points[:,0])>1.5*std)|(cc-p(res_points[:,1], res_points[:,0])<-3.*std)]=False
-
-			# fit fibre model
-			mask=np.array([ True]*len(cc), dtype=bool)
-			for n in range(1):
-				f=[]
-				profile=cc-p(res_points[:,1], res_points[:,0])
-				for ap in range(1,393):
-					values=profile[res_points[:,0]==ap]
-					if len(values)==0:
-						f.append([0.0]*4096)
-					else:
-						f.append([np.median(values)]*4096)
-			f=np.array(f)
-
-			# refit smooth model
-			cc_new=[]
-			for x,y in zip(res_points[:,1], res_points[:,0]):
-				cc_new.append(f[int(y)-1,int(x)])
-			cc=cc-np.array(cc_new)
-			mask=np.array([True]*len(cc), dtype=bool)
-			for n in range(10):
-				p_init = polynomial.Chebyshev2D(x_degree=3, y_degree=3)
-				fit_p = fitting.LevMarLSQFitter()
-				p = fit_p(p_init, res_points[:,1][mask], res_points[:,0][mask], cc[mask])
-				std=np.std(cc-p(res_points[:,1], res_points[:,0]))
-				mask=np.array([ True]*len(cc), dtype=bool)
-				mask[(cc-p(res_points[:,1], res_points[:,0])>1.3*std)|(cc-p(res_points[:,1], res_points[:,0])<-3.*std)]=False
-
-			# refit fibre model
-			mask=np.array([ True]*len(cc), dtype=bool)
-			for n in range(1):
-				f=[]
-				profile=cc-p(res_points[:,1], res_points[:,0])+np.array(cc_new)
-				for ap in range(1,393):
-					values=profile[res_points[:,0]==ap]
-					if len(values)==0:
-						f.append([0.0]*4096)
-					else:
-						mask=np.array([True]*len(values), dtype=bool)
-						for n in range(5):#do sigma clipping
-							model=np.median(values[mask])
-							std=np.std(values-model)
-							mask=np.array([True]*len(values), dtype=bool)
-							mask[(values-model>1.3*std)|(values-model<-3.*std)]=False
-						f.append([np.median(values[mask])]*4096)
-			f=np.array(f)
-
-			y=np.arange(392)
-			x=np.arange(4096)
-			xx,yy=np.meshgrid(x,y)
-
-			for file in files:
-				disp=[]
-				dispersions=iraf.slist(images=file, apertures='', long_header='no', Stdout=1)
-				for line in dispersions:
-					disp.append(float(line.split()[6]))
-				iraf.scopy(input=file, output='/'.join(file.split('/')[:-1])+'/res_'+file.split('/')[-1])
-				hdul=fits.open('/'.join(file.split('/')[:-1])+'/res_'+file.split('/')[-1], mode='update')
-				hdul[0].data=f+p(xx,yy)#write FWHM in pixels
-				hdul[0].data=hdul[0].data*np.array(disp)[:,None]#convert FWHM in pixels to FWHM in A by multyping with dispersion
-				hdul.close()
-
-			os.remove('/'.join(arc.split('/')[:-1])+'/nobaseline_'+arc.split('/')[-1])
-
-			#y=np.arange(392)
-			#x=np.arange(4096)
-			#xx,yy=np.meshgrid(x,y)	
-
-			#ax2=fig.add_subplot(142)
-			#ax2.pcolormesh(xx, yy, p(xx,yy))
-
-			#ax3=fig.add_subplot(143)
-			#ax3.pcolormesh(xx,yy,f)
-
-			#ax4=fig.add_subplot(144)
-			#ax4.pcolormesh(xx,yy,p(xx,yy)+f, vmin=4.0,vmax=6.5)
-
-			#ax4.set_title('Combined model')
-			#ax3.set_title('Fibre model')
-			#ax2.set_title('Smooth model')
-			#ax.set_title('Measurements')
-
-			#show()
+	if ncpu>1:
+		pool = Pool(processes=ncpu)
+		pool.map(resolution_profile_proc, args)
+		pool.close()
+	else:
+		for arg in args:
+			resolution_profile_proc(arg)
+			
 
 def v_bary_correction_proc(args):
 	"""
@@ -2728,11 +2767,6 @@ def remove_telurics(date):
 		cobs=glob.glob("reductions/%s/ccd%s/*" % (date,ccd))
 		for cob in cobs:	
 			files=glob.glob("%s/[01-31]*.fits" % cob)
-
-			if len(files) == 0:
-				extract_log.warning('Teluric fit and removal will not be performed for ccd %d of COB %s.' % (ccd, cob.split('/')[-1]))
-				continue
-
 			valid_files=[]
 			for f in files:
 				if '.ms' not in f: valid_files.append(f)
@@ -2807,11 +2841,7 @@ def remove_telurics(date):
 					# if this is the first time fitting this exposure, start from arbitrary initial conditions
 					params = Parameters()
 					params.add('scale_h2o', value=0.9, min=0.01, max=2.0)
-					# O2 can only be estimated on certain ccds
-					if ccd == 4 or ccd == 2:
-						params.add('scale_o2', value=0.1, min=0.01, max=2.0, vary=True)
-					else:
-						params.add('scale_o2', value=0.1, min=0.01, max=2.0, vary=False)
+					params.add('scale_o2', value=0.1, min=0.01, max=2.0)
 					params.add('vr', value=0.0, min=-0.05, max=0.05)
 					if ccd==4: 
 						params.add('res', value=98.0, min=85, max=110)
@@ -3172,7 +3202,7 @@ def create_final_spectra_proc(args):
 					hdul[extension].header['RVCOM_OK']=('None', 'Did RV pipeline converge? 1=yes, 0=no')
 					hdul[extension].header['TEFF']=('None', 'T_eff in K')
 					hdul[extension].header['LOGG']=('None', 'log g in log cm/s^2')
-					hdul[extension].header['FE_H']=('None', 'Iron abundance in dex')#more parameters?
+					hdul[extension].header['MET']=('None', 'Metallicity in dex')#more parameters?
 					hdul[extension].header['PAR_OK']=('None', 'Are parameters trustworthy? 1=yes, 0=no')
 					#set exposure of the resolution profile to the same value as for spectra
 					hdul[extension].header['EXPOSED']=hdul[0].header['EXPOSED']
@@ -3465,11 +3495,9 @@ def create_database(date):
 
 	To do:
 		Add fibre throughput into the db and add flags for poor throughput
-		Add checks for possible missing ccds, DONE - added initial checks and hamdling of casses when ccd4 is missing, can other ccds also be missing?, have to properlly add those exceptions where needed
+		Add checks for possible missing ccds
 
 	"""
-
-	extract_log.info('Creating an database with information about spectra')
 
 	# Create empty table for this night
 	cols=[]
@@ -3510,6 +3538,7 @@ def create_database(date):
 	cols.append(fits.Column(name='e_rv_com', format='E', unit='km/s', null=None))
 	cols.append(fits.Column(name='teff', format='E', unit='K', null=None))
 	cols.append(fits.Column(name='logg', format='E', unit='cm / s^-2', null=None))
+	cols.append(fits.Column(name='met', format='E', null=None))
 	cols.append(fits.Column(name='fe_h', format='E', null=None))
 	cols.append(fits.Column(name='obs_comment', format='A56'))
 	cols.append(fits.Column(name='pipeline_version', format='A5'))
@@ -3525,43 +3554,22 @@ def create_database(date):
 
 	for sobject in sobjects:
 		#open all four (for four ccds) headers.
-		headers = []
 		file1="reductions/results/%s/spectra/com/%s1.fits" % (date, sobject)
-		if os.path.isfile(file1):
-			hdul1=fits.open(file1)
-			header1=hdul1[0].header
-			hdul1.close()
-			headers.append(header1)
-		else:
-			headers.append(None)
-
+		hdul1=fits.open(file1)
+		header1=hdul1[0].header
+		hdul1.close()
 		file2="reductions/results/%s/spectra/com/%s2.fits" % (date, sobject)
-		if os.path.isfile(file2):
-			hdul2=fits.open(file2)
-			header2=hdul2[0].header
-			hdul2.close()
-			headers.append(header2)
-		else:
-			headers.append(None)
-
+		hdul2=fits.open(file2)
+		header2=hdul2[0].header
+		hdul2.close()
 		file3="reductions/results/%s/spectra/com/%s3.fits" % (date, sobject)
-		if os.path.isfile(file3):
-			hdul3=fits.open(file3)
-			header3=hdul3[0].header
-			hdul3.close()
-			headers.append(header3)
-		else:
-			headers.append(None)
-
+		hdul3=fits.open(file3)
+		header3=hdul3[0].header
+		hdul3.close()
 		file4="reductions/results/%s/spectra/com/%s4.fits" % (date, sobject)
-		has_ccd4 = os.path.isfile(file4)
-		if has_ccd4:
-			hdul4=fits.open(file4)
-			header4=hdul4[0].header
-			hdul4.close()
-			headers.append(header4)
-		else:
-			headers.append(None)
+		hdul4=fits.open(file4)
+		header4=hdul4[0].header
+		hdul4.close()
 
 		#read parameters from headers
 		ra=header1['RA_OBJ']
@@ -3581,7 +3589,7 @@ def create_database(date):
 		fibre_theta=header1['THETA']
 		plate=header1['PLATE']
 		if plate=='None': plate=None
-		aperture_position = [header_ccd['AP_POS'] if header_ccd is not None else None for header_ccd in headers]
+		aperture_position=[header1['AP_POS'], header2['AP_POS'], header3['AP_POS'], header4['AP_POS']]
 		cfg_file=header1['CFG_FILE'].replace(',', ';')#replace commas, so the don't interfere with a csv version of the database
 		if cfg_file=='None': cfg_file=None
 		cfg_field_name=header1['OBJECT'].replace(',', ';')
@@ -3591,26 +3599,26 @@ def create_database(date):
 		galah_id=header1['GALAH_ID']
 		if galah_id=='None': galah_id=-1#not sure why None is not working here
 		mag=header1['mag']
-		wav_rms = [header_ccd['WAV_RMS'] if header_ccd is not None else None for header_ccd in headers]
+		wav_rms=[header1['WAV_RMS'], header2['WAV_RMS'], header3['WAV_RMS'], header4['WAV_RMS']]
 		wav_rms=[None if i=='None' else i for i in wav_rms]
-		wav_n_lines = [header_ccd['WAVLINES'] if header_ccd is not None else '0/0' for header_ccd in headers]
+		wav_n_lines=[header1['WAVLINES'], header2['WAVLINES'], header3['WAVLINES'], header4['WAVLINES']]
 		wav_n_lines_arr=[None if i=='None' else i for i in wav_n_lines]
-		wav_n_lines=''.join([i.ljust(7, ' ') for i in wav_n_lines_arr]) #weird formating because of astropy bugs
-		snr = [header_ccd['SNR'] if header_ccd is not None else None for header_ccd in headers]
+		wav_n_lines=''.join([i.ljust(7, ' ') for i in wav_n_lines_arr])#weird formating because of astropy bugs
+		snr=[header1['SNR'], header2['SNR'], header3['SNR'], header4['SNR']]
 		snr=[None if i=='None' else i for i in snr]
-		fibre_throughput = [header_ccd['FIB_THR'] if header_ccd is not None else None for header_ccd in headers]
+		fibre_throughput=[header1['FIB_THR'], header2['FIB_THR'], header3['FIB_THR'], header4['FIB_THR']]
 		fibre_throughput=[None if i=='None' else i for i in fibre_throughput]
-		res = [header_ccd['RES'] if header_ccd is not None else None for header_ccd in headers]
+		res=[header1['RES'], header2['RES'], header3['RES'], header4['RES']]
 		res=[None if i=='None' else i for i in res]
-		b = [header_ccd['B'] if header_ccd is not None else None for header_ccd in headers]
+		b=[header1['B'], header2['B'], header3['B'], header4['B']]
 		b=[None if i=='None' else i for i in b]
 		v_bary_eff=header1['BARYEFF']
 		if v_bary_eff=='None': v_bary_eff=None
 		exposed=header1['EXPOSED']
 		if exposed=='None': exposed=None
-		rv = [header_ccd['rv'] if header_ccd is not None else None for header_ccd in headers]
+		rv=[header1['rv'], header2['rv'], header3['rv'], header4['rv']]
 		rv=[None if i=='None' else i for i in rv]
-		e_rv = [header_ccd['E_RV'] if header_ccd is not None else None for header_ccd in headers]
+		e_rv=[header1['E_RV'], header2['E_RV'], header3['E_RV'], header4['E_RV']]
 		e_rv=[None if i=='None' else i for i in e_rv]
 		rv_com=header1['rvcom']
 		if rv_com=='None': rv_com=None
@@ -3620,8 +3628,8 @@ def create_database(date):
 		if teff=='None': teff=None
 		logg=header1['LOGG']
 		if logg=='None': logg=None
-		feh=header1['FE_H']
-		if feh=='None': feh=None
+		met=header1['MET']
+		if met=='None': met=None
 		pipeline_version=header1['PIPE_VER']
 		obs_comment=header1['COMM_OBS'].replace(',', ';')
 		#bin mask reduction flags
@@ -3629,29 +3637,30 @@ def create_database(date):
 		if header1['TRACE_OK']==0: flag+=1
 		if header2['TRACE_OK']==0: flag+=2
 		if header3['TRACE_OK']==0: flag+=4
+		if header4['TRACE_OK']==0: flag+=8
 		if header1['WAV_OK']==0: flag+=16
 		if header2['WAV_OK']==0: flag+=32
 		if header3['WAV_OK']==0: flag+=64
-		if has_ccd4 and header4['WAV_OK']==0: flag+=128
+		if header4['WAV_OK']==0: flag+=128
 		if header1['CROSS_OK']==0: flag+=256
 		if header2['CROSS_OK']==0: flag+=512
 		if header3['CROSS_OK']==0: flag+=1024
-		if as_ccd4 and header4['CROSS_OK']==0: flag+=2048
+		if header4['CROSS_OK']==0: flag+=2048
 		if header1['RV_OK']==0: flag+=4096
 		if header2['RV_OK']==0: flag+=8192
 		if header3['RV_OK']==0: flag+=16384
-		if as_ccd4 and header4['RV_OK']==0: flag+=32768
+		if header4['RV_OK']==0: flag+=32768
 		if header1['RVCOM_OK']==0: flag+=65536#this one is the same in all 4 ccds
 		if header1['PAR_OK']==0: flag+=131072#parameters are calculated over all arms, so this flag is the same for all 4 ccds
 
 		#add parameters into the table
-		table.add_row([sobject, ra, dec, mjd, utdate, epoch, aperture, pivot, fibre, fibre_x, fibre_y, fibre_theta, plate, aperture_position, mean_ra, mean_dec, mean_zd, mean_ha, cfg_file, cfg_field_name, obj_name, galah_id, snr, fibre_throughput, res, b, v_bary_eff, exposed, mag, wav_rms, wav_n_lines, rv, e_rv, rv_com, e_rv_com, teff, logg, feh, obs_comment, pipeline_version, flag])
+		table.add_row([sobject, ra, dec, mjd, utdate, epoch, aperture, pivot, fibre, fibre_x, fibre_y, fibre_theta, plate, aperture_position, mean_ra, mean_dec, mean_zd, mean_ha, cfg_file, cfg_field_name, obj_name, galah_id, snr, fibre_throughput, res, b, v_bary_eff, exposed, mag, wav_rms, wav_n_lines, rv, e_rv, rv_com, e_rv_com, teff, logg, met, obs_comment, pipeline_version, flag])
 
 	#write table to hdu
 	hdu=fits.BinTableHDU(table)
 
 	#write hdu to file
-	hdu.writeto('reductions/results/%s/db/%s.fits' % (date, date), overwrite=True)
+	hdu.writeto('reductions/results/%s/db/%s.fits' % (date, date))
 
 	#open table again and add comments to all columns. MAKE SURE THESE ARE IN THE RIGHT ORDER
 	hdul=fits.open('reductions/results/%s/db/%s.fits' % (date, date), mode='update')
@@ -3693,7 +3702,7 @@ def create_database(date):
 	header['TTYPE35']=(header['TTYPE35'], 'combined rv uncertainty')
 	header['TTYPE36']=(header['TTYPE36'], 'effective tmperature')
 	header['TTYPE37']=(header['TTYPE37'], 'log of surface gravitational acceleration')
-	header['TTYPE38']=(header['TTYPE38'], 'iron abundance ([Fe/H])')
+	header['TTYPE38']=(header['TTYPE38'], 'metallicity ([M/H])')
 	header['TTYPE39']=(header['TTYPE39'], 'comments by observer')
 	header['TTYPE40']=(header['TTYPE40'], 'pipeline evrsion')
 	header['TTYPE41']=(header['TTYPE41'], 'reduction flags given as a binary mask')
@@ -4133,7 +4142,7 @@ if __name__ == "__main__":
 		if args.scattered:
 			remove_scattered(date, start_folder, ncpu=int(args.n_cpu))
 		if args.xtalk:
-			measure_cross_on_flat(date)
+			measure_cross_on_flat(date, ncpu=int(args.n_cpu))
 		if args.extract:
 			extract_spectra(date, start_folder)
 		if args.wav:
@@ -4149,10 +4158,9 @@ if __name__ == "__main__":
 		if args.bary:
 			v_bary_correction(date, quick=args.bary_quick, ncpu=int(args.n_cpu))
 		if args.resolution:
-			resolution_profile(date)
+			resolution_profile(date, ncpu=int(args.n_cpu))
 		if args.final:
 			create_final_spectra(date, ncpu=int(args.n_cpu), plot_diagnostics=args.plot_diagnostics)
-			# check_spectra_quality(date)
 		if args.analyze:
 			analyze(date, ncpu=int(args.n_cpu))
 		if args.database:
