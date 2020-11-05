@@ -3,6 +3,7 @@ This script merges a database for one night with a global database. If global da
 
 TO DO:
 	Add command line arguments
+	Remove .dblock when procedure fails
 """
 import os
 import shutil
@@ -20,14 +21,15 @@ parser=argparse.ArgumentParser()
 parser.add_argument("date", help="Date you want to merge into the global DB (in format yymmdd).")
 args=parser.parse_args()
 
-date=args.date
+date = args.date
 
-if isinstance(date, (int, long)):
+if len(date) == 6 and 10 < int(date[:2]) < 30 and 1 <= int(date[2:4]) <= 12 and 1 <= int(date[4:6]) <= 31:
 	pass
 else:
 	logging.error('Date must be an intiger in format yymmdd.')
 	sys.exit(-1)
 
+os.chdir('..')
 
 if os.path.isfile('reductions/dr6.0.fits'):
 	# check if global database exists and open it if it does
@@ -131,4 +133,5 @@ else:
 		csv_db.write('\n')
 	csv_db.close()
 	hdul.close()
+
 	os.remove('reductions/.dblock')
