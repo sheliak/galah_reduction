@@ -729,6 +729,9 @@ def find_apertures(date, start_folder):
 
 	"""
 
+	def iraf_norm(a, max_, min_):
+		return (2.0*a-(max_+min_))/(max_-min_)
+
 	# load correct IRAF packages
 	iraf.noao(_doprint=0,Stdout="/dev/null")
 	iraf.twodspec(_doprint=0,Stdout="/dev/null")
@@ -783,6 +786,108 @@ def find_apertures(date, start_folder):
 
 			# clear cache, or IRAF will have problems with files with the same name
 			iraf.flprcache()
+
+			# Replace trace of failed apertures with the nearest good trace
+			# Read apmasterflat file
+			f=open(cob+"/apmasterflat", "r")
+			# dict of aperture positions
+			ap_dict={}
+			start=False
+			ap=0
+			for line in f:
+				l=line.strip().split()
+				if len(l)==6:
+					ap=int(l[3])
+					pos=float(l[5])
+				if len(l)==2 and l[0]=='curve':
+					coefs=[int(l[1])]
+					start=True
+				elif start and len(l)==1:
+					coefs.append(float(l[0]))
+				if len(l)==0:
+					start=False
+					ap_dict[ap]=[coefs, pos]
+			f.close()
+
+			column=np.arange(4096)
+			for ap in set(failed_apertures):
+				column_norm=iraf_norm(column, ap_dict[ap][0][4], ap_dict[ap][0][3])
+				lines=np.polynomial.legendre.legval(column_norm, np.array(ap_dict[ap][0][5:]))
+				fig=figure(0)
+				ax=fig.add_subplot(111)
+				ax.plot(column,lines, 'k-')
+				ax.set_ylim(-3,3)
+				ax.set_title(ap)
+
+				# find nearest well traced aperture
+				dist_min=10000.
+				ap_min=0
+				for ap_i in range(1,393):
+					if abs(ap_dict[ap][1]-ap_dict[ap_i][1])<dist_min and ap_i!=ap and ap_i not in set(failed_apertures):
+						dist_min=abs(ap_dict[ap][1]-ap_dict[ap_i][1])
+						ap_min=ap_i
+				
+				ap_dict[ap]=ap_dict[ap_min]
+
+				try:
+					column_norm=iraf_norm(column, ap_dict[ap_min][0][4], ap_dict[ap_min][0][3])
+					lines=np.polynomial.legendre.legval(column_norm, np.array(ap_dict[ap_min][0][5:]))
+					ax.plot(column,lines, 'r-')
+				except:
+					pass
+				#show()
+
+			# write new apmasterflat and replace poorly traced apertures with corrected ones
+			f=open(cob+"/apmasterflat", "r")
+			g=open(cob+"/apmasterflat_cor", "w")
+			start=False
+			for line in f:
+				l=line.strip().split()
+				if len(l)==6:
+					ap_i=int(l[3])
+				if len(l)==2 and l[0]=='curve':
+					start=True
+					g.write('\tcurve\t'+str(ap_dict[ap_i][0][0])+'\n')
+					n=0
+				elif len(l)==1 and start and n+1<len(ap_dict[ap_i][0]):
+					n+=1
+					g.write('\t\t'+str(ap_dict[ap_i][0][n])+'\n')
+				elif len(l)==1 and start and n+1>=len(ap_dict[ap_i][0]):
+					pass
+				else:
+					g.write(line)
+					start=False
+				if len(l)==0:
+					start=False
+
+			f.close()
+			g.close()
+			
+			#extract apertures again
+			os.chdir(cob)
+			os.remove('masterflat.ms.fits')
+			shutil.move('apmasterflat_cor', 'apmasterflat')
+			iraf.apall(input='masterflat.fits', format='multispec', referen='masterflat', interac='no', find='no', recenter='no', resize='no', edit='no', trace='no', fittrac='no', extract='yes', extras='no', review='no', line=2000, lower=-3, upper=3, llimit=-3, ulimit=3, nfind=392, maxsep=45, minsep=5, width=4.5, radius=3, ylevel='0.3', shift='no', t_order=5, t_niter=5, t_low_r=3, t_high_r=3, t_sampl='1:4095', t_nlost=1, npeaks=392, bkg='no', b_order=7, nsum=-10, background='none')
+			os.chdir('../../../..')
+			iraf.flprcache()
+
+
+
+
+
+			"""
+			if len(line.strip())>0 and line.strip().split()[0]=='begin': 
+				ap=int(line.strip().split()[3])
+				pos=float(line.strip().split()[5])-1 # -1 is because iraf starts counting with 1 and python with 0.
+				ap_dict[ap]=[[pos], None, [], []] # items are default position and trace polynomials in apmasterflat file, fitted profile, two arrays for fitted crosstalk (p cross talk and m cross talk)
+				ap_dict_initial[ap]=pos
+			if len(line.strip())>0 and line.strip().split()[0]=='curve':
+				start=True
+			if start and len(line.strip().split())==1:
+				ap_dict[ap][0].append(float(line.strip().split()[0]))
+			if len(line.strip().split())==0:
+				start=False
+			"""
 
 
 def plot_apertures(date,cob_id,ccd):
