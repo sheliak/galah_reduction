@@ -864,10 +864,14 @@ def find_apertures(date, start_folder):
 			g.close()
 			
 			#extract apertures again
+			#moving files is necessary, because iraf crshes, when extracting masterflat again. Hence masterflat_cor is created, extracted, and renamed into msterflat.
 			os.chdir(cob)
-			os.remove('masterflat.ms.fits')
+			shutil.move('masterflat.fits', 'masterflat_cor.fits')
 			shutil.move('apmasterflat_cor', 'apmasterflat')
-			iraf.apall(input='masterflat.fits', format='multispec', referen='masterflat', interac='no', find='no', recenter='no', resize='no', edit='no', trace='no', fittrac='no', extract='yes', extras='no', review='no', line=2000, lower=-3, upper=3, llimit=-3, ulimit=3, nfind=392, maxsep=45, minsep=5, width=4.5, radius=3, ylevel='0.3', shift='no', t_order=5, t_niter=5, t_low_r=3, t_high_r=3, t_sampl='1:4095', t_nlost=1, npeaks=392, bkg='no', b_order=7, nsum=-10, background='none')
+			iraf.apall(input='masterflat_cor.fits', format='multispec', referen='masterflat', interac='no', find='no', recenter='no', resize='no', edit='no', trace='no', fittrac='no', extract='yes', extras='no', review='no', line=2000, lower=-3, upper=3, llimit=-3, ulimit=3, nfind=392, maxsep=45, minsep=5, width=4.5, radius=3, ylevel='0.3', shift='no', t_order=5, t_niter=5, t_low_r=3, t_high_r=3, t_sampl='1:4095', t_nlost=1, npeaks=392, bkg='no', b_order=7, nsum=-10, background='none')
+			shutil.move('masterflat_cor.ms.fits', 'masterflat.ms.fits')
+			shutil.move('masterflat_cor.fits', 'masterflat.fits')
+			os.remove('apmasterflat_cor')
 			os.chdir('../../../..')
 			iraf.flprcache()
 
