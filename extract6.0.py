@@ -3333,7 +3333,7 @@ def create_final_spectra_proc(args):
 					hdul[extension].header['WAV_OK']=(wav_flag, 'Is wav. solution OK? 1=yes, 0=no')
 					#fibre throughput
 					fibre_throughput=fib_thr[ap]
-					hdul[extension].header['FIB_THR']=(fibre_throughput, 'Fibre throughput relative to best fibre in field')
+					hdul[extension].header['FIB_THR']=(fibre_throughput, 'Fibre throughput relative to best fibre in fld')
 					#cross-talk
 					hdul[extension].header['CROSS_OK']=(aperture_flags_dict[ap][2], 'is cross-talk calculated reliably? 1=yes, 0=no')
 					#write down the LSF 
