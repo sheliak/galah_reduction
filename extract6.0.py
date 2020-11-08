@@ -3311,7 +3311,7 @@ def create_final_spectra_proc(args):
 					hdul[extension].header['RVCOM_OK']=('None', 'Did RV pipeline converge? 1=yes, 0=no')
 					hdul[extension].header['TEFF']=('None', 'T_eff in K')
 					hdul[extension].header['LOGG']=('None', 'log g in log cm/s^2')
-					hdul[extension].header['MET']=('None', 'Metallicity in dex')#more parameters?
+					hdul[extension].header['FE_H']=('None', 'iron abundance in dex')#more parameters?
 					hdul[extension].header['PAR_OK']=('None', 'Are parameters trustworthy? 1=yes, 0=no')
 					#set exposure of the resolution profile to the same value as for spectra
 					hdul[extension].header['EXPOSED']=hdul[0].header['EXPOSED']
@@ -3647,7 +3647,6 @@ def create_database(date):
 	cols.append(fits.Column(name='e_rv_com', format='E', unit='km/s', null=None))
 	cols.append(fits.Column(name='teff', format='E', unit='K', null=None))
 	cols.append(fits.Column(name='logg', format='E', unit='cm / s^-2', null=None))
-	cols.append(fits.Column(name='met', format='E', null=None))
 	cols.append(fits.Column(name='fe_h', format='E', null=None))
 	cols.append(fits.Column(name='obs_comment', format='A56'))
 	cols.append(fits.Column(name='pipeline_version', format='A5'))
@@ -3737,8 +3736,8 @@ def create_database(date):
 		if teff=='None': teff=None
 		logg=header1['LOGG']
 		if logg=='None': logg=None
-		met=header1['MET']
-		if met=='None': met=None
+		feh=header1['FE_H']
+		if feh=='None': feh=None
 		pipeline_version=header1['PIPE_VER']
 		obs_comment=header1['COMM_OBS'].replace(',', ';')
 		#bin mask reduction flags
@@ -3763,7 +3762,7 @@ def create_database(date):
 		if header1['PAR_OK']==0: flag+=131072#parameters are calculated over all arms, so this flag is the same for all 4 ccds
 
 		#add parameters into the table
-		table.add_row([sobject, ra, dec, mjd, utdate, epoch, aperture, pivot, fibre, fibre_x, fibre_y, fibre_theta, plate, aperture_position, mean_ra, mean_dec, mean_zd, mean_ha, cfg_file, cfg_field_name, obj_name, galah_id, snr, fibre_throughput, res, b, v_bary_eff, exposed, mag, wav_rms, wav_n_lines, rv, e_rv, rv_com, e_rv_com, teff, logg, met, obs_comment, pipeline_version, flag])
+		table.add_row([sobject, ra, dec, mjd, utdate, epoch, aperture, pivot, fibre, fibre_x, fibre_y, fibre_theta, plate, aperture_position, mean_ra, mean_dec, mean_zd, mean_ha, cfg_file, cfg_field_name, obj_name, galah_id, snr, fibre_throughput, res, b, v_bary_eff, exposed, mag, wav_rms, wav_n_lines, rv, e_rv, rv_com, e_rv_com, teff, logg, feh, obs_comment, pipeline_version, flag])
 
 	#write table to hdu
 	hdu=fits.BinTableHDU(table)
@@ -3811,7 +3810,7 @@ def create_database(date):
 	header['TTYPE35']=(header['TTYPE35'], 'combined rv uncertainty')
 	header['TTYPE36']=(header['TTYPE36'], 'effective tmperature')
 	header['TTYPE37']=(header['TTYPE37'], 'log of surface gravitational acceleration')
-	header['TTYPE38']=(header['TTYPE38'], 'metallicity ([M/H])')
+	header['TTYPE38']=(header['TTYPE38'], 'iron abundance ([Fe/H])')
 	header['TTYPE39']=(header['TTYPE39'], 'comments by observer')
 	header['TTYPE40']=(header['TTYPE40'], 'pipeline evrsion')
 	header['TTYPE41']=(header['TTYPE41'], 'reduction flags given as a binary mask')
