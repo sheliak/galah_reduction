@@ -1956,6 +1956,7 @@ def resolution_profile_proc(arg):
 	hdul.close()
 
 	res_points=[]
+	res_points_poor=[]
 	b_values=[]
 	for ap in range(1,393):
 		line=ap-1  # line in array is different than aperture number
@@ -1963,7 +1964,7 @@ def resolution_profile_proc(arg):
 		#ax=fig.add_subplot(311)
 		#ax.plot(data[line], 'k-')
 		# find peaks positions
-		peaks,properties=signal.find_peaks(data[line], width=(3.0,8.0), distance=10, height=100.0, prominence=1.0)
+		peaks,properties=signal.find_peaks(data[line], width=(3.0,8.0), distance=10, height=75.0, prominence=1.0)
 		widths=properties['widths']
 		heights=properties['peak_heights']
 		# accept only some strongest peaks
@@ -2001,25 +2002,46 @@ def resolution_profile_proc(arg):
 		widths=np.array(widths_fit)
 		# remember peaks widths and B values
 		b_values.append(b_median)
-		if len(sorted_ind)>2*n_of_lines_dict[ccd]:  # there must be at least
+		if len(sorted_ind)>n_of_lines_dict[ccd]*1.5:  # there must be at least this many lines, or the resolution profile will be unreliable
 			for i,j in zip(peaks[(peaks>20)&(peaks<4076)],widths[(peaks>20)&(peaks<4076)]):  # 20 px at each edge are truncated, because width cannot be measured correctly
 				res_points.append([ap,i,j])
+		if len(sorted_ind)>n_of_lines_dict[ccd]-10:  # something might be done with fewer points
+			for i,j in zip(peaks[(peaks>20)&(peaks<4076)],widths[(peaks>20)&(peaks<4076)]):  # 20 px at each edge are truncated, because width cannot be measured correctly
+				res_points_poor.append([ap,i,j])
+
 
 		#ax2.set_ylim(4,6)
 		#ax3.set_ylim(2.0,3.8)
 		#show()
 
-	np.save(cob+'/b_values', np.array(b_values))
 	res_points=np.array(res_points)
+	res_points_poor=np.array(res_points_poor)
+
+	if len(res_points)>0 and len(set(res_points[:,0]))>300:
+                working_with_poor_data=False
+        elif len(res_points_poor)>0 and len(set(res_points_poor[:,0]))>300:
+                working_with_poor_data=True
+                res_points=res_points_poor
+		extract_log.warning('COB %s has an arc frame with too few lines to reliably measure the resolution profile.' % (cob))
+        else:
+		extract_log.warning('COB %s has an arc frame with too few lines to measure the resolution profile at all.' % (cob))
+                return 0
+
+	np.save(cob+'/b_values', np.array(b_values))
+
 	#fig=figure(0)
 	#ax=fig.add_subplot(141)
+
 	cc=res_points[:,2]#-0.0005*res_points[:,1]
 	#ax.scatter(res_points[:,1], res_points[:,0], c=cc, vmin=np.percentile(cc,2), vmax=np.percentile(cc,85), s=3, lw=0)
 
 	# fit smooth model
 	mask=np.array([True]*len(cc), dtype=bool)
 	for n in range(10):
-		p_init = polynomial.Chebyshev2D(x_degree=3, y_degree=3)
+		if working_with_poor_data:
+			p_init = polynomial.Chebyshev2D(x_degree=2, y_degree=2)
+		else:
+			p_init = polynomial.Chebyshev2D(x_degree=3, y_degree=3)
 		fit_p = fitting.LevMarLSQFitter()
 		p = fit_p(p_init, res_points[:,1][mask], res_points[:,0][mask], cc[mask])
 		std=np.std(cc-p(res_points[:,1], res_points[:,0]))
@@ -2046,7 +2068,10 @@ def resolution_profile_proc(arg):
 	cc=cc-np.array(cc_new)
 	mask=np.array([True]*len(cc), dtype=bool)
 	for n in range(10):
-		p_init = polynomial.Chebyshev2D(x_degree=3, y_degree=3)
+		if working_with_poor_data:
+			p_init = polynomial.Chebyshev2D(x_degree=2, y_degree=2)
+		else:
+			p_init = polynomial.Chebyshev2D(x_degree=3, y_degree=3)
 		fit_p = fitting.LevMarLSQFitter()
 		p = fit_p(p_init, res_points[:,1][mask], res_points[:,0][mask], cc[mask])
 		std=np.std(cc-p(res_points[:,1], res_points[:,0]))
