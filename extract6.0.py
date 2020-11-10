@@ -150,6 +150,7 @@ def correct_ndfclass(hdul):
 	t_ra = h_head['MEANRA']
 	t_dec = h_head['MEANDEC']
 	f_data = Table(hdul['STRUCT.MORE.FIBRES'].data)
+	f_data = f_data[np.logical_and(f_data['RA'] != 0, f_data['DEC'] != 0)] 
 	f_ra = np.rad2deg(np.median(f_data['RA']))
 	f_dec = np.rad2deg(np.median(f_data['DEC']))
 	t_coord = SkyCoord(ra=t_ra*u.deg, dec=t_dec*u.deg)
@@ -2902,6 +2903,11 @@ def remove_telurics(date):
 		for cob in cobs:	
 			files=glob.glob("%s/[01-31]*.fits" % cob)
 			valid_files=[]
+
+			if len(files) == 0:
+				extract_log.warning('Teluric fit and removal will not be performed for ccd %d of COB %s.' % (ccd, cob.split('/')[-1]))
+				continue 
+
 			for f in files:
 				if '.ms' not in f: valid_files.append(f)
 			
@@ -2975,7 +2981,11 @@ def remove_telurics(date):
 					# if this is the first time fitting this exposure, start from arbitrary initial conditions
 					params = Parameters()
 					params.add('scale_h2o', value=0.9, min=0.01, max=2.0)
-					params.add('scale_o2', value=0.1, min=0.01, max=2.0)
+					# O2 can only be estimated on certain ccds 
+					if ccd == 4 or ccd == 2: 
+						params.add('scale_o2', value=0.1, min=0.01, max=2.0, vary=True)
+					else:
+						params.add('scale_o2', value=0.1, min=0.01, max=2.0, vary=False)
 					params.add('vr', value=0.0, min=-0.05, max=0.05)
 					if ccd==4: 
 						params.add('res', value=98.0, min=85, max=110)
@@ -3336,7 +3346,7 @@ def create_final_spectra_proc(args):
 					hdul[extension].header['RVCOM_OK']=('None', 'Did RV pipeline converge? 1=yes, 0=no')
 					hdul[extension].header['TEFF']=('None', 'T_eff in K')
 					hdul[extension].header['LOGG']=('None', 'log g in log cm/s^2')
-					hdul[extension].header['FE_H']=('None', 'iron abundance in dex')#more parameters?
+					hdul[extension].header['FE_H']=('None', 'Iron abundance in dex')#more parameters?
 					hdul[extension].header['PAR_OK']=('None', 'Are parameters trustworthy? 1=yes, 0=no')
 					#set exposure of the resolution profile to the same value as for spectra
 					hdul[extension].header['EXPOSED']=hdul[0].header['EXPOSED']
@@ -3632,6 +3642,7 @@ def create_database(date):
 		Add checks for possible missing ccds
 
 	"""
+	extract_log.info('Creating an database with information about spectra') 
 
 	# Create empty table for this night
 	cols=[]
@@ -3687,22 +3698,43 @@ def create_database(date):
 
 	for sobject in sobjects:
 		#open all four (for four ccds) headers.
+		headers = []
 		file1="reductions/results/%s/spectra/com/%s1.fits" % (date, sobject)
-		hdul1=fits.open(file1)
-		header1=hdul1[0].header
-		hdul1.close()
+		if os.path.isfile(file1): 
+			hdul1=fits.open(file1)
+			header1=hdul1[0].header
+			hdul1.close()
+			headers.append(header1)
+		else:
+			headers.append(None)
+
 		file2="reductions/results/%s/spectra/com/%s2.fits" % (date, sobject)
-		hdul2=fits.open(file2)
-		header2=hdul2[0].header
-		hdul2.close()
+		if os.path.isfile(file2): 
+			hdul2=fits.open(file2)
+			header2=hdul2[0].header
+			hdul2.close()
+			headers.append(header2)
+		else:
+			headers.append(None)
+
 		file3="reductions/results/%s/spectra/com/%s3.fits" % (date, sobject)
-		hdul3=fits.open(file3)
-		header3=hdul3[0].header
-		hdul3.close()
+		if os.path.isfile(file3):
+			hdul3=fits.open(file3)
+			header3=hdul3[0].header
+			hdul3.close()
+			headers.append(header3)
+		else:
+			headers.append(None)
+
 		file4="reductions/results/%s/spectra/com/%s4.fits" % (date, sobject)
-		hdul4=fits.open(file4)
-		header4=hdul4[0].header
-		hdul4.close()
+		has_ccd4 = os.path.isfile(file4)
+		if has_ccd4:
+			hdul4=fits.open(file4)
+			header4=hdul4[0].header
+			hdul4.close()
+			headers.append(header4)
+		else:
+			headers.append(None)
 
 		#read parameters from headers
 		ra=header1['RA_OBJ']
@@ -3722,7 +3754,7 @@ def create_database(date):
 		fibre_theta=header1['THETA']
 		plate=header1['PLATE']
 		if plate=='None': plate=None
-		aperture_position=[header1['AP_POS'], header2['AP_POS'], header3['AP_POS'], header4['AP_POS']]
+		aperture_position = [header_ccd['AP_POS'] if header_ccd is not None else None for header_ccd in headers]
 		cfg_file=header1['CFG_FILE'].replace(',', ';')#replace commas, so the don't interfere with a csv version of the database
 		if cfg_file=='None': cfg_file=None
 		cfg_field_name=header1['OBJECT'].replace(',', ';')
@@ -3732,26 +3764,26 @@ def create_database(date):
 		galah_id=header1['GALAH_ID']
 		if galah_id=='None': galah_id=-1#not sure why None is not working here
 		mag=header1['mag']
-		wav_rms=[header1['WAV_RMS'], header2['WAV_RMS'], header3['WAV_RMS'], header4['WAV_RMS']]
+		wav_rms = [header_ccd['WAV_RMS'] if header_ccd is not None else None for header_ccd in headers]
 		wav_rms=[None if i=='None' else i for i in wav_rms]
-		wav_n_lines=[header1['WAVLINES'], header2['WAVLINES'], header3['WAVLINES'], header4['WAVLINES']]
+		wav_n_lines = [header_ccd['WAVLINES'] if header_ccd is not None else '0/0' for header_ccd in headers]
 		wav_n_lines_arr=[None if i=='None' else i for i in wav_n_lines]
 		wav_n_lines=''.join([i.ljust(7, ' ') for i in wav_n_lines_arr])#weird formating because of astropy bugs
-		snr=[header1['SNR'], header2['SNR'], header3['SNR'], header4['SNR']]
+		snr = [header_ccd['SNR'] if header_ccd is not None else None for header_ccd in headers]
 		snr=[None if i=='None' else i for i in snr]
-		fibre_throughput=[header1['FIB_THR'], header2['FIB_THR'], header3['FIB_THR'], header4['FIB_THR']]
+		fibre_throughput = [header_ccd['FIB_THR'] if header_ccd is not None else None for header_ccd in headers]
 		fibre_throughput=[None if i=='None' else i for i in fibre_throughput]
-		res=[header1['RES'], header2['RES'], header3['RES'], header4['RES']]
+		res = [header_ccd['RES'] if header_ccd is not None else None for header_ccd in headers]
 		res=[None if i=='None' else i for i in res]
-		b=[header1['B'], header2['B'], header3['B'], header4['B']]
+		b = [header_ccd['B'] if header_ccd is not None else None for header_ccd in headers]
 		b=[None if i=='None' else i for i in b]
 		v_bary_eff=header1['BARYEFF']
 		if v_bary_eff=='None': v_bary_eff=None
 		exposed=header1['EXPOSED']
 		if exposed=='None': exposed=None
-		rv=[header1['rv'], header2['rv'], header3['rv'], header4['rv']]
+		rv = [header_ccd['rv'] if header_ccd is not None else None for header_ccd in headers]
 		rv=[None if i=='None' else i for i in rv]
-		e_rv=[header1['E_RV'], header2['E_RV'], header3['E_RV'], header4['E_RV']]
+		e_rv = [header_ccd['E_RV'] if header_ccd is not None else None for header_ccd in headers]
 		e_rv=[None if i=='None' else i for i in e_rv]
 		rv_com=header1['rvcom']
 		if rv_com=='None': rv_com=None
@@ -3770,21 +3802,22 @@ def create_database(date):
 		if header1['TRACE_OK']==0: flag+=1
 		if header2['TRACE_OK']==0: flag+=2
 		if header3['TRACE_OK']==0: flag+=4
-		if header4['TRACE_OK']==0: flag+=8
 		if header1['WAV_OK']==0: flag+=16
 		if header2['WAV_OK']==0: flag+=32
 		if header3['WAV_OK']==0: flag+=64
-		if header4['WAV_OK']==0: flag+=128
 		if header1['CROSS_OK']==0: flag+=256
 		if header2['CROSS_OK']==0: flag+=512
 		if header3['CROSS_OK']==0: flag+=1024
-		if header4['CROSS_OK']==0: flag+=2048
 		if header1['RV_OK']==0: flag+=4096
 		if header2['RV_OK']==0: flag+=8192
 		if header3['RV_OK']==0: flag+=16384
-		if header4['RV_OK']==0: flag+=32768
 		if header1['RVCOM_OK']==0: flag+=65536#this one is the same in all 4 ccds
 		if header1['PAR_OK']==0: flag+=131072#parameters are calculated over all arms, so this flag is the same for all 4 ccds
+		if has_ccd4:
+			if header4['TRACE_OK']==0: flag+=8
+			if header4['WAV_OK']==0: flag+=128
+			if header4['CROSS_OK']==0: flag+=2048
+			if header4['RV_OK']==0: flag+=32768
 
 		#add parameters into the table
 		table.add_row([sobject, ra, dec, mjd, utdate, epoch, aperture, pivot, fibre, fibre_x, fibre_y, fibre_theta, plate, aperture_position, mean_ra, mean_dec, mean_zd, mean_ha, cfg_file, cfg_field_name, obj_name, galah_id, snr, fibre_throughput, res, b, v_bary_eff, exposed, mag, wav_rms, wav_n_lines, rv, e_rv, rv_com, e_rv_com, teff, logg, feh, obs_comment, pipeline_version, flag])
@@ -3793,7 +3826,7 @@ def create_database(date):
 	hdu=fits.BinTableHDU(table)
 
 	#write hdu to file
-	hdu.writeto('reductions/results/%s/db/%s.fits' % (date, date))
+	hdu.writeto('reductions/results/%s/db/%s.fits' % (date, date), overwrite=True)
 
 	#open table again and add comments to all columns. MAKE SURE THESE ARE IN THE RIGHT ORDER
 	hdul=fits.open('reductions/results/%s/db/%s.fits' % (date, date), mode='update')
