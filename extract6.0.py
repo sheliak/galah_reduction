@@ -759,7 +759,7 @@ def find_apertures(date, start_folder):
 			# trace apertures on masterflat
 			iraf.apextract.database=start_folder+'/'+cob
 			os.chdir(cob)
-			check=iraf.apall(input='masterflat.fits', format='multispec', referen='masterflat', interac='no', find='no', recenter='yes', resize='no', edit='yes', trace='yes', fittrac='yes', extract='yes', extras='no', review='yes', line=2000, lower=-3, upper=3, llimit=-3, ulimit=3, nfind=392, maxsep=45, minsep=5, width=4.5, radius=3, ylevel='0.3', shift='no', t_order=5, t_niter=5, t_low_r=3, t_high_r=3, t_sampl='1:4095', t_nlost=1, npeaks=392, bkg='no', b_order=7, nsum=-10, background='none', Stdout=1)
+			check=iraf.apall(input='masterflat.fits', format='multispec', referen='masterflat', interac='no', find='no', recenter='yes', resize='no', edit='yes', trace='yes', fittrac='yes', extract='yes', extras='no', review='no', line=2000, lower=-3, upper=3, llimit=-3, ulimit=3, nfind=392, maxsep=45, minsep=5, width=4.5, radius=3, ylevel='0.3', shift='no', t_order=5, t_niter=5, t_low_r=3, t_high_r=3, t_sampl='1:4095', t_nlost=1, npeaks=392, bkg='no', b_order=7, nsum=-10, background='none', Stdout=1)
 			# extract another flat 1 px wide. This is better for measuring fibre throughputs
 			#check2=iraf.apall(input='masterflat.fits', output='masterflat1px.ms.fits', format='multispec', referen='masterflat', interac='no', find='no', recenter='yes', resize='yes', edit='yes', trace='yes', fittrac='yes', extract='yes', extras='no', review='yes', line=2000, lower=-0.5, upper=0.5, llimit=-0.5, ulimit=0.5, nfind=392, maxsep=45, minsep=5, width=4.5, radius=3, ylevel='0.3', shift='no', t_order=5, t_niter=5, t_low_r=3, t_high_r=3, t_sampl='1:4095', t_nlost=1, npeaks=392, bkg='no', b_order=7, nsum=-10, background='none', Stdout=1)
 			os.chdir('../../../..')
@@ -841,57 +841,42 @@ def find_apertures(date, start_folder):
 			f=open(cob+"/apmasterflat", "r")
 			g=open(cob+"/apmasterflat_cor", "w")
 			start=False
+
 			for line in f:
 				l=line.strip().split()
 				if len(l)==6:
 					ap_i=int(l[3])
 				if len(l)==2 and l[0]=='curve':
 					start=True
-					g.write('\tcurve\t'+str(ap_dict[ap_i][0][0])+'\n')
 					n=0
-				elif len(l)==1 and start and n+1<len(ap_dict[ap_i][0]):
-					n+=1
-					g.write('\t\t'+str(ap_dict[ap_i][0][n])+'\n')
-				elif len(l)==1 and start and n+1>=len(ap_dict[ap_i][0]):
-					pass
-				else:
-					g.write(line)
-					start=False
 				if len(l)==0:
 					start=False
+				if start:
+					n+=1
+				if start and n>10 and ap_i in set(failed_apertures):
+					g.write('\t\t0.0\n')
+				elif start and n>5 and ap_i in set(failed_apertures):
+					g.write('\t\t%s\n' % str(ap_dict[ap_i][0][n-1]))
+				else:
+					g.write(line)
 
 			f.close()
 			g.close()
-			
+
+
 			#extract apertures again
-			#moving files is necessary, because iraf crshes, when extracting masterflat again. Hence masterflat_cor is created, extracted, and renamed into msterflat.
 			os.chdir(cob)
-			shutil.move('masterflat.fits', 'masterflat_cor.fits')
 			shutil.move('apmasterflat_cor', 'apmasterflat')
-			iraf.apall(input='masterflat_cor.fits', format='multispec', referen='masterflat', interac='no', find='no', recenter='no', resize='no', edit='no', trace='no', fittrac='no', extract='yes', extras='no', review='no', line=2000, lower=-3, upper=3, llimit=-3, ulimit=3, nfind=392, maxsep=45, minsep=5, width=4.5, radius=3, ylevel='0.3', shift='no', t_order=5, t_niter=5, t_low_r=3, t_high_r=3, t_sampl='1:4095', t_nlost=1, npeaks=392, bkg='no', b_order=7, nsum=-10, background='none')
-			shutil.move('masterflat_cor.ms.fits', 'masterflat.ms.fits')
-			shutil.move('masterflat_cor.fits', 'masterflat.fits')
-			os.remove('apmasterflat_cor')
+			os.remove('masterflat.ms.fits')
+			os.remove('aplast')
+			iraf.unlearn('apall')
+			iraf.unlearn('apextract')
+			iraf.apextract.database=start_folder+'/'+cob
+			iraf.apextract.dispaxis=1
+			#iraf.apall(input='masterflat.fits', format='multispec', referen='masterflat', interac='no', find='no', recenter='no', resize='no', edit='no', trace='no', fittrac='no', extract='yes', extras='no', review='no', line=2000, lower=-3, upper=3, llimit=-3, ulimit=3, nfind=392, maxsep=45, minsep=5, width=4.5, radius=3, ylevel='0.3', shift='no', t_order=5, t_niter=5, t_low_r=3, t_high_r=3, t_sampl='1:4095', t_nlost=1, npeaks=392, bkg='no', b_order=7, nsum=-10, background='none')
+			iraf.apsum(input='masterflat.fits', format='multispec', referen='masterflat', interac='no', find='no', recenter='no', resize='no', edit='no', trace='no', fittrace='no', extract='yes', extras='no', review='no')
 			os.chdir('../../../..')
 			iraf.flprcache()
-
-
-
-
-
-			"""
-			if len(line.strip())>0 and line.strip().split()[0]=='begin': 
-				ap=int(line.strip().split()[3])
-				pos=float(line.strip().split()[5])-1 # -1 is because iraf starts counting with 1 and python with 0.
-				ap_dict[ap]=[[pos], None, [], []] # items are default position and trace polynomials in apmasterflat file, fitted profile, two arrays for fitted crosstalk (p cross talk and m cross talk)
-				ap_dict_initial[ap]=pos
-			if len(line.strip())>0 and line.strip().split()[0]=='curve':
-				start=True
-			if start and len(line.strip().split())==1:
-				ap_dict[ap][0].append(float(line.strip().split()[0]))
-			if len(line.strip().split())==0:
-				start=False
-			"""
 
 
 def plot_apertures(date,cob_id,ccd):
@@ -2018,14 +2003,14 @@ def resolution_profile_proc(arg):
 	res_points_poor=np.array(res_points_poor)
 
 	if len(res_points)>0 and len(set(res_points[:,0]))>300:
-                working_with_poor_data=False
-        elif len(res_points_poor)>0 and len(set(res_points_poor[:,0]))>300:
-                working_with_poor_data=True
-                res_points=res_points_poor
+		working_with_poor_data=False
+	elif len(res_points_poor)>0 and len(set(res_points_poor[:,0]))>300:
+		working_with_poor_data=True
+		res_points=res_points_poor
 		extract_log.warning('COB %s has an arc frame with too few lines to reliably measure the resolution profile.' % (cob))
-        else:
+	else:
 		extract_log.warning('COB %s has an arc frame with too few lines to measure the resolution profile at all.' % (cob))
-                return 0
+		return 0
 
 	np.save(cob+'/b_values', np.array(b_values))
 
