@@ -814,11 +814,11 @@ def find_apertures(date, start_folder):
 			for ap in set(failed_apertures):
 				column_norm=iraf_norm(column, ap_dict[ap][0][4], ap_dict[ap][0][3])
 				lines=np.polynomial.legendre.legval(column_norm, np.array(ap_dict[ap][0][5:]))
-				fig=figure(0)
-				ax=fig.add_subplot(111)
-				ax.plot(column,lines, 'k-')
-				ax.set_ylim(-3,3)
-				ax.set_title(ap)
+				#fig=figure(0)
+				#ax=fig.add_subplot(111)
+				#ax.plot(column,lines, 'k-')
+				#ax.set_ylim(-3,3)
+				#ax.set_title(ap)
 
 				# find nearest well traced aperture
 				dist_min=10000.
@@ -874,8 +874,8 @@ def find_apertures(date, start_folder):
 			iraf.unlearn('apextract')
 			iraf.apextract.database=start_folder+'/'+cob
 			iraf.apextract.dispaxis=1
-			#iraf.apall(input='masterflat.fits', format='multispec', referen='masterflat', interac='no', find='no', recenter='no', resize='no', edit='no', trace='no', fittrac='no', extract='yes', extras='no', review='no', line=2000, lower=-3, upper=3, llimit=-3, ulimit=3, nfind=392, maxsep=45, minsep=5, width=4.5, radius=3, ylevel='0.3', shift='no', t_order=5, t_niter=5, t_low_r=3, t_high_r=3, t_sampl='1:4095', t_nlost=1, npeaks=392, bkg='no', b_order=7, nsum=-10, background='none')
-			iraf.apsum(input='masterflat.fits', format='multispec', referen='masterflat', interac='no', find='no', recenter='no', resize='no', edit='no', trace='no', fittrace='no', extract='yes', extras='no', review='no')
+			iraf.apall(input='masterflat.fits', format='multispec', referen='masterflat', interac='no', find='no', recenter='no', resize='no', edit='no', trace='no', fittrac='no', extract='yes', extras='no', review='no', line=2000, lower=-3, upper=3, llimit=-3, ulimit=3, nfind=392, maxsep=45, minsep=5, width=4.5, radius=3, ylevel='0.3', shift='no', t_order=5, t_niter=5, t_low_r=3, t_high_r=3, t_sampl='1:4095', t_nlost=1, npeaks=392, bkg='no', b_order=7, nsum=-10, background='none')
+			#iraf.apsum(input='masterflat.fits', format='multispec', referen='masterflat', interac='no', find='no', recenter='no', resize='no', edit='no', trace='no', fittrace='no', extract='yes', extras='no', review='no')
 			os.chdir('../../../..')
 			iraf.flprcache()
 
@@ -2360,7 +2360,7 @@ def plot_spectra(date, cob_id, ccd):
 		#load failed apertures
 		failed_apertures=np.load('reductions/%s/ccd%s/%s/failed_apertures.npy' % (date, ccd, cob_id))
 
-		iraf.continuum(input=file, output='reductions/%s/ccd%s/%s/norm.tmp'  % (date, ccd, cob_id), order=5, interactive='no', low_reject=2.5, high_reject=0.0, niterate=7, naverage=11)
+		iraf.continuum(input=file, output='reductions/%s/ccd%s/%s/norm.tmp'  % (date, ccd, cob_id), order=5, interactive='no', low_reject=2.5, high_reject=0.0, niterate=7, naverage=1)
 		hdul=fits.open(file)
 		data_orig=hdul[0].data
 		hdul.close
@@ -3079,11 +3079,22 @@ def create_final_spectra_proc(args):
 		if os.path.exists(cob+'/b_values.npy'): b_values=np.load(cob+'/b_values.npy')
 		else: b_values=np.array([2.0]*392)
 
-		#make a normalized spectrum, because this will be added to the final fits files
-		iraf.continuum(input=file, output='/'.join(file.split('/')[:-1])+'/norm_'+file.split('/')[-1], order=5, interactive='no', low_reject=2.0, high_reject=0.0, niterate=5, naverage=11, Stdout="/dev/null")
+		# regions over which the normalisation is calculated
+		norm_regions={1:"4700:4841,4876:4920", 2:"*", 3:"6460:6547,6582:6760", 4:"7570:7594,7614:7622.5,7640:7910"}
+
+		# make a normalized spectrum, because this will be added to the final fits files
+		# first we make a very rough fit to supress any strong cosmic rays. Then we do it for real and delete the temporary files
+		iraf.continuum(input=file, output='/'.join(file.split('/')[:-1])+'/normtmp_'+file.split('/')[-1], order=2, interactive='no', replace='yes', low_reject=10.0, high_reject=10.0, niterate=3, naverage=1, grow=0, type='data')
+		iraf.hedit(images='/'.join(file.split('/')[:-1])+'/normtmp_'+file.split('/')[-1], fields='SFIT,SFITB', delete='yes', verify='no', show='no', update='yes')
+		iraf.continuum(input='/'.join(file.split('/')[:-1])+'/normtmp_'+file.split('/')[-1], output='/'.join(file.split('/')[:-1])+'/normfit_'+file.split('/')[-1], order=5, function='legendre', interactive='no', replace='no', low_reject=1.1, high_reject=3.5, niterate=5, naverage=3, grow=0, sample=norm_regions[ccd], type='fit')
+		iraf.sarith(input1=file, op='/', input2='/'.join(file.split('/')[:-1])+'/normfit_'+file.split('/')[-1], output='/'.join(file.split('/')[:-1])+'/norm_'+file.split('/')[-1])
+		os.remove('/'.join(file.split('/')[:-1])+'/normtmp_'+file.split('/')[-1])
+		os.remove('/'.join(file.split('/')[:-1])+'/normfit_'+file.split('/')[-1])
+		iraf.flprcache()
 
 		#make a sqrt spectrum for adding errors to it
 		iraf.sarith(input1=file, op='^', input2='-0.5', output='/'.join(file.split('/')[:-1])+'/err_'+file.split('/')[-1], apertures='', Stdout="/dev/null")
+		iraf.flprcache()
 
 		#linearize all spectra
 		extract_log.info('Linearizing spectra.')
@@ -3248,7 +3259,10 @@ def create_final_spectra_proc(args):
 				#load fitting results for wavelength solution
 				wav_dict=np.load(cob+'/wav_fit.npy')
 				#load fibre throughputs
-				fib_thr=np.load(cob+'/fibre_throughputs.npy')
+				if os.path.exists(cob+'/fibre_throughputs.npy'):
+					fib_thr=np.load(cob+'/fibre_throughputs.npy')
+				else:
+					fib_thr=None
 				#write to fits
 				for extension in range(8):
 					#clean header
@@ -3352,7 +3366,10 @@ def create_final_spectra_proc(args):
 					if wav_rms=='None' or wav_rms>0.2: wav_flag=0
 					hdul[extension].header['WAV_OK']=(wav_flag, 'Is wav. solution OK? 1=yes, 0=no')
 					#fibre throughput
-					fibre_throughput=fib_thr[ap]
+					if fib_thr!= None:
+						fibre_throughput=fib_thr[ap]
+					else:
+						fibre_throughput='None'
 					hdul[extension].header['FIB_THR']=(fibre_throughput, 'Fibre throughput relative to best fibre in fld')
 					#cross-talk
 					hdul[extension].header['CROSS_OK']=(aperture_flags_dict[ap][2], 'is cross-talk calculated reliably? 1=yes, 0=no')
