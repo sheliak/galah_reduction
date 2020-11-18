@@ -110,8 +110,8 @@ def get_parameters_nn(sobjects, logging=None, processes=1):
             spec_data[i_s, idx_use] = use_spec_flx
 
     # treat possible missing values
-    idx_bad_spec = np.where(np.logical_not(np.isfinite(spec_data)))[0]
-    n_bad_spectra = len(idx_bad_spec)
+    idx_bad_spec = np.where(np.logical_not(np.isfinite(spec_data)))
+    n_bad_spectra = len(idx_bad_spec[0])
     if n_bad_spectra > 0:
         # replace nan values with theoretical continuum flux value
         _write_out('Replacing %s nan pixels' % (n_bad_spectra), prio=0, logging=logging)

@@ -133,7 +133,7 @@ def correct_ndfclass(hdul):
 		return None
 
 	# handle uncommon exposure classes
-	if orig_class in ['MFFLX', 'LFLAT']:
+	if orig_class in ['MFFLX', 'LFLAT', 'DARK']:
 		return orig_class
 
 	# bias should always be determined correctly
