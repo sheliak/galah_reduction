@@ -1,6 +1,10 @@
 # GALAH reduction pipeline
 
+This is a package of programs and tools used to reduce spectra obtained by the HERMES instrument at the AAO. They are being developed to reduce data obtained by the GALAH survey and related programs. It is not guranateed to produce trustworthy results or work at all for data outside the GALAH ecosystem. 
+
 # Installation
+
+GALAH reduction pipeline does not need to be installed. It depends on the following software that is needed to run the reduction pipeline.
 
 **Dependencies**
 
@@ -19,8 +23,9 @@
  - joblib
  - h5py
  - galah_tools (included in this repository)
- - tesndorflow 2.1.0 (the latest version working on python2.7)
+ - tensorflow 2.1.0 (the latest version working on python2.7)
  - keras 2.3.1 (this is the latest version that works with tensorflow 2.1.0)
+ - dustmaps (follow installation instructions at https://dustmaps.readthedocs.io/en/latest/installation.html and download Planck maps)
 
 **Iraf installation**
 
@@ -38,14 +43,6 @@ $ conda config --add channels http://ssb.stsci.edu/astroconda
 $ conda install iraf-all pyraf-all
 ```
 
-# Before running - optional
-
-Iraf needs to know which configuration file to use. If you want to set some custom parameters, create a login.cl file in the folder from which you will run the reduction procedure. To create an ifraf login.cl file with default setting run the following command:
-```
-$ mkiraf
-```
-This step is optional as iraf will instead use settings from the default login.cl file. Which login.cl file is used is displayed when pyraf is run. 
-
 # How to run the pipeline
 
 **1. RUNNING COMPLETE REDUCTION PIPELINE**
@@ -60,7 +57,7 @@ where `/path/to/settings.py` is a path to the settings file you are using.
 
 **2. RUNNING MINIMAL REDUCTION**
 
-The pipeline will make a minimal reduction to get 1D spectra. This preview is useful for quick checks during observations. Comming soon.
+Comming soon.
 
 **3. PARTIAL REDUCTION**
 
@@ -86,14 +83,16 @@ Spectral information and physical parameters of spectra in an individual night w
 
 **1. MERGE DATABASES**
 
-To create a final combined database of all spectra, a procedure `merge_db.py` has to be run for every individual night. It will create a `dr6.0.fits` and `dr6.0.csv` files in the directory `../reductions/`
+After one night is reduced, the reduction database is created for that night only. If you are happy with the results, you can merge it into a global database that includes results for multiple nights. Script `merge_db.py` in `utils` does that for you. It will merge the database for one night into `dr6.0.fits` and `dr6.0.csv` files (or create them, if they don't exist yet) in the `reductions/` directory.
 
 **2. HDF5 SPECTRAL DATABASE (optional)**
 
-If you prefer to have all spectra combined into a single hdf5 file, the procedure `create_hdf5_database.py` that is located in the utils folder. It will read the final merged database and save all mentioned combined spectra into the `dr6.0_com.hdf5` file. This procedure takes a long time if the number of spectra is large.
+If you prefer to have all spectra combined into a single hdf5 file, the procedure `create_hdf5_database.py` that is located in the `utils` folder. It will read the final merged database and save all combined spectra into a `dr6.0_com.hdf5` file. This procedure takes a long time if the number of spectra is large.
 
 # Known errors and issues
  - **Not enough space in image header**: Find login.cl file and raise the `min_lenuserarea` parameter (also uncomment it, if commented before).
  - **Your "iraf" and "IRAFARCH" environment variables are not defined**: define them as instructed. Do it in bash.rc permanently.
  - **Image xxxxxx already exists**: You are trying to override previous reductions. Delete `../reductions` folder (or part thereof) and try again.
  - **Memory error: You don't have enough memory to run the code with current settings**. Change `ncpu` parameters to a lower value and try again.
+ - **ERROR (827, "Cannot open image (masterflat.ms.fits)")**. You failed to do some mandatory reduction steps. Check your settings file.
+
