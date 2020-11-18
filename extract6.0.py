@@ -3711,7 +3711,7 @@ def create_database(date):
 	cols.append(fits.Column(name='fe_h', format='E', null=None))
 	cols.append(fits.Column(name='obs_comment', format='A56'))
 	cols.append(fits.Column(name='pipeline_version', format='A5'))
-	cols.append(fits.Column(name='reduction_flags', format='I'))
+	cols.append(fits.Column(name='reduction_flags', format='J'))
 	hdu=fits.BinTableHDU.from_columns(cols)
 	table=Table.read(hdu)	
 
@@ -3886,7 +3886,7 @@ def create_database(date):
 	header['TTYPE27']=(header['TTYPE27'], 'mean barycentric velocity (already corrected)')
 	header['TTYPE28']=(header['TTYPE28'], 'total exposure time')
 	header['TTYPE29']=(header['TTYPE29'], 'magnitude as given in cfg_file')
-	header['TTYPE30']=(header['TTYPE30'], 'terminal E(B-V) from planck maps')
+	header['TTYPE30']=(header['TTYPE30'], 'terminal E(B-V) from Planck maps')
 	header['TTYPE31']=(header['TTYPE31'], 'RMS of wavlength calibr. in 4 CCDs')
 	header['TTYPE32']=(header['TTYPE32'], 'number of lines found/used for wav. cal.')
 	header['TTYPE33']=(header['TTYPE33'], 'radial velocity in 4 CCDs')
