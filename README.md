@@ -1,5 +1,7 @@
 # GALAH reduction pipeline
 
+This is a package of programs and tools used to reduce spectra obtained by the HERMES instrument at the AAO. They are being developed to reduce data obtained by the GALAH survey and related programs. It is not guranateed to produce trustworthy results or work at all for data outside the GALAH ecosystem. 
+
 # Installation
 
 GALAH reduction pipeline does not need to be installed. It depends on the following software that is needed to run the reduction pipeline.
