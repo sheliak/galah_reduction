@@ -30,6 +30,7 @@ import ephem
 from scipy.optimize import curve_fit
 import argparse
 from parameters_nn import get_parameters_nn
+from dustmaps.planck import PlanckQuery
 
 # possible NDFCLASS values in human readable form
 ndfclass_types={'MFFFF':'fibre flat', 'MFARC':'arc', 'MFOBJECT':'object', 'BIAS':'bias'}
@@ -3052,6 +3053,8 @@ def create_final_spectra_proc(args):
 	ccd, cob, files, plot_diag = args
 	date=cob.split('/')[1]
 
+	planck = PlanckQuery()
+
 	# copy wavelength solution diagnostics plot
 	wvl_file = cob+'/wav_'+cob.split('/')[-1]+'00xxx'+str(ccd)+'.png'
 	# initiate copy only if the file exists - handle missing ccds in some cobs
@@ -3060,6 +3063,7 @@ def create_final_spectra_proc(args):
 
 	# save individual spectra
 	for file in files:
+
 		#create a dict from fibre table
 		fibre_table_file='/'.join(file.split('/')[:-1])+'/fibre_table_'+file.split('/')[-1].replace('.ms', '')
 		hdul=fits.open(fibre_table_file)
@@ -3072,8 +3076,22 @@ def create_final_spectra_proc(args):
 				pass
 			else: 
 				n+=1
-				fibre_table_dict[n]=np.append(np.array(i), np.array([fibre+1]))
-		fibre_table_dict=defaultdict(lambda:np.array(['FIBRE NOT IN USE', 0.0, 0.0, 0, 0, 0, 0, 0.0, 'N', 0, 0.0, 0, 'Not in use', '0', 0.0, 0.0, 0.0, fibre+1]), fibre_table_dict)
+				fibre_table_dict[n]=np.append(np.array(i), [np.array([fibre+1]), 0.0])
+		fibre_table_dict=defaultdict(lambda:np.array(['FIBRE NOT IN USE', 0.0, 0.0, 0, 0, 0, 0, 0.0, 'N', 0, 0.0, 0, 'Not in use', '0', 0.0, 0.0, 0.0, fibre+1, 'None']), fibre_table_dict)
+
+		# create extinction array to be added to fibre_table_dict
+		# query of the Planck map should be done once for all coordinates, hence this is done here and not individually for every fibre
+		ext_ra=[]
+		ext_dec=[]
+		for ap in range(1,393):
+			ext_ra.append(float(fibre_table_dict[ap][1])/np.pi*180.)
+			ext_dec.append(float(fibre_table_dict[ap][2])/np.pi*180.)
+		coords = SkyCoord(ext_ra, ext_dec, unit='deg', frame='icrs')
+		ext_planck=planck(coords)
+
+		for ap in range(1,393):
+			fibre_table_dict[ap][18]=round(float(ext_planck[ap-1]),4)
+
 
 		#read saved b_values
 		if os.path.exists(cob+'/b_values.npy'): b_values=np.load(cob+'/b_values.npy')
@@ -3086,7 +3104,7 @@ def create_final_spectra_proc(args):
 		# first we make a very rough fit to supress any strong cosmic rays. Then we do it for real and delete the temporary files
 		iraf.continuum(input=file, output='/'.join(file.split('/')[:-1])+'/normtmp_'+file.split('/')[-1], order=2, interactive='no', replace='yes', low_reject=10.0, high_reject=10.0, niterate=3, naverage=1, grow=0, type='data')
 		iraf.hedit(images='/'.join(file.split('/')[:-1])+'/normtmp_'+file.split('/')[-1], fields='SFIT,SFITB', delete='yes', verify='no', show='no', update='yes')
-		iraf.continuum(input='/'.join(file.split('/')[:-1])+'/normtmp_'+file.split('/')[-1], output='/'.join(file.split('/')[:-1])+'/normfit_'+file.split('/')[-1], order=5, function='legendre', interactive='no', replace='no', low_reject=1.1, high_reject=3.5, niterate=5, naverage=3, grow=0, sample=norm_regions[ccd], type='fit')
+		iraf.continuum(input='/'.join(file.split('/')[:-1])+'/normtmp_'+file.split('/')[-1], output='/'.join(file.split('/')[:-1])+'/normfit_'+file.split('/')[-1], order=11, function='legendre', interactive='no', replace='no', low_reject=1.1, high_reject=3.5, niterate=5, naverage=3, grow=0, sample=norm_regions[ccd], type='fit')
 		iraf.sarith(input1=file, op='/', input2='/'.join(file.split('/')[:-1])+'/normfit_'+file.split('/')[-1], output='/'.join(file.split('/')[:-1])+'/norm_'+file.split('/')[-1])
 		os.remove('/'.join(file.split('/')[:-1])+'/normtmp_'+file.split('/')[-1])
 		os.remove('/'.join(file.split('/')[:-1])+'/normfit_'+file.split('/')[-1])
@@ -3223,7 +3241,7 @@ def create_final_spectra_proc(args):
 				hdul.close()
 				#add data
 				hdul=fits.open('reductions/results/%s/spectra/all/%s' % (date,filename), mode='update')
-				#read some info drom fibre table
+				#read some info from fibre table
 				object_name=fibre_table_dict[ap][0]
 				ra=float(fibre_table_dict[ap][1])/np.pi*180.
 				dec=float(fibre_table_dict[ap][2])/np.pi*180.
@@ -3233,6 +3251,7 @@ def create_final_spectra_proc(args):
 				y=fibre_table_dict[ap][4]
 				theta=fibre_table_dict[ap][7]
 				mag=fibre_table_dict[ap][10]
+				ebv=fibre_table_dict[ap][18]
 				#check aperture flags
 				aperture_flags_dict={}
 				a=open('%s/aplast' % (cob))
@@ -3333,6 +3352,8 @@ def create_final_spectra_proc(args):
 					hdul[extension].header['TRACE_OK']=(aperture_flags_dict[ap][1], 'Is aperture trace OK? 1=yes, 0=no')
 					#magnitude
 					hdul[extension].header['MAG']=(float(mag), 'magnitude from the .fld file')
+					#E(B-V)
+					hdul[extension].header['E_B-V']=(ebv, 'Terminal color excess queried from Planck maps')
 					#origin
 					hdul[extension].header['ORIGIN']='IRAF reduction pipeline'
 					hdul[extension].header['PIPE_VER']=('6.0', 'IRAF reduction pipeline version')
@@ -3366,7 +3387,7 @@ def create_final_spectra_proc(args):
 					if wav_rms=='None' or wav_rms>0.2: wav_flag=0
 					hdul[extension].header['WAV_OK']=(wav_flag, 'Is wav. solution OK? 1=yes, 0=no')
 					#fibre throughput
-					if fib_thr!= None:
+					if fib_thr is not None:
 						fibre_throughput=fib_thr[ap]
 					else:
 						fibre_throughput='None'
@@ -3408,6 +3429,7 @@ def create_final_spectra_proc(args):
 				hdul.close()
 
 				iraf.flprcache()
+
 
 	extract_log.info('Combining individual spectra.')
 	#save combined spectra
@@ -3677,6 +3699,7 @@ def create_database(date):
 	cols.append(fits.Column(name='v_bary_eff', format='E', unit='km/s'))
 	cols.append(fits.Column(name='exposed', format='E', unit='s'))
 	cols.append(fits.Column(name='mag', format='E'))
+	cols.append(fits.Column(name='e_b-v', format='E'))
 	cols.append(fits.Column(name='wav_rms', format='4E', unit='km/s', null=None))
 	cols.append(fits.Column(name='wav_n_lines', format='28A7'))
 	cols.append(fits.Column(name='rv', format='4E', unit='km/s', null=None))
@@ -3766,6 +3789,7 @@ def create_database(date):
 		galah_id=header1['GALAH_ID']
 		if galah_id=='None': galah_id=-1#not sure why None is not working here
 		mag=header1['mag']
+		ebv=header1['E_B-V']
 		wav_rms = [header_ccd['WAV_RMS'] if header_ccd is not None else None for header_ccd in headers]
 		wav_rms=[None if i=='None' else i for i in wav_rms]
 		wav_n_lines = [header_ccd['WAVLINES'] if header_ccd is not None else '0/0' for header_ccd in headers]
@@ -3822,7 +3846,7 @@ def create_database(date):
 			if header4['RV_OK']==0: flag+=32768
 
 		#add parameters into the table
-		table.add_row([sobject, ra, dec, mjd, utdate, epoch, aperture, pivot, fibre, fibre_x, fibre_y, fibre_theta, plate, aperture_position, mean_ra, mean_dec, mean_zd, mean_ha, cfg_file, cfg_field_name, obj_name, galah_id, snr, fibre_throughput, res, b, v_bary_eff, exposed, mag, wav_rms, wav_n_lines, rv, e_rv, rv_com, e_rv_com, teff, logg, feh, obs_comment, pipeline_version, flag])
+		table.add_row([sobject, ra, dec, mjd, utdate, epoch, aperture, pivot, fibre, fibre_x, fibre_y, fibre_theta, plate, aperture_position, mean_ra, mean_dec, mean_zd, mean_ha, cfg_file, cfg_field_name, obj_name, galah_id, snr, fibre_throughput, res, b, v_bary_eff, exposed, mag, ebv, wav_rms, wav_n_lines, rv, e_rv, rv_com, e_rv_com, teff, logg, feh, obs_comment, pipeline_version, flag])
 
 	#write table to hdu
 	hdu=fits.BinTableHDU(table)
@@ -3862,21 +3886,22 @@ def create_database(date):
 	header['TTYPE27']=(header['TTYPE27'], 'mean barycentric velocity (already corrected)')
 	header['TTYPE28']=(header['TTYPE28'], 'total exposure time')
 	header['TTYPE29']=(header['TTYPE29'], 'magnitude as given in cfg_file')
-	header['TTYPE30']=(header['TTYPE30'], 'RMS of wavlength calibr. in 4 CCDs')
-	header['TTYPE31']=(header['TTYPE31'], 'number of lines found/used for wav. cal.')
-	header['TTYPE32']=(header['TTYPE32'], 'radial velocity in 4 CCDs')
-	header['TTYPE33']=(header['TTYPE33'], 'rv uncertainty in 4 CCDs')
-	header['TTYPE34']=(header['TTYPE34'], 'rv combined from all arms')
-	header['TTYPE35']=(header['TTYPE35'], 'combined rv uncertainty')
-	header['TTYPE36']=(header['TTYPE36'], 'effective tmperature')
-	header['TTYPE37']=(header['TTYPE37'], 'log of surface gravitational acceleration')
-	header['TTYPE38']=(header['TTYPE38'], 'iron abundance ([Fe/H])')
-	header['TTYPE39']=(header['TTYPE39'], 'comments by observer')
-	header['TTYPE40']=(header['TTYPE40'], 'pipeline evrsion')
-	header['TTYPE41']=(header['TTYPE41'], 'reduction flags given as a binary mask')
+	header['TTYPE30']=(header['TTYPE30'], 'terminal E(B-V) from planck maps')
+	header['TTYPE31']=(header['TTYPE31'], 'RMS of wavlength calibr. in 4 CCDs')
+	header['TTYPE32']=(header['TTYPE32'], 'number of lines found/used for wav. cal.')
+	header['TTYPE33']=(header['TTYPE33'], 'radial velocity in 4 CCDs')
+	header['TTYPE34']=(header['TTYPE34'], 'rv uncertainty in 4 CCDs')
+	header['TTYPE35']=(header['TTYPE35'], 'rv combined from all arms')
+	header['TTYPE36']=(header['TTYPE36'], 'combined rv uncertainty')
+	header['TTYPE37']=(header['TTYPE37'], 'effective tmperature')
+	header['TTYPE38']=(header['TTYPE38'], 'log of surface gravitational acceleration')
+	header['TTYPE39']=(header['TTYPE39'], 'iron abundance ([Fe/H])')
+	header['TTYPE40']=(header['TTYPE40'], 'comments by observer')
+	header['TTYPE41']=(header['TTYPE41'], 'pipeline evrsion')
+	header['TTYPE42']=(header['TTYPE42'], 'reduction flags given as a binary mask')
 
 	#fix bug in astropy (formating of string arrays. Last 7 is dropped when data is inserted)
-	header['TFORM31']='28A7'#this is wav_n_lines column
+	header['TFORM32']='28A7'#this is wav_n_lines column
 	hdul.close()
 
 	#set table name
