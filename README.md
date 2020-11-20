@@ -45,9 +45,9 @@ $ conda install iraf-all pyraf-all
 
 # How to run the pipeline
 
-**1. RUNNING COMPLETE REDUCTION PIPELINE**
+**1. RUNNING COMPLETE REDUCTION PIPELINE USING run.py SCRIPT**
 
-All parameters, including which nights to reduce, are set in the settings.py file. 
+All parameters, including which nights to reduce, are set in the `settings.py` file. 
 
 To run the reduction do
 ```
@@ -57,15 +57,19 @@ where `/path/to/settings.py` is a path to the settings file you are using.
 
 File `settings.py` defines which reductions steps will be performed. Those marked with `(optional)` can be skipped and the pipeline should perform the rest with no issues. 
 
-**2. RUNNING MINIMAL REDUCTION**
+**2. RUNNING COMPLETE REDUCTION PIPELINE WITH A CUSTOM SET OF INSTRUCTIONS**
 
-Comming soon.
+Coming soon
 
-**3. PARTIAL REDUCTION**
+**3. RUNNING MINIMAL REDUCTION**
+
+Coming soon.
+
+**4. PARTIAL REDUCTION**
 
 If only part of the reduction is performed, the intermediate results can be saved and the reduction pipeline can resume from where it previously finished. This can not be done if any reduction step returned errors or the reduction was interrupted while performing a step.
 
-**4. REDUCING DATA NOT IN GALAH FORMAT**
+**5. REDUCING DATA NOT IN GALAH FORMAT**
 
 GALAH stores data in a specific order (uses specific filenames, folder structure, comment files etc.). Data with a different structure can be reduced, if the initial reduction steps are bypassed. In any case, the reduction will only work with data taken with the HERMES instrument.
 
