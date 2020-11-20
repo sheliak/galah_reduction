@@ -55,17 +55,15 @@ python run.py /path/to/settings.py
 ```
 where `/path/to/settings.py` is a path to the settings file you are using.
 
+File `settings.py` defines which reductions steps will be performed. Those marked with `(optional)` can be skipped and the pipeline should perform the rest with no issues. 
+
 **2. RUNNING MINIMAL REDUCTION**
 
 Comming soon.
 
 **3. PARTIAL REDUCTION**
 
-Reduction steps that will be performed are listed at the end of `extract6.0.py`. If only some steps are performed, the reduction can be run again with only the remaining steps. This is most useful for testing. That way, you don't have to run the whole pipeline every time.
-
-Warning: **DO NOT** run the same reduction step multiple times on the same data as they are not overwritten. The pipeline also does not check if the selected step was already performed. Therefore data could get manipulated multiple times, providing wrong final results. This warning also holds true for the step called `prepare_dir`.
-
-When calling a part of the pipeline, you will have to manually define the `date` and `cobs` variables. They are currently determined as part of a longer procedure that prepares and copies original observed data.
+If only part of the reduction is performed, the intermediate results can be saved and the reduction pipeline can resume from where it previously finished. This can not be done if any reduction step returned errors or the reduction was interrupted while performing a step.
 
 **4. REDUCING DATA NOT IN GALAH FORMAT**
 
