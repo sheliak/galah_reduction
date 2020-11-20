@@ -67,6 +67,54 @@ Warning: **DO NOT** run the same reduction step multiple times on the same data 
 
 When calling a part of the pipeline, you will have to manually define the `date` and `cobs` variables. They are currently determined as part of a longer procedure that prepares and copies original observed data.
 
+**4. REDUCING DATA NOT IN GALAH FORMAT**
+
+GALAH stores data in a specific order (uses specific filenames, folder structure, comment files etc.). Data with a different structure can be reduced, if the initial reduction steps are bypassed. In any case, the reduction will only work with data taken with the HERMES instrument.
+
+1. You will have to remove bias, compensate for gain, fix bad pixels and rename files.
+1. Create the following structure in the `reductions` folder. Data from different nights must be collected in separate folders (named 200811 for data collected August 11 2020, for example). Fits files for each observed field must be in respective folders (named 2008110041 for filed starting with run number 0041, for example). Each of these files must contain exactly one flat field image and one arc image named masterflat.fits and masterarc.fits, respectively. There can be any number of science images (named 11avg10046.fits for run number 0046 taken with ccd 1, for example).
+```
+reductions
+|-- yymmdd (6 digit date number)
+|   |-- ccd1
+|   |   |-- yymmddrrrr (10 digit COB number)
+|   |   |   |-- masterflat.fits
+|   |   |   |-- masterarc.fits
+|   |   |   |-- ddmmm1rrrr.fits
+|   |   |   |-- ...
+|   |   |-- ...
+|   |
+|   |-- ccd2
+|   |   |-- yymmddrrrr (10 digit COB number)
+|   |   |   |-- masterflat.fits
+|   |   |   |-- masterarc.fits
+|   |   |   |-- ddmmm2rrrr.fits
+|   |   |   |-- ...
+|   |   |-- ...
+|   |   
+|   |-- ccd3
+|   |   |-- yymmddrrrr (10 digit COB number)
+|   |   |   |-- masterflat.fits
+|   |   |   |-- masterarc.fits
+|   |   |   |-- ddmmm3rrrr.fits
+|   |   |   |-- ...
+|   |   |-- ...
+|   |   
+|   |-- ccd4
+|   |   |-- yymmddrrrr (10 digit COB number)
+|   |   |   |-- masterflat.fits
+|   |   |   |-- masterarc.fits
+|   |   |   |-- ddmmm4rrrr.fits
+|   |   |   |-- ...
+|   |   |-- ...
+```
+3. Run the reduction pipeline as usual, skipping initial part of the reduction. You can set 
+```
+list_cobs = False
+initial = False
+```
+in the `settings.py` file.
+
 # Parameter estimation
 
 During the run, the pipeline will estimate rough stellar parameters and abundances, but won't provide any warning flags or uncertainties. Use the data with caution, especially the abundances.
