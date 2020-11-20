@@ -125,9 +125,9 @@ The estimation procedure is a convolutional neural network that was trained on s
 
 # Where are my reduced data
 
-During the run, the pipeline will, by default create several folders with intermediate results in your working directory. That is the folder you were in when you started the python pipeline. As the process is very read/write intensive select as fast memory as possible. After the pipeline has finished working, spectra combined from multiple exposures will be located in the directory `../reductions/results/yymmdd/spectra/com/`.
+During the reduction run two folders will be created in the `reductions` folder. `reductions/yymmdd/` will hold intermediate results, as well as all the files produced during the reduction. If the reduction is run all the way through (using `final = True` or `--final` option), the results will be saved in the `reductions/results/yymmdd/` folder. 
 
-Spectral information and physical parameters of spectra in an individual night will be gathered in a single database that can be found in the directory `../reductions/results/yymmdd/db/`. It is available as a fits and csv file. To combine results from multiple nights run the procedure `merge_db.py` that is located in the utils folder.
+To produce the final table (with all the parameters produced by the reduction pipeline) run the reduction with a setting `database = True` or `--database` flag. Table for each night will be saved in `/reductions/results/yymmdd/db/`. It is available as a .fits and .csv file.
 
 # After the pipeline has finished
 
