@@ -9,7 +9,10 @@ from astropy.table import Table
 import numpy as np
 import os
 import shutil
+stderr = sys.stderr
+sys.stderr = open(os.devnull, 'w')
 from pyraf import iraf
+sys.stderr = stderr
 from matplotlib import *
 from pylab import *
 import matplotlib.transforms as transforms
@@ -481,8 +484,8 @@ def remove_bias(date):
 	for ccd in [1,2,3,4]:
 		files=glob.glob("reductions/%s/ccd%s/biases/*.fits" % (date,ccd))
 		
-		if len(files)>=3:
-			extract_log.info("Found more than 2 biases thus using them")
+		if len(files)>=5:
+			extract_log.info("Found at least 5 biases and making proper bias subtraction for images from CCD %s." % ccd)
 			# create masterbias
 			biases=[]
 			for f in files:
@@ -501,7 +504,7 @@ def remove_bias(date):
 						hdu_c[0].data=hdu_c[0].data-masterbias
 						hdu_c.flush()
 		else: # if there are not enough biases, use overscan
-			extract_log.info("Found less than 3 biases thus using overscan")
+			extract_log.warning("Found less than 5 biases for CCD %s thus using overscan." % ccd)
 			files=glob.glob("reductions/%s/ccd%s/*/[01-31]*.fits" % (date,ccd))
 			for f in files:
 				if 'biases' in f: 
@@ -743,10 +746,11 @@ def find_apertures(date, start_folder):
 	iraf.unlearn('apall')
 	iraf.apextract.dispaxis=1
 
+	extract_log.info('Tracing apertures.')
+
 	for ccd in [1,2,3,4]:
 		cobs=glob.glob("reductions/%s/ccd%s/*" % (date,ccd))
 		for cob in cobs:
-			print cob
 			# shift reference flat, so the apertures will be found correctly and will always be in the same order
 			try:
 				hdul=fits.open(cob+'/masterflat.fits')
@@ -761,7 +765,7 @@ def find_apertures(date, start_folder):
 			# trace apertures on masterflat
 			iraf.apextract.database=start_folder+'/'+cob
 			os.chdir(cob)
-			check=iraf.apall(input='masterflat.fits', format='multispec', referen='masterflat', interac='no', find='no', recenter='yes', resize='no', edit='yes', trace='yes', fittrac='yes', extract='yes', extras='no', review='no', line=2000, lower=-3, upper=3, llimit=-3, ulimit=3, nfind=392, maxsep=45, minsep=5, width=4.5, radius=3, ylevel='0.3', shift='no', t_order=5, t_niter=5, t_low_r=3, t_high_r=3, t_sampl='1:4095', t_nlost=1, npeaks=392, bkg='no', b_order=7, nsum=-10, background='none', Stdout=1)
+			check=iraf.apall(input='masterflat.fits', format='multispec', referen='masterflat', interac='no', find='no', recenter='yes', resize='no', edit='yes', trace='yes', fittrac='yes', extract='yes', extras='no', review='no', line=2000, lower=-3, upper=3, llimit=-3, ulimit=3, nfind=392, maxsep=45, minsep=5, width=4.5, radius=3, ylevel='0.3', shift='no', t_order=5, t_niter=5, t_low_r=3, t_high_r=3, t_sampl='1:4095', t_nlost=1, npeaks=392, bkg='no', b_order=7, nsum=-10, background='none', Stdout=1, Stderr='/dev/null')
 			# extract another flat 1 px wide. This is better for measuring fibre throughputs
 			#check2=iraf.apall(input='masterflat.fits', output='masterflat1px.ms.fits', format='multispec', referen='masterflat', interac='no', find='no', recenter='yes', resize='yes', edit='yes', trace='yes', fittrac='yes', extract='yes', extras='no', review='yes', line=2000, lower=-0.5, upper=0.5, llimit=-0.5, ulimit=0.5, nfind=392, maxsep=45, minsep=5, width=4.5, radius=3, ylevel='0.3', shift='no', t_order=5, t_niter=5, t_low_r=3, t_high_r=3, t_sampl='1:4095', t_nlost=1, npeaks=392, bkg='no', b_order=7, nsum=-10, background='none', Stdout=1)
 			os.chdir('../../../..')
@@ -783,8 +787,7 @@ def find_apertures(date, start_folder):
 				failed_apertures_save.append(i)
 			np.save(cob+'/failed_apertures', np.array(failed_apertures_save))
 
-			print 'Failed apertures:', set(failed_apertures)
-			print 'Failed once:', set(failed_apertures_once)
+			if len(np.array(failed_apertures_save))>0: extract_log.warning('Some apertures did not trace correctly for COB %s. This is normal behaviour for a small number of apertures. Affected apertures are: %s' % (cob, ','.join(np.array(failed_apertures_save, dtype=str))))
 
 			# clear cache, or IRAF will have problems with files with the same name
 			iraf.flprcache()
@@ -1012,6 +1015,8 @@ def remove_scattered_proc(arg):
 	os.chdir(cob)
 	iraf.apextract.database=start_folder+'/'+cob
 
+	extract_log.info('Removing scattered light for image %s.' % file)
+
 	def fill_nans(im):
 		"""
 		Linearly interpolate nan values in an image
@@ -1116,7 +1121,7 @@ def remove_scattered(date, start_folder, ncpu=1):
 		poly=polyval2d(xx, yy, m)
 		return np.nansum(abs(image-poly))
 
-	extract_log.info('Removing scattered light.')
+	extract_log.info('Preparing to remove scattered light.')
 
 	iraf.noao(_doprint=0,Stdout="/dev/null")
 	iraf.twodspec(_doprint=0,Stdout="/dev/null")
@@ -1221,9 +1226,12 @@ def measure_cross_on_flat_proc(arg):
 
 	extract_log.info('Calculating cross talk for COB %s.' % cob)
 	# open masterflat
-	hdul=fits.open(cob+'/masterflat.fits')
-	data=hdul[0].data
-	hdul.close()
+	if os.path.exists(cob+'/masterflat.fits'):
+		hdul=fits.open(cob+'/masterflat.fits')
+		data=hdul[0].data
+		hdul.close()
+	else:
+		return 0
 
 	# open apertures file
 	f=open(cob+"/apmasterflat", "r")
@@ -2455,6 +2463,8 @@ def remove_sky_nearest(arg):
 		sky_ap=nearest_sky(ap)
 		if sky_ap==-1:
 			extract_log.error('There are no sky fibres in image %s.' % file)
+			os.chdir('../../../../')
+			return 0
 		if sky_ap_old!=sky_ap:
 			if os.path.exists(file+'sky.fits'):	os.remove(file+'sky.fits')
 			iraf.scopy(input=file, output=file+'sky.fits', apertures=sky_ap, Stdout="/dev/null")
@@ -2533,6 +2543,8 @@ def remove_sky_nearest3(arg):
 		sky_aps=nearest_3_sky(ap)
 		if sky_aps==-1:
 			extract_log.error('There are no sky fibres in image %s.' % file)
+			os.chdir('../../../../')
+			return 0
 		if os.path.exists(file+'sky1.fits'):	
 			os.remove(file+'sky1.fits')
 		if os.path.exists(file+'sky2.fits'):	
@@ -3507,10 +3519,9 @@ def create_final_spectra_proc(args):
 				to_combine = ','.join(filenames)
 				iraf.scombine(input=to_combine, output=ref_final_filename + '[append]', aperture='', group='all', combine='average', reject='none', first='no', scale='none', weight='!EXPOSED', Stdout="/dev/null")
 			else:
-				hdul = fits.open(ref_final_filename, mode='update')
-				hdul.append(fits.ImageHDU([0]))
-				hdul.close()
-				iraf.hedit(images=ref_final_filename + '[7]', fields="EXTNAME", value='resolution_profile', add='yes', addonly='no', delete='no', verify='no', show='no', update='yes', Stdout="/dev/null")
+				#if there was no resolution profile calculated, extensions cannot be combined. One extension is copied to perserve the header.
+				res_filename = 'reductions/results/'+str(date)+'/spectra/all/'+str(date)+files[0].split('/')[-1][6:10]+'00'+str(fibre_table_dict[ap][9]).zfill(3)+str(ccd)+'.fits'
+				iraf.scopy(input=res_filename + '[7]', output=ref_final_filename + '[append]', Stdout='/dev/null')
 			#add data
 			filenames=[]
 			for file in files:
