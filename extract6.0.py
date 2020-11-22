@@ -3347,7 +3347,7 @@ def create_final_spectra_proc(args):
 					#add average snr and average resolution
 					snr=1.0/np.nanmedian(hdul[2].data)
 					if np.isnan(snr) or np.isinf(snr): snr=0.0
-					hdul[extension].header['SNR']=(snr, 'Average SNR of the final spectrum')
+					hdul[extension].header['SNR']=(snr, 'Average SNR of the final spectrum per pixel')
 					hdul[extension].header['RES']=(np.nanmean(hdul[7].data), 'Average resolution (FWHM in angstroms)')
 					#add ra and dec of object
 					hdul[extension].header['RA_OBJ']=(ra, 'RA of object in degrees')
