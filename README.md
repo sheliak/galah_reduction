@@ -45,9 +45,9 @@ $ conda install iraf-all pyraf-all
 
 # How to run the pipeline
 
-**1. RUNNING COMPLETE REDUCTION PIPELINE**
+**1. RUNNING COMPLETE REDUCTION PIPELINE USING run.py SCRIPT**
 
-All parameters, including which nights to reduce, are set in the settings.py file. 
+All parameters, including which nights to reduce, are set in the `settings.py` file. 
 
 To run the reduction do
 ```
@@ -55,17 +55,67 @@ python run.py /path/to/settings.py
 ```
 where `/path/to/settings.py` is a path to the settings file you are using.
 
-**2. RUNNING MINIMAL REDUCTION**
+File `settings.py` defines which reductions steps will be performed. Those marked with `(optional)` can be skipped and the pipeline should perform the rest with no issues. 
 
-Comming soon.
+**2. RUNNING COMPLETE REDUCTION PIPELINE WITH A CUSTOM SET OF INSTRUCTIONS**
 
-**3. PARTIAL REDUCTION**
+Coming soon
 
-Reduction steps that will be performed are listed at the end of `extract6.0.py`. If only some steps are performed, the reduction can be run again with only the remaining steps. This is most useful for testing. That way, you don't have to run the whole pipeline every time.
+**3. RUNNING MINIMAL REDUCTION**
 
-Warning: **DO NOT** run the same reduction step multiple times on the same data as they are not overwritten. The pipeline also does not check if the selected step was already performed. Therefore data could get manipulated multiple times, providing wrong final results. This warning also holds true for the step called `prepare_dir`.
+Coming soon.
 
-When calling a part of the pipeline, you will have to manually define the `date` and `cobs` variables. They are currently determined as part of a longer procedure that prepares and copies original observed data.
+**4. PARTIAL REDUCTION**
+
+If only part of the reduction is performed, the intermediate results can be saved and the reduction pipeline can resume from where it previously finished. This can not be done if any reduction step returned errors or the reduction was interrupted while performing a step.
+
+**5. REDUCING DATA NOT IN GALAH FORMAT**
+
+GALAH stores data in a specific order (uses specific filenames, folder structure, comment files etc.). Data with a different structure can be reduced, if the initial reduction steps are bypassed. In any case, the reduction will only work with data taken with the HERMES instrument.
+
+1. You will have to remove bias, compensate for gain, fix bad pixels and rename files.
+1. Create the following structure in the `reductions` folder. Data from different nights must be collected in separate folders (named 200811 for data collected August 11 2020, for example). Fits files for each observed field must be in respective folders (named 2008110041 for filed starting with run number 0041, for example). Each of these files must contain exactly one flat field image and one arc image named masterflat.fits and masterarc.fits, respectively. There can be any number of science images (named 11avg10046.fits for run number 0046 taken with ccd 1, for example).
+```
+reductions
+|-- yymmdd (6 digit date number)
+|   |-- ccd1
+|   |   |-- yymmddrrrr (10 digit COB number)
+|   |   |   |-- masterflat.fits
+|   |   |   |-- masterarc.fits
+|   |   |   |-- ddmmm1rrrr.fits
+|   |   |   |-- ...
+|   |   |-- ...
+|   |
+|   |-- ccd2
+|   |   |-- yymmddrrrr (10 digit COB number)
+|   |   |   |-- masterflat.fits
+|   |   |   |-- masterarc.fits
+|   |   |   |-- ddmmm2rrrr.fits
+|   |   |   |-- ...
+|   |   |-- ...
+|   |   
+|   |-- ccd3
+|   |   |-- yymmddrrrr (10 digit COB number)
+|   |   |   |-- masterflat.fits
+|   |   |   |-- masterarc.fits
+|   |   |   |-- ddmmm3rrrr.fits
+|   |   |   |-- ...
+|   |   |-- ...
+|   |   
+|   |-- ccd4
+|   |   |-- yymmddrrrr (10 digit COB number)
+|   |   |   |-- masterflat.fits
+|   |   |   |-- masterarc.fits
+|   |   |   |-- ddmmm4rrrr.fits
+|   |   |   |-- ...
+|   |   |-- ...
+```
+3. Run the reduction pipeline as usual, skipping initial part of the reduction. You can set 
+```
+list_cobs = False
+initial = False
+```
+in the `settings.py` file.
 
 # Parameter estimation
 
@@ -75,9 +125,9 @@ The estimation procedure is a convolutional neural network that was trained on s
 
 # Where are my reduced data
 
-During the run, the pipeline will, by default create several folders with intermediate results in your working directory. That is the folder you were in when you started the python pipeline. As the process is very read/write intensive select as fast memory as possible. After the pipeline has finished working, spectra combined from multiple exposures will be located in the directory `../reductions/results/yymmdd/spectra/com/`.
+During the reduction run two folders will be created in the `reductions` folder. `reductions/yymmdd/` will hold intermediate results, as well as all the files produced during the reduction. If the reduction is run all the way through (using `final = True` or `--final` option), the results will be saved in the `reductions/results/yymmdd/` folder. 
 
-Spectral information and physical parameters of spectra in an individual night will be gathered in a single database that can be found in the directory `../reductions/results/yymmdd/db/`. It is available as a fits and csv file. To combine results from multiple nights run the procedure `merge_db.py` that is located in the utils folder.
+To produce the final table (with all the parameters produced by the reduction pipeline) run the reduction with a setting `database = True` or `--database` flag. Table for each night will be saved in `/reductions/results/yymmdd/db/`. It is available as a .fits and .csv file.
 
 # After the pipeline has finished
 
