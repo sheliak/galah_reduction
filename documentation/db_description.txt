@@ -6,6 +6,12 @@ dec	Declination in decimal degrees as given in the .fld file (file used to confi
 mjd	Modified UTC Julian date in the middle of the observation. If several observations are combined, the mjd is scalled with exposure times (but not with actual flux). Be careful when using mjd if observations over several epochs are combined.
 utdate	Date and time in the middle of the observation given in ISO 8601 format in UTC. If several observations are combined, the utdate is scalled with exposure times (but not with actual flux). Be careful when using utdate if observations over several epochs are combined.
 epoch	Decimal year in the middle of the observation in UTC. If several observations are combined, the epoch is scalled with exposure times (but not with actual flux). Be careful when using epoch if observations over several epochs are combined.
+mjd_s	Same as mjd, but at the beginning of the first exposure.
+utdate_s	Same as utdate, but at the beginning of the first exposure
+epoch_s	Same as epoch, but at the beginning of the first exposure.
+mjd_e	Same as mjd, but at the end of the first exposure.
+utdate_e	Same as utdate, but at the end of the first exposure
+epoch_e	Same as epoch, but at the end of the first exposure.
 aperture	Number given to a spectrum in the image. There are always 392 apertures in each image (one for each fibre, excluding guiding fibres).
 pivot	Number given to a fibre at the 2dF fibre positioner end of the fibre line. There are 400 pivots. This number is used in sobject_id.
 fibre	Number given to a fibre at the spectrograph end of the fibre line. There are 400 fibres.
@@ -22,7 +28,9 @@ cfg_file	Name of the file used to configure the observed field (a .fld file).
 cfg_field_name	Name of the field as given in the cfg_file.
 obj_name	Name of the object as given in the cfg_file (in the .fld file).
 galah_id	Identifier unique to a star used internally in GALAH. Must be given as an obj_name in the cfg_file in a format galahic_xxxxxxxxx.
-snr	Mean signal to noise ratio. Is an array with four numbers for blue, green, red and IR ccds.
+2mass_id	2MASS identifier. 
+snr	Mean signal to noise ratio per pixel. Is an array with four numbers for blue, green, red and IR ccds.
+snr_AA	Mean signal to noise ratio per Angstrom. Is an array with four numbers for blue, green, red and IR ccds.
 fibre_throughput	Fibre throughput measured relative to the most transparent fibre in each COB. Most transparent fibre has throughput=1.
 res	Mean resolution given as FWHM of the LSF in Angstroms.  Is an array with four numbers for blue, green, red and IR ccds.
 b_par	B parameter used to define the LSF. Is an array with four numbers for blue, green, red and IR ccds. B parameter is a constant for each spectrum in each ccd.
@@ -31,7 +39,7 @@ exposed	Total exposure time of all combined spectra in seconds.
 mag	Magnitude as given in the cfg_file.
 e_b-v	Color excess E(B-V) in magnitudes. This is the terminal color excess (as it would appear for objects far away). Real color excess for the observed star is expected to be lower than the given value. Parameter is queried from Planck maps.
 wav_rms	RMS of the wavelength calibration. Is an array with four numbers for blue, green, red and IR ccds. If spectra from different epochs are combined, only the worst RMS is given.
-wav_n_lines	Number of arc lines used for wavelength calibration in format xx/yy. xx is the number of found lines and yy is the number of lines used in the calibration.
+wav_n_lines	Number of arc lines used for wavelength calibration in format xx/yy. xx is the number of found lines and yy is the number of lines used in the calibration. This is an array for 4 CCDs.
 rv	Radial velocity measured for individual arms in km/s. Is an array with four numbers for blue, green, red and IR ccds.
 e_rv	Radial velocity uncertainty in km/s. Is an array with four numbers for blue, green, red and IR ccds.
 rv_com	Combined radial velocity in km/s. This is not a combination of radial velocities from four arms, but is measured again from combined likelihoods for rvs in four arms. 

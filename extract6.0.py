@@ -3341,40 +3341,43 @@ def create_final_spectra_proc(args):
 					if 'galahic' in object_name:
 						hdul[extension].header['GALAH_ID']=(object_name.split('_')[1], 'GALAH id number (if exists)')
 					else:
-						hdul[extension].header['GALAH_ID']='None'
+						hdul[extension].header['GALAH_ID']=('None', 'GALAH id number (if exists)')
+					#add 2MASS id
+					hdul[extension].header['2MASS_ID']=('None', '2MASS id (if exists)')
 					#add object name (first column in fibre table)
 					hdul[extension].header['OBJ_NAME']=(object_name, 'Object name from the .fld file')
 					#add average snr and average resolution
 					snr=1.0/np.nanmedian(hdul[2].data)
 					if np.isnan(snr) or np.isinf(snr): snr=0.0
 					hdul[extension].header['SNR']=(snr, 'Average SNR of the final spectrum per pixel')
-					hdul[extension].header['RES']=(np.nanmean(hdul[7].data), 'Average resolution (FWHM in angstroms)')
+					hdul[extension].header['SNR_AA']=(snr*np.sqrt(1.0/hdul[0].header['CDELT1']), 'Average SNR of the final spectrum per Angstrom')
+					hdul[extension].header['RES']=(np.nanmean(hdul[7].data), 'Average resolution (FWHM in Angstroms)')
 					#add ra and dec of object
 					hdul[extension].header['RA_OBJ']=(ra, 'RA of object in degrees')
 					hdul[extension].header['DEC_OBJ']=(dec, 'dec of object in degrees')
 					#fibre and pivot numbers
-					hdul[extension].header['APERTURE']=(ap, 'aperture number (1-392, in image)')
-					hdul[extension].header['PIVOT']=(int(pivot), 'pivot number (1-400, in 2dF)')
-					hdul[extension].header['FIBRE']=(int(fibre), 'fibre number (1-400, in image)')
+					hdul[extension].header['APERTURE']=(ap, 'Aperture number (1-392, in image)')
+					hdul[extension].header['PIVOT']=(int(pivot), 'Pivot number (1-400, in 2dF)')
+					hdul[extension].header['FIBRE']=(int(fibre), 'Fibre number (1-400, in image)')
 					hdul[extension].header['X']=(float(x), 'x position of fibre on plate in um')
 					hdul[extension].header['Y']=(float(y), 'y position of fibre on plate in um')
-					hdul[extension].header['THETA']=(float(theta), 'bend of fibre in degrees')
+					hdul[extension].header['THETA']=(float(theta), 'Bend of fibre in degrees')
 					#position of aperture on image
 					hdul[extension].header['AP_POS']=(aperture_flags_dict[ap][0], 'Position of aperture in image at x=2000')
 					hdul[extension].header['TRACE_OK']=(aperture_flags_dict[ap][1], 'Is aperture trace OK? 1=yes, 0=no')
 					#magnitude
-					hdul[extension].header['MAG']=(float(mag), 'magnitude from the .fld file')
+					hdul[extension].header['MAG']=(float(mag), 'Magnitude from the .fld file')
 					#E(B-V)
 					hdul[extension].header['E_B-V']=(ebv, 'Terminal color excess queried from Planck maps')
 					#origin
 					hdul[extension].header['ORIGIN']='IRAF reduction pipeline'
 					hdul[extension].header['PIPE_VER']=('6.0', 'IRAF reduction pipeline version')
 					#stellar parameters
-					hdul[extension].header['RV']=('None', 'radial velocity (one arm) in km/s')
-					hdul[extension].header['E_RV']=('None', 'radial velocity uncertainty in km/s')
+					hdul[extension].header['RV']=('None', 'Radial velocity (this CCD) in km/s')
+					hdul[extension].header['E_RV']=('None', 'Radial velocity uncertainty (this CCD) in km/s')
 					hdul[extension].header['RV_OK']=('None', 'Did RV pipeline converge? 1=yes, 0=no')
 					hdul[extension].header['RVCOM']=('None', 'Combined radial velocity in km/s')
-					hdul[extension].header['E_RVCOM']=('None', 'radial velocity uncertainty in km/s')
+					hdul[extension].header['E_RVCOM']=('None', 'Radial velocity uncertainty in km/s')
 					hdul[extension].header['RVCOM_OK']=('None', 'Did RV pipeline converge? 1=yes, 0=no')
 					hdul[extension].header['TEFF']=('None', 'T_eff in K')
 					hdul[extension].header['LOGG']=('None', 'log g in log cm/s^2')
@@ -3383,9 +3386,21 @@ def create_final_spectra_proc(args):
 					#set exposure of the resolution profile to the same value as for spectra
 					hdul[extension].header['EXPOSED']=hdul[0].header['EXPOSED']
 					#correct times
-					hdul[extension].header['UTMJD']=hdul[0].header['UTMJD']+hdul[0].header['EXPOSED']/3600./24./2.#svae MJD in the middle of teh exposure
+					hdul[extension].header['UTMJD']=(hdul[0].header['UTMJD']+hdul[0].header['EXPOSED']/3600./24./2., 'Mean MJD in UT')#save MJD in the middle of the exposure
 					tm=Time(hdul[extension].header['UTMJD'], format='mjd')
 					hdul[extension].header['UTDATE']=(tm.iso, 'Mean UT date in iso format')#save date and time in iso format in the middle of the exposure
+					# make sure EPOCH is the same time as UTMJD
+					hdul[extension].header['EPOCH']=(tm.decimalyear, 'Mean Epoch, decimal years C.E.')
+					# add times of the beginning of the exposure
+					hdul[extension].header['UTMJD_S']=(hdul[0].header['UTMJD']-hdul[0].header['EXPOSED']/3600./24./2., 'UTMJD at the start of exposure')#save MJD in at the beginning of the exposure
+					tm_s=Time(hdul[extension].header['UTMJD_S'], format='mjd')
+					hdul[extension].header['UTDATE_S']=(tm_s.iso, 'UT date in iso format at start of exposure')#save date and time in iso format at the beginning of the exposure
+					hdul[extension].header['EPOCH_S']=(tm_s.decimalyear, 'Epoch, decimal years C.E. at start of exposure')
+					# add times of the end of the exposure
+					hdul[extension].header['UTMJD_E']=(hdul[0].header['UTMJD']+hdul[0].header['EXPOSED']/3600./24./2., 'UTMJD at the end of exposure')#save MJD at the end of the exposure
+					tm_e=Time(hdul[extension].header['UTMJD_E'], format='mjd')
+					hdul[extension].header['UTDATE_E']=(tm_e.iso, 'UT date in iso format at end of exposure')#save date and time in iso format at the end of the exposure
+					hdul[extension].header['EPOCH_E']=(tm_e.decimalyear, 'Epoch, decimal years C.E. at end of exposure')
 					#convert start and end zd and ha to average ha and zd
 					hdul[extension].header['MEAN_ZD']=((hdul[0].header['ZDEND']+hdul[0].header['ZDSTART'])/2., 'Mean zenith distance')
 					hdul[extension].header['MEAN_HA']=((hdul[0].header['HAEND']+hdul[0].header['HASTART'])/2., 'Mean hour angle')
@@ -3545,14 +3560,31 @@ def create_final_spectra_proc(args):
 				for file in filenames:
 					mjd+=float(headers_dict[file]['UTMJD'])
 				hdul[extension].header['UTMJD']=mjd/len(filenames)
-				#combine epoch
-				epoch=0
+				#combine start of exposure UTMJD (UTMJD_S)
+				mjd=[]
 				for file in filenames:
-					epoch+=float(headers_dict[file]['EPOCH'])
-				hdul[extension].header['EPOCH']=epoch/len(filenames)
-				#combine times
+					mjd.append(float(headers_dict[file]['UTMJD_S']))
+				hdul[extension].header['UTMJD_S']=min(mjd)
+				#combine end of exposure UTMJD (UTMJD_S)
+				mjd=[]
+				for file in filenames:
+					mjd.append(float(headers_dict[file]['UTMJD_E']))
+				hdul[extension].header['UTMJD_E']=max(mjd)
+				#combine epoch
 				tm=Time(hdul[extension].header['UTMJD'], format='mjd')
+				hdul[extension].header['EPOCH']=tm.decimalyear
+				#combine start epoch
+				tm_s=Time(hdul[extension].header['UTMJD_S'], format='mjd')
+				hdul[extension].header['EPOCH_S']=tm_s.decimalyear
+				#combine end epoch
+				tm_e=Time(hdul[extension].header['UTMJD_E'], format='mjd')
+				hdul[extension].header['EPOCH_E']=tm_e.decimalyear
+				#combine times
 				hdul[extension].header['UTDATE']=(tm.iso, 'Mean UT date of all exposures in ISO format')
+				#combine beginning of exposure times
+				hdul[extension].header['UTDATE_S']=(tm_s.iso, 'UT date of start of first exposure in ISO format')
+				#combine end of exposure times
+				hdul[extension].header['UTDATE_E']=(tm_e.iso, 'UT date of end of last exposure in ISO format')
 				#add exposure times
 				exposed=0
 				for file in filenames:
@@ -3592,7 +3624,9 @@ def create_final_spectra_proc(args):
 				#edit combined SNR and resolution
 				snr=1.0/np.nanmedian(hdul[2].data)
 				if np.isnan(snr) or np.isinf(snr): snr=0.0
-				hdul[extension].header['SNR']=(snr, 'Average SNR of the final spectrum')
+				hdul[extension].header['SNR']=(snr, 'Average SNR of the final spectrum per pixel')
+				hdul[extension].header['SNR_AA']=(snr*np.sqrt(1.0/hdul[0].header['CDELT1']), 'Average SNR of the final spectrum per Angstrom')
+
 				hdul[extension].header['RES']=(np.nanmean(hdul[7].data), 'Average resolution (FWHM in Angstroms)')
 
 			hdul.close()
@@ -3687,6 +3721,12 @@ def create_database(date):
 	cols.append(fits.Column(name='mjd', format='D'))
 	cols.append(fits.Column(name='utdate', format='A23'))
 	cols.append(fits.Column(name='epoch', format='D'))
+	cols.append(fits.Column(name='mjd_s', format='D'))
+	cols.append(fits.Column(name='utdate_s', format='A23'))
+	cols.append(fits.Column(name='epoch_s', format='D'))
+	cols.append(fits.Column(name='mjd_e', format='D'))
+	cols.append(fits.Column(name='utdate_e', format='A23'))
+	cols.append(fits.Column(name='epoch_e', format='D'))
 	cols.append(fits.Column(name='aperture', format='I'))
 	cols.append(fits.Column(name='pivot', format='I'))
 	cols.append(fits.Column(name='fibre', format='I'))
@@ -3703,7 +3743,9 @@ def create_database(date):
 	cols.append(fits.Column(name='cfg_field_name', format='A56', null=None))
 	cols.append(fits.Column(name='obj_name', format='A48', null=None))
 	cols.append(fits.Column(name='galah_id', format='K', null=None))
+	cols.append(fits.Column(name='2mass', format='K', null=None))
 	cols.append(fits.Column(name='snr', format='4E', null=None))
+	cols.append(fits.Column(name='snr_AA', format='4E', null=None))
 	cols.append(fits.Column(name='fibre_throughput', format='4E', null=None))
 	cols.append(fits.Column(name='res', format='4E', null=None, unit='A'))
 	cols.append(fits.Column(name='b_par', format='4E', null=None))
@@ -3782,6 +3824,12 @@ def create_database(date):
 		mjd=header1['UTMJD']
 		utdate=header1['UTDATE']
 		epoch=header1['EPOCH']
+		mjd_s=header1['UTMJD_S']
+		utdate_s=header1['UTDATE_S']
+		epoch_s=header1['EPOCH_S']
+		mjd_e=header1['UTMJD_E']
+		utdate_e=header1['UTDATE_E']
+		epoch_e=header1['EPOCH_E']
 		aperture=header1['APERTURE']
 		pivot=header1['pivot']
 		fibre=header1['fibre']
@@ -3798,7 +3846,9 @@ def create_database(date):
 		obj_name=header1['OBJ_NAME'].replace(',', ';')
 		if obj_name=='None': obj_name=None
 		galah_id=header1['GALAH_ID']
-		if galah_id=='None': galah_id=-1#not sure why None is not working here
+		if galah_id=='None': galah_id=-1
+		tmass_id=header1['2MASS_ID']
+		if tmass_id=='None': tmass_id=-1
 		mag=header1['mag']
 		ebv=header1['E_B-V']
 		wav_rms = [header_ccd['WAV_RMS'] if header_ccd is not None else None for header_ccd in headers]
@@ -3808,6 +3858,8 @@ def create_database(date):
 		wav_n_lines=''.join([i.ljust(7, ' ') for i in wav_n_lines_arr])#weird formating because of astropy bugs
 		snr = [header_ccd['SNR'] if header_ccd is not None else None for header_ccd in headers]
 		snr=[None if i=='None' else i for i in snr]
+		snr_aa = [header_ccd['SNR_AA'] if header_ccd is not None else None for header_ccd in headers]
+		snr_aa=[None if i=='None' else i for i in snr_aa]
 		fibre_throughput = [header_ccd['FIB_THR'] if header_ccd is not None else None for header_ccd in headers]
 		fibre_throughput=[None if i=='None' else i for i in fibre_throughput]
 		res = [header_ccd['RES'] if header_ccd is not None else None for header_ccd in headers]
@@ -3857,7 +3909,7 @@ def create_database(date):
 			if header4['RV_OK']==0: flag+=32768
 
 		#add parameters into the table
-		table.add_row([sobject, ra, dec, mjd, utdate, epoch, aperture, pivot, fibre, fibre_x, fibre_y, fibre_theta, plate, aperture_position, mean_ra, mean_dec, mean_zd, mean_ha, cfg_file, cfg_field_name, obj_name, galah_id, snr, fibre_throughput, res, b, v_bary_eff, exposed, mag, ebv, wav_rms, wav_n_lines, rv, e_rv, rv_com, e_rv_com, teff, logg, feh, obs_comment, pipeline_version, flag])
+		table.add_row([sobject, ra, dec, mjd, utdate, epoch, mjd_s, utdate_s, epoch_s, mjd_e, utdate_e, epoch_e, aperture, pivot, fibre, fibre_x, fibre_y, fibre_theta, plate, aperture_position, mean_ra, mean_dec, mean_zd, mean_ha, cfg_file, cfg_field_name, obj_name, galah_id, tmass_id, snr, snr_aa, fibre_throughput, res, b, v_bary_eff, exposed, mag, ebv, wav_rms, wav_n_lines, rv, e_rv, rv_com, e_rv_com, teff, logg, feh, obs_comment, pipeline_version, flag])
 
 	#write table to hdu
 	hdu=fits.BinTableHDU(table)
@@ -3871,48 +3923,56 @@ def create_database(date):
 	header['TTYPE1']=(header['TTYPE1'], 'sobject_id is unique for each GALAH observation')
 	header['TTYPE2']=(header['TTYPE2'], 'RA of object in deg')
 	header['TTYPE3']=(header['TTYPE3'], 'dec of object in deg')
-	header['TTYPE4']=(header['TTYPE4'], 'modified UTC julian date, exposures weighted')
-	header['TTYPE5']=(header['TTYPE5'], 'UTC date in ISO 8601 format')
-	header['TTYPE6']=(header['TTYPE6'], 'epoch')
-	header['TTYPE7']=(header['TTYPE7'], 'aperture number (1-392)')
-	header['TTYPE8']=(header['TTYPE8'], 'pivot number (1-400)')
-	header['TTYPE9']=(header['TTYPE9'], 'fibre number (1-400)')
-	header['TTYPE10']=(header['TTYPE10'], 'x position on 2dF plate')
-	header['TTYPE11']=(header['TTYPE11'], 'y position on 2dF plate')
-	header['TTYPE12']=(header['TTYPE12'], 'fibre bent on 2dF plate')
-	header['TTYPE13']=(header['TTYPE13'], '2dF plate number (0-1)')
-	header['TTYPE14']=(header['TTYPE14'], 'aperture position in image (at x=2000)')
-	header['TTYPE15']=(header['TTYPE15'], 'RA of telescope position')
-	header['TTYPE16']=(header['TTYPE16'], 'dec of telescope position')
-	header['TTYPE17']=(header['TTYPE17'], 'zenith distance of telescope position')
-	header['TTYPE18']=(header['TTYPE18'], 'hour angle of telescope position')
-	header['TTYPE19']=(header['TTYPE19'], 'name of the fibre configuration file')
-	header['TTYPE20']=(header['TTYPE20'], 'name of the field in cfg_file')
-	header['TTYPE21']=(header['TTYPE21'], 'object name')
-	header['TTYPE22']=(header['TTYPE22'], 'galahic id')
-	header['TTYPE23']=(header['TTYPE23'], 'mean snr in 4 CCDs')
-	header['TTYPE24']=(header['TTYPE24'], 'fibre throughput in 4 CCDs')
-	header['TTYPE25']=(header['TTYPE25'], 'mean resolution (FWHM) in 4 CCDs')
-	header['TTYPE26']=(header['TTYPE26'], 'LSF B parameter in 4 CCDs')
-	header['TTYPE27']=(header['TTYPE27'], 'mean barycentric velocity (already corrected)')
-	header['TTYPE28']=(header['TTYPE28'], 'total exposure time')
-	header['TTYPE29']=(header['TTYPE29'], 'magnitude as given in cfg_file')
-	header['TTYPE30']=(header['TTYPE30'], 'terminal E(B-V) from Planck maps')
-	header['TTYPE31']=(header['TTYPE31'], 'RMS of wavlength calibr. in 4 CCDs')
-	header['TTYPE32']=(header['TTYPE32'], 'number of lines found/used for wav. cal.')
-	header['TTYPE33']=(header['TTYPE33'], 'radial velocity in 4 CCDs')
-	header['TTYPE34']=(header['TTYPE34'], 'rv uncertainty in 4 CCDs')
-	header['TTYPE35']=(header['TTYPE35'], 'rv combined from all arms')
-	header['TTYPE36']=(header['TTYPE36'], 'combined rv uncertainty')
-	header['TTYPE37']=(header['TTYPE37'], 'effective tmperature')
-	header['TTYPE38']=(header['TTYPE38'], 'log of surface gravitational acceleration')
-	header['TTYPE39']=(header['TTYPE39'], 'iron abundance ([Fe/H])')
-	header['TTYPE40']=(header['TTYPE40'], 'comments by observer')
-	header['TTYPE41']=(header['TTYPE41'], 'pipeline evrsion')
-	header['TTYPE42']=(header['TTYPE42'], 'reduction flags given as a binary mask')
+	header['TTYPE4']=(header['TTYPE4'], 'mean modified UTC julian date, exposures weighted')
+	header['TTYPE5']=(header['TTYPE5'], 'mean UTC date in ISO 8601 format')
+	header['TTYPE6']=(header['TTYPE6'], 'mean epoch (decimal year)')
+	header['TTYPE7']=(header['TTYPE7'], 'starting modified UTC julian date')
+	header['TTYPE8']=(header['TTYPE8'], 'starting UTC date in ISO 8601 format')
+	header['TTYPE9']=(header['TTYPE9'], 'starting epoch (decimal year)')
+	header['TTYPE10']=(header['TTYPE10'], 'ending modified UTC julian date')
+	header['TTYPE11']=(header['TTYPE11'], 'ending UTC date in ISO 8601 format')
+	header['TTYPE12']=(header['TTYPE12'], 'ending epoch (decimal year)')
+	header['TTYPE13']=(header['TTYPE13'], 'aperture number (1-392)')
+	header['TTYPE14']=(header['TTYPE14'], 'pivot number (1-400)')
+	header['TTYPE15']=(header['TTYPE15'], 'fibre number (1-400)')
+	header['TTYPE16']=(header['TTYPE16'], 'x position on 2dF plate')
+	header['TTYPE17']=(header['TTYPE17'], 'y position on 2dF plate')
+	header['TTYPE18']=(header['TTYPE18'], 'fibre bent on 2dF plate')
+	header['TTYPE19']=(header['TTYPE19'], '2dF plate number (0-1)')
+	header['TTYPE20']=(header['TTYPE20'], 'aperture position in image (at x=2000)')
+	header['TTYPE21']=(header['TTYPE21'], 'RA of telescope position')
+	header['TTYPE22']=(header['TTYPE22'], 'dec of telescope position')
+	header['TTYPE23']=(header['TTYPE23'], 'zenith distance of telescope position')
+	header['TTYPE24']=(header['TTYPE24'], 'hour angle of telescope position')
+	header['TTYPE25']=(header['TTYPE25'], 'name of the fibre configuration file')
+	header['TTYPE26']=(header['TTYPE26'], 'name of the field in cfg_file')
+	header['TTYPE27']=(header['TTYPE27'], 'object name')
+	header['TTYPE28']=(header['TTYPE28'], 'galahic id')
+	header['TTYPE29']=(header['TTYPE29'], '2MASS id')
+	header['TTYPE30']=(header['TTYPE30'], 'mean snr in 4 CCDs')
+	header['TTYPE31']=(header['TTYPE31'], 'mean snr per Angstrom in 4 CCDs')
+	header['TTYPE32']=(header['TTYPE32'], 'fibre throughput in 4 CCDs')
+	header['TTYPE33']=(header['TTYPE33'], 'mean resolution (FWHM) in 4 CCDs')
+	header['TTYPE34']=(header['TTYPE34'], 'LSF B parameter in 4 CCDs')
+	header['TTYPE35']=(header['TTYPE35'], 'mean barycentric velocity (already corrected)')
+	header['TTYPE36']=(header['TTYPE36'], 'total exposure time')
+	header['TTYPE37']=(header['TTYPE37'], 'magnitude as given in cfg_file')
+	header['TTYPE38']=(header['TTYPE38'], 'terminal E(B-V) from Planck maps')
+	header['TTYPE39']=(header['TTYPE39'], 'RMS of wavlength calibr. in 4 CCDs')
+	header['TTYPE40']=(header['TTYPE40'], 'number of lines found/used for wav. cal.')
+	header['TTYPE41']=(header['TTYPE41'], 'radial velocity in 4 CCDs')
+	header['TTYPE42']=(header['TTYPE42'], 'rv uncertainty in 4 CCDs')
+	header['TTYPE43']=(header['TTYPE43'], 'rv combined from all arms')
+	header['TTYPE44']=(header['TTYPE44'], 'combined rv uncertainty')
+	header['TTYPE45']=(header['TTYPE45'], 'effective tmperature')
+	header['TTYPE46']=(header['TTYPE46'], 'log of surface gravitational acceleration')
+	header['TTYPE47']=(header['TTYPE47'], 'iron abundance ([Fe/H])')
+	header['TTYPE48']=(header['TTYPE48'], 'comments by observer')
+	header['TTYPE49']=(header['TTYPE49'], 'pipeline evrsion')
+	header['TTYPE50']=(header['TTYPE50'], 'reduction flags given as a binary mask')
 
 	#fix bug in astropy (formating of string arrays. Last 7 is dropped when data is inserted)
-	header['TFORM32']='28A7'#this is wav_n_lines column
+	header['TFORM40']='28A7'#this is wav_n_lines column
 	hdul.close()
 
 	#set table name
