@@ -41,6 +41,12 @@ ndfclass_types={'MFFFF':'fibre flat', 'MFARC':'arc', 'MFOBJECT':'object', 'BIAS'
 # possible fibre one-letter values in human readable form
 fibre_types={'S':'sky fibre', 'P':'positioned fibre', 'U':'parked fibre', 'N':'fibre not in use', 'F':'guiding fibre'}
 
+extract_log=logging.getLogger('extract_log')	
+extract_log.setLevel(logging.INFO)
+consoleLog = logging.StreamHandler()
+consoleLog.setLevel(logging.DEBUG)
+extract_log.addHandler(consoleLog)
+
 def print_cobs(cobs, date):
 	"""
 	Print COBs for a given night
@@ -2336,7 +2342,7 @@ def plot_spectra(date, cob_id, ccd):
 	iraf.onedspec(_doprint=0,Stdout="/dev/null")
 
 	fig=figure('Apertures date=%s, cob_id=%s, ccd=%s' % (date,cob_id,ccd))
-	subplots_adjust(left=0.025, right=0.89, top=0.99, bottom=0.045, wspace=0.0, hspace=0.0)
+	subplots_adjust(left=0.035, right=0.88, top=0.99, bottom=0.05, wspace=0.0, hspace=0.0)
 	ax=fig.add_subplot(111)
 
 	trans=transforms.blended_transform_factory(ax.transAxes, ax.transData)
@@ -2369,7 +2375,7 @@ def plot_spectra(date, cob_id, ccd):
 		#load failed apertures
 		failed_apertures=np.load('reductions/%s/ccd%s/%s/failed_apertures.npy' % (date, ccd, cob_id))
 
-		iraf.continuum(input=file, output='reductions/%s/ccd%s/%s/norm.tmp'  % (date, ccd, cob_id), order=5, interactive='no', low_reject=2.5, high_reject=0.0, niterate=7, naverage=1)
+		iraf.continuum(input=file, output='reductions/%s/ccd%s/%s/norm.tmp'  % (date, ccd, cob_id), order=11, interactive='no', low_reject=1.1, high_reject=3.5, niterate=5, naverage=15, function='legendre')
 		hdul=fits.open(file)
 		data_orig=hdul[0].data
 		hdul.close
