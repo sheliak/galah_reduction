@@ -26,6 +26,7 @@ GALAH reduction pipeline does not need to be installed. It depends on the follow
  - tensorflow 2.1.0 (the latest version working on python2.7)
  - keras 2.3.1 (this is the latest version that works with tensorflow 2.1.0)
  - dustmaps (follow installation instructions at https://dustmaps.readthedocs.io/en/latest/installation.html and download Planck maps)
+ - astroquery (version 0.3.9 works with python 2.7)
 
 **Iraf installation**
 
