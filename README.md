@@ -125,9 +125,46 @@ The estimation procedure is a convolutional neural network that was trained on s
 
 # Where are my reduced data
 
-During the reduction run two folders will be created in the `reductions` folder. `reductions/yymmdd/` will hold intermediate results, as well as all the files produced during the reduction. If the reduction is run all the way through (using `final = True` or `--final` option), the results will be saved in the `reductions/results/yymmdd/` folder. 
+**1. REDUCED SPECTRA**
 
-To produce the final table (with all the parameters produced by the reduction pipeline) run the reduction with a setting `database = True` or `--database` flag. Table for each night will be saved in `/reductions/results/yymmdd/db/`. It is available as a .fits and .csv file.
+During the reduction, two folders will be created in the `reductions` folder. `reductions/yymmdd/` will hold intermediate results, as well as all the files produced during the reduction. If the reduction is run all the way through (using `final = True` or `--final` option), the results will be saved in the `reductions/results/yymmdd/` folder. The latter is the intended way of producing final reduced spectra. Folder structure is as follows:
+```
+results
+|-- yymmdd (6 digit date number)
+|   |-- spectra
+|   |   |-- all
+|   |   |   |-- yymmddrrrr00ppp1.fits
+|   |   |   |-- yymmddrrrr00ppp2.fits
+|   |   |   |-- yymmddrrrr00ppp3.fits
+|   |   |   |-- yymmddrrrr00ppp4.fits
+|   |   |   |-- ...
+|   |   |-- com
+|   |   |   |-- yymmddrrrr01ppp1.fits
+|   |   |   |-- yymmddrrrr01ppp2.fits
+|   |   |   |-- yymmddrrrr01ppp3.fits
+|   |   |   |-- yymmddrrrr01ppp4.fits
+|   |   |   |-- ...
+|   |-- db
+|   |   |-- yymmdd.fits
+|   |   |-- yymmdd.csv
+|   |   |-- yymmdd.hdf5
+|   |-- diagnostics
+|   |   |-- various .png and .pdf files
+```
+
+**2. DATABASE**
+
+To produce the final table (with all the parameters produced by the reduction pipeline) run the reduction with a setting `database = True` or `--database` flag. Table for each night is saved in `/reductions/results/yymmdd/db/`. It is available as a .fits, .csv, or .hdf5 file.
+
+**3. INTERMEDIATE SPECTRA**
+
+From the reduced spectra, one can produce intermediate spectra, as they would appear at varius steps of the reduction process. The starting point is the spuctrum in extension 0. Note that the normalised spectrum cannot be used in this process (with the exception of undoing the teluric correction). The following steps can be done in this exact order to undo reduction steps done in the official GALAH reduction:
+
+- Remove barycentric velocity correction (add velocity given in BARYEFF keyword in the header to all wavelength solutions).
+- Divide spectrum in extension 0 by the teluric correction (extension 4). 
+- Add sky spectrum (extension 3)
+- Add cross talk (extension 6)
+- Add scattered light (extension 5)
 
 # After the pipeline has finished
 
