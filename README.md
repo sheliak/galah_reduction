@@ -62,15 +62,19 @@ File `settings.py` defines which reductions steps will be performed. Those marke
 
 Coming soon
 
-**3. RUNNING MINIMAL REDUCTION**
+**3. CHECKING DATA PARTITIONING INTO COBs**
+
+First step of the reduction process is to partition the nightly data into consecutive observing blocks (COBs). Each COB should include consecutive observations of one field and associated flat field and arc frame. To list the inferred COBs, run the reduction with `--list_cobs` flag or `list_cobs = True` set in `settings.py`. In this case the reduction pipeline will only list the COBs, but won't proceede with reduction.
+
+**4. RUNNING MINIMAL REDUCTION**
 
 Coming soon.
 
-**4. PARTIAL REDUCTION**
+**5. PARTIAL REDUCTION**
 
 If only part of the reduction is performed, the intermediate results can be saved and the reduction pipeline can resume from where it previously finished. This can not be done if any reduction step returned errors or the reduction was interrupted while performing a step.
 
-**5. REDUCING DATA NOT IN GALAH FORMAT**
+**6. REDUCING DATA NOT IN GALAH FORMAT**
 
 GALAH stores data in a specific order (uses specific filenames, folder structure, comment files etc.). Data with a different structure can be reduced, if the initial reduction steps are bypassed. In any case, the reduction will only work with data taken with the HERMES instrument.
 
