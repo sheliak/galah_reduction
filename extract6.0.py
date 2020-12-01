@@ -3414,9 +3414,12 @@ def create_final_spectra_proc(args):
 					hdul[extension].header['RVCOM']=('None', 'Combined radial velocity in km/s')
 					hdul[extension].header['E_RVCOM']=('None', 'Radial velocity uncertainty in km/s')
 					hdul[extension].header['RVCOM_OK']=('None', 'Did RV pipeline converge? 1=yes, 0=no')
-					hdul[extension].header['TEFF']=('None', 'T_eff in K')
-					hdul[extension].header['LOGG']=('None', 'log g in log cm/s^2')
-					hdul[extension].header['FE_H']=('None', 'Iron abundance in dex')#more parameters?
+					hdul[extension].header['TEFF_R']=('None', 'T_eff in K')
+					hdul[extension].header['LOGG_R']=('None', 'log g in log cm/s^2')
+					hdul[extension].header['FE_H_R']=('None', 'Iron abundance in dex ([Fe/H])')
+					hdul[extension].header['A_FE_R']=('None', 'Alpha abundance in dex ([alpha/Fe])')
+					hdul[extension].header['VMIC_R']=('None', 'Microturbulence in km/s')
+					hdul[extension].header['VBROAD_R']=('None', 'Broadening velocity in km/s')
 					hdul[extension].header['PAR_OK']=('None', 'Are parameters trustworthy? 1=yes, 0=no')
 					#set exposure of the resolution profile to the same value as for spectra
 					hdul[extension].header['EXPOSED']=hdul[0].header['EXPOSED']
@@ -3797,9 +3800,12 @@ def create_database(date):
 	cols.append(fits.Column(name='e_rv', format='4E', unit='km/s', null=None))
 	cols.append(fits.Column(name='rv_com', format='E', unit='km/s', null=None))
 	cols.append(fits.Column(name='e_rv_com', format='E', unit='km/s', null=None))
-	cols.append(fits.Column(name='teff', format='E', unit='K', null=None))
-	cols.append(fits.Column(name='logg', format='E', unit='cm / s^-2', null=None))
-	cols.append(fits.Column(name='fe_h', format='E', null=None))
+	cols.append(fits.Column(name='teff_r', format='E', unit='K', null=None))
+	cols.append(fits.Column(name='logg_r', format='E', unit='cm / s^-2', null=None))
+	cols.append(fits.Column(name='fe_h_r', format='E', null=None))
+	cols.append(fits.Column(name='alpha_fe_r', format='E', null=None))
+	cols.append(fits.Column(name='v_mic_r', format='E', unit='km/s', null=None))
+	cols.append(fits.Column(name='v_broad_r', format='E', unit='km/s', null=None))
 	cols.append(fits.Column(name='obs_comment', format='A56'))
 	cols.append(fits.Column(name='pipeline_version', format='A5'))
 	cols.append(fits.Column(name='reduction_flags', format='J'))
@@ -3918,12 +3924,18 @@ def create_database(date):
 		if rv_com=='None': rv_com=None
 		e_rv_com=header1['e_rvcom']
 		if e_rv_com=='None': e_rv_com=None
-		teff=header1['TEFF']
+		teff=header1['TEFF_R']
 		if teff=='None': teff=None
-		logg=header1['LOGG']
+		logg=header1['LOGG_R']
 		if logg=='None': logg=None
-		feh=header1['FE_H']
+		feh=header1['FE_H_R']
 		if feh=='None': feh=None
+		alpha=header1['A_FE_R']
+		if alpha=='None': alpha=None
+		vmic=header1['VMIC_R']
+		if vmic=='None': vmic=None
+		vbroad=header1['VBROAD_R']
+		if vbroad=='None': vbroad=None
 		pipeline_version=header1['PIPE_VER']
 		obs_comment=header1['COMM_OBS'].replace(',', ';')
 		#bin mask reduction flags
@@ -3949,7 +3961,7 @@ def create_database(date):
 			if header4['RV_OK']==0: flag+=32768
 
 		#add parameters into the table
-		table.add_row([sobject, ra, dec, ra_icrs, dec_icrs, mjd, utdate, epoch, mjd_s, utdate_s, epoch_s, mjd_e, utdate_e, epoch_e, aperture, pivot, fibre, fibre_x, fibre_y, fibre_theta, plate, aperture_position, mean_ra, mean_dec, mean_zd, mean_ha, cfg_file, cfg_field_name, obj_name, galah_id, tmass_id, gaia_id, snr, snr_aa, fibre_throughput, res, b, v_bary_eff, exposed, mag, ebv, wav_rms, wav_n_lines, rv, e_rv, rv_com, e_rv_com, teff, logg, feh, obs_comment, pipeline_version, flag])
+		table.add_row([sobject, ra, dec, ra_icrs, dec_icrs, mjd, utdate, epoch, mjd_s, utdate_s, epoch_s, mjd_e, utdate_e, epoch_e, aperture, pivot, fibre, fibre_x, fibre_y, fibre_theta, plate, aperture_position, mean_ra, mean_dec, mean_zd, mean_ha, cfg_file, cfg_field_name, obj_name, galah_id, tmass_id, gaia_id, snr, snr_aa, fibre_throughput, res, b, v_bary_eff, exposed, mag, ebv, wav_rms, wav_n_lines, rv, e_rv, rv_com, e_rv_com, teff, logg, feh, alpha, vmic, vbroad, obs_comment, pipeline_version, flag])
 
 	#write table to hdu
 	hdu=fits.BinTableHDU(table)
@@ -4007,12 +4019,15 @@ def create_database(date):
 	header['TTYPE45']=(header['TTYPE45'], 'rv uncertainty in 4 CCDs')
 	header['TTYPE46']=(header['TTYPE46'], 'rv combined from all arms')
 	header['TTYPE47']=(header['TTYPE47'], 'combined rv uncertainty')
-	header['TTYPE48']=(header['TTYPE48'], 'effective tmperature')
-	header['TTYPE49']=(header['TTYPE49'], 'log of surface gravitational acceleration')
+	header['TTYPE48']=(header['TTYPE48'], 'effective tmperature in K')
+	header['TTYPE49']=(header['TTYPE49'], 'log of surface gravitational acceleration in log(cm / s^2)')
 	header['TTYPE50']=(header['TTYPE50'], 'iron abundance ([Fe/H])')
-	header['TTYPE51']=(header['TTYPE51'], 'comments by observer')
-	header['TTYPE52']=(header['TTYPE52'], 'pipeline evrsion')
-	header['TTYPE53']=(header['TTYPE53'], 'reduction flags given as a binary mask')
+	header['TTYPE51']=(header['TTYPE51'], 'alpha abundance ([alpha/Fe])')
+	header['TTYPE52']=(header['TTYPE52'], 'microturbulence in km/s')
+	header['TTYPE53']=(header['TTYPE53'], 'broadening velocity in km/s')
+	header['TTYPE54']=(header['TTYPE54'], 'comments by observer')
+	header['TTYPE55']=(header['TTYPE55'], 'pipeline evrsion')
+	header['TTYPE56']=(header['TTYPE56'], 'reduction flags given as a binary mask')
 
 	#fix bug in astropy (formating of string arrays. Last 7 is dropped when data is inserted)
 	header['TFORM43']='28A7'#this is wav_n_lines column
