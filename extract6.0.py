@@ -3864,7 +3864,7 @@ def create_database(date):
 		ra_icrs=header1['RA_ICRS']
 		if ra_icrs=='None': ra_icrs=None
 		dec_icrs=header1['DEC_ICRS']
-		if dec_icrs=='none': dec_icrs=None
+		if dec_icrs=='None': dec_icrs=None
 		mean_ra=header1['MEANRA']
 		mean_dec=header1['MEANDEC']
 		mean_zd=header1['MEAN_ZD']
