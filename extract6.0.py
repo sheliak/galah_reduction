@@ -3756,8 +3756,8 @@ def create_database(date):
 	cols.append(fits.Column(name='sobject_id', format='K'))
 	cols.append(fits.Column(name='ra', format='E', unit='deg'))
 	cols.append(fits.Column(name='dec', format='E', unit='deg'))
-	cols.append(fits.Column(name='ra_icrs', format='E', unit='deg'))
-	cols.append(fits.Column(name='dec_icrs', format='E', unit='deg'))
+	cols.append(fits.Column(name='ra_icrs', format='E', unit='deg', null=None))
+	cols.append(fits.Column(name='dec_icrs', format='E', unit='deg', null=None))
 	cols.append(fits.Column(name='mjd', format='D'))
 	cols.append(fits.Column(name='utdate', format='A23'))
 	cols.append(fits.Column(name='epoch', format='D'))
@@ -3862,7 +3862,9 @@ def create_database(date):
 		ra=header1['RA_OBS']
 		dec=header1['DEC_OBS']
 		ra_icrs=header1['RA_ICRS']
+		if ra_icrs=='None': ra_icrs=None
 		dec_icrs=header1['DEC_ICRS']
+		if dec_icrs=='none': dec_icrs=None
 		mean_ra=header1['MEANRA']
 		mean_dec=header1['MEANDEC']
 		mean_zd=header1['MEAN_ZD']
