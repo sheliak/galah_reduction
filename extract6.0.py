@@ -3122,7 +3122,7 @@ def create_final_spectra_proc(args):
 		f_xmatch.close()
 		xmatch_table_tmass = XMatch.query(cat1=open(cob+'/xmatch.txt'), cat2='vizier:II/246/out', max_distance=3*u.arcsec, colRA1='myra', colDec1='mydec')['aperture', '2MASS']
 		xmatch_table_tmass = np.array(xmatch_table_tmass)
-		xmatch_table_gaia = XMatch.query(cat1=open(cob+'/xmatch.txt'), cat2='vizier:I/345/gaia2', max_distance=2*u.arcsec, colRA1='myra', colDec1='mydec')['aperture', 'source_id', 'ra', 'dec', 'angDist', 'phot_g_mean_mag']
+		xmatch_table_gaia = XMatch.query(cat1=open(cob+'/xmatch.txt'), cat2='I/350/gaiaedr3', max_distance=2*u.arcsec, colRA1='myra', colDec1='mydec')['aperture', 'source_id', 'ra', 'dec', 'angDist', 'phot_g_mean_mag']
 		xmatch_table_gaia = np.array(xmatch_table_gaia)
 
 		tmass_dict={}
@@ -3376,7 +3376,7 @@ def create_final_spectra_proc(args):
 					#add 2MASS id
 					hdul[extension].header['2MASS_ID']=(tmass_dict[ap], '2MASS id (if exists)')
 					#add gaia id
-					hdul[extension].header['GAIA_ID']=(gaia_dict[ap][0], 'Gaia DR2 source_id (if exists)')
+					hdul[extension].header['GAIA_ID']=(gaia_dict[ap][0], 'Gaia EDR3 source_id (if exists)')
 					#add object name (first column in fibre table)
 					hdul[extension].header['OBJ_NAME']=(object_name, 'Object name from the .fld file')
 					#add average snr and average resolution
@@ -4005,7 +4005,7 @@ def create_database(date):
 	header['TTYPE29']=(header['TTYPE29'], 'object name')
 	header['TTYPE30']=(header['TTYPE30'], 'galahic id')
 	header['TTYPE31']=(header['TTYPE31'], '2MASS id')
-	header['TTYPE32']=(header['TTYPE32'], 'Gaia DR2 source id')
+	header['TTYPE32']=(header['TTYPE32'], 'Gaia EDR3 source id')
 	header['TTYPE33']=(header['TTYPE33'], 'mean snr in 4 CCDs')
 	header['TTYPE34']=(header['TTYPE34'], 'mean snr per Angstrom in 4 CCDs')
 	header['TTYPE35']=(header['TTYPE35'], 'fibre throughput in 4 CCDs')
