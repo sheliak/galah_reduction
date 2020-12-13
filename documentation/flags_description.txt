@@ -22,4 +22,4 @@ Bit	Decimal value	Description
 
 
 *A trace that didn't fit correctly might still produce useful spectra. Although it usually won't have cross-talk calculated properly.
-**In this case the radial velocity can be None/NULL or have some value. If the flag is raised, the value is very unreliable.
+**In this case the radial velocity can be None/NULL or have some value. If the flag is raised, the value is very unreliable, if it exists.

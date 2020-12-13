@@ -71,6 +71,7 @@ if os.path.isfile('reductions/dr6.0.fits'):
 	csv_db=open('reductions/dr6.0.csv', 'a')
 	hdul=fits.open('reductions/results/%s/db/%s.fits' % (date,date))
 	hdu=hdul[1]
+
 	data=np.array(hdu.data)
 	#add data
 	for i in data:
@@ -86,6 +87,13 @@ if os.path.isfile('reductions/dr6.0.fits'):
 			csv_db.write('\n')
 	csv_db.close()
 	hdul.close()
+
+	# convert table to hdf5. astropy write function has append option, but it doesn't work for hdf5, aparently
+	hdul=fits.open('reductions/dr6.0.fits', mode='update')
+	hdu=hdul[1]
+	t=Table(hdu.data)
+	hdul.close()
+	t.write('reductions/dr6.0.hdf5', format='hdf5', path='data', overwrite=True)
 
 	#save results
 	os.remove('reductions/.dblock')
@@ -133,5 +141,8 @@ else:
 		csv_db.write('\n')
 	csv_db.close()
 	hdul.close()
+
+	# convert table to hdf5
+	t.write('reductions/dr6.0.hdf5', format='hdf5', path='data')
 
 	os.remove('reductions/.dblock')

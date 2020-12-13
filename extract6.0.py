@@ -3122,7 +3122,7 @@ def create_final_spectra_proc(args):
 		f_xmatch.close()
 		xmatch_table_tmass = XMatch.query(cat1=open(cob+'/xmatch.txt'), cat2='vizier:II/246/out', max_distance=3*u.arcsec, colRA1='myra', colDec1='mydec')['aperture', '2MASS']
 		xmatch_table_tmass = np.array(xmatch_table_tmass)
-		xmatch_table_gaia = XMatch.query(cat1=open(cob+'/xmatch.txt'), cat2='I/350/gaiaedr3', max_distance=2*u.arcsec, colRA1='myra', colDec1='mydec')['aperture', 'source_id', 'ra', 'dec', 'angDist', 'phot_g_mean_mag']
+		xmatch_table_gaia = XMatch.query(cat1=open(cob+'/xmatch.txt'), cat2='vizier:I/350/gaiaedr3', max_distance=2*u.arcsec, colRA1='myra', colDec1='mydec', cache=False)['aperture', 'source_id', 'ra', 'dec', 'angDist', 'phot_g_mean_mag']
 		xmatch_table_gaia = np.array(xmatch_table_gaia)
 
 		tmass_dict={}
@@ -3782,7 +3782,7 @@ def create_database(date):
 	cols.append(fits.Column(name='cfg_file', format='A48', null=None))
 	cols.append(fits.Column(name='cfg_field_name', format='A56', null=None))
 	cols.append(fits.Column(name='obj_name', format='A48', null=None))
-	cols.append(fits.Column(name='galah_id', format='K', null=None))
+	cols.append(fits.Column(name='galah_id', format='A16', null=None))
 	cols.append(fits.Column(name='2mass', format='A16', null=None))
 	cols.append(fits.Column(name='gaia_id', format='A20', null=None))
 	cols.append(fits.Column(name='snr', format='4E', null=None))
@@ -3796,6 +3796,7 @@ def create_database(date):
 	cols.append(fits.Column(name='e_b-v', format='E'))
 	cols.append(fits.Column(name='wav_rms', format='4E', unit='km/s', null=None))
 	cols.append(fits.Column(name='wav_n_lines', format='28A7'))
+	cols.append(fits.Column(name='n_combined', format='I'))
 	cols.append(fits.Column(name='rv', format='4E', unit='km/s', null=None))
 	cols.append(fits.Column(name='e_rv', format='4E', unit='km/s', null=None))
 	cols.append(fits.Column(name='rv_com', format='E', unit='km/s', null=None))
@@ -3879,6 +3880,7 @@ def create_database(date):
 		utdate_e=header1['UTDATE_E']
 		epoch_e=header1['EPOCH_E']
 		aperture=header1['APERTURE']
+		n_combined=header1['NCOMBINE']
 		pivot=header1['pivot']
 		fibre=header1['fibre']
 		fibre_x=header1['X']
@@ -3894,9 +3896,11 @@ def create_database(date):
 		obj_name=header1['OBJ_NAME'].replace(',', ';')
 		if obj_name=='None': obj_name=None
 		galah_id=header1['GALAH_ID']
-		if galah_id=='None': galah_id=-1
+		if galah_id=='None': galah_id=None
 		tmass_id=header1['2MASS_ID']
+		if tmass_id=='None': tmass_id=None
 		gaia_id=header1['GAIA_ID']
+		if gaia_id=='None': gaia_id=None
 		mag=header1['mag']
 		ebv=header1['E_B-V']
 		wav_rms = [header_ccd['WAV_RMS'] if header_ccd is not None else None for header_ccd in headers]
@@ -3963,7 +3967,7 @@ def create_database(date):
 			if header4['RV_OK']==0: flag+=32768
 
 		#add parameters into the table
-		table.add_row([sobject, ra, dec, ra_icrs, dec_icrs, mjd, utdate, epoch, mjd_s, utdate_s, epoch_s, mjd_e, utdate_e, epoch_e, aperture, pivot, fibre, fibre_x, fibre_y, fibre_theta, plate, aperture_position, mean_ra, mean_dec, mean_zd, mean_ha, cfg_file, cfg_field_name, obj_name, galah_id, tmass_id, gaia_id, snr, snr_aa, fibre_throughput, res, b, v_bary_eff, exposed, mag, ebv, wav_rms, wav_n_lines, rv, e_rv, rv_com, e_rv_com, teff, logg, feh, alpha, vmic, vbroad, obs_comment, pipeline_version, flag])
+		table.add_row([sobject, ra, dec, ra_icrs, dec_icrs, mjd, utdate, epoch, mjd_s, utdate_s, epoch_s, mjd_e, utdate_e, epoch_e, aperture, pivot, fibre, fibre_x, fibre_y, fibre_theta, plate, aperture_position, mean_ra, mean_dec, mean_zd, mean_ha, cfg_file, cfg_field_name, obj_name, galah_id, tmass_id, gaia_id, snr, snr_aa, fibre_throughput, res, b, v_bary_eff, exposed, mag, ebv, wav_rms, wav_n_lines, n_combined, rv, e_rv, rv_com, e_rv_com, teff, logg, feh, alpha, vmic, vbroad, obs_comment, pipeline_version, flag])
 
 	#write table to hdu
 	hdu=fits.BinTableHDU(table)
@@ -4017,6 +4021,7 @@ def create_database(date):
 	header['TTYPE41']=(header['TTYPE41'], 'terminal E(B-V) from Planck maps')
 	header['TTYPE42']=(header['TTYPE42'], 'RMS of wavlength calibr. in 4 CCDs')
 	header['TTYPE43']=(header['TTYPE43'], 'number of lines found/used for wav. cal.')
+	header['TTYPE44']=(header['TTYPE44'], 'number of spectra combined (see image header for list of combined spectra)')
 	header['TTYPE44']=(header['TTYPE44'], 'radial velocity in 4 CCDs')
 	header['TTYPE45']=(header['TTYPE45'], 'rv uncertainty in 4 CCDs')
 	header['TTYPE46']=(header['TTYPE46'], 'rv combined from all arms')
@@ -4068,7 +4073,9 @@ def create_database(date):
 		csv_db.write('\n')
 	csv_db.close()
 	hdul.close()
-					
+
+	# convert table to hdf5
+	t.write('reductions/results/%s/db/%s.hdf5' % (date, date), format='hdf5', path='data')
 
 def analyze_rv(args):
 	"""
@@ -4101,7 +4108,7 @@ def analyze_rv(args):
 		fits_path = 'reductions/results/%s/spectra/com/%s%s.fits' % (date, sobject,ccd)
 		if not os.path.isfile(fits_path):
 			# in the case of missing ccd data
-			# CCF is equal to zero and select one of the templates as that are all equally good/bad
+			# CCF is equal to zero and select one of the templates as they are all equally good/bad
 			ccfs.append(np.full_like(rvs, 0.))
 			best_template.append(0)
 			continue
@@ -4252,7 +4259,9 @@ def analyze_rv(args):
 			if ccd<4: sigma2=-1.0/(4076*(fit_second_derivative[peak_prime-1]/dd/dd/dd)/ccfs[ccd-1][peak_prime]*(ccfs[ccd-1][peak_prime])/(1.0-ccfs[ccd-1][peak_prime]))# watch derivative units if you change rvs
 			else: sigma2=-1.0/(2586*(fit_second_derivative[peak_prime-1]/dd/dd/dd)/ccfs[ccd-1][peak_prime]*(ccfs[ccd-1][peak_prime])/(1.0-ccfs[ccd-1][peak_prime]))# watch derivative units if you change rvs
 			sigma_ind=np.sqrt(sigma2)
-			if np.isnan(sigma_ind): sigma_ind='None'
+			if np.isnan(sigma_ind): 
+				sigma_ind='None'
+				rv_ind='None'
 			#report_fit(out)
 			rv_ind_ar.append(rv_ind)
 			sigma_ind_ar.append(sigma_ind)
