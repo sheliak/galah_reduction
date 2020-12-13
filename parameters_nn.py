@@ -145,7 +145,7 @@ def get_parameters_nn(sobjects, logging=None, processes=1):
             hdulist = fits.open(fits_path, mode='update')
             for extension in range(len(hdulist)):
                 for i_p, p_name in enumerate(model_out):
-                    if p_name in ['teff', 'logg', 'fe_h']:
-                        hdulist[extension].header[p_name.upper()] = nn_results[i_s, i_p]
+                    if p_name in ['teff', 'logg', 'fe_h', 'vmic', 'a_fe', 'vbroad']:
+                        hdulist[extension].header[p_name.upper() + '_R'] = nn_results[i_s, i_p]
                 hdulist[extension].header['PAR_OK'] = 1
             hdulist.close()
