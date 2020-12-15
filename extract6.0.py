@@ -17,6 +17,7 @@ from matplotlib import *
 from pylab import *
 import matplotlib.transforms as transforms
 from matplotlib.ticker import MultipleLocator, AutoMinorLocator
+import matplotlib.gridspec as gridspec
 from astropy.coordinates import SkyCoord, EarthLocation
 import astropy.units as u
 from collections import defaultdict
@@ -852,6 +853,8 @@ def find_apertures(date, start_folder):
 			f=open(cob+"/apmasterflat", "r")
 			g=open(cob+"/apmasterflat_cor", "w")
 			start=False
+
+			#iraf.delete('tmp$idiraf*')
 
 			for line in f:
 				l=line.strip().split()
@@ -4082,6 +4085,8 @@ def analyze_rv(args):
 	Calculate radial velocity and write it into headers
 	"""
 
+	make_plot=False
+
 	def residual(pars, x, data=None):
 		model=pars['amp']*np.exp(-(x-pars['shift'])**2/(2*pars['sigma']**2))+pars['offset']
 		#model=gaussian(x, pars['amp'], pars['shift'], pars['sigma'])
@@ -4103,6 +4108,16 @@ def analyze_rv(args):
 	ccfs=[]
 	specs=[]
 	best_template=[]
+
+	if make_plot:
+		fig=figure('rv_'+str(sobject))
+		gs=gridspec.GridSpec(ncols=1, nrows=5, figure=fig)
+		ax1 = fig.add_subplot(gs[0, 0])
+		ax2 = fig.add_subplot(gs[1, 0])
+		ax3 = fig.add_subplot(gs[2, 0])
+		ax4 = fig.add_subplot(gs[3, 0])
+		ax5 = fig.add_subplot(gs[4, 0])
+
 	for ccd in [1,2,3,4]:
 		# open spectrum
 		fits_path = 'reductions/results/%s/spectra/com/%s%s.fits' % (date, sobject,ccd)
@@ -4116,9 +4131,26 @@ def analyze_rv(args):
 		hdulist = fits.open(fits_path)
 		crval=hdulist[1].header['CRVAL1']
 		crdel=hdulist[1].header['CDELT1']
+		snr=hdulist[1].header['SNR']
 		f=hdulist[1].data
 		hdulist.close()
 		l=np.linspace(crval, crval+crdel*(len(f)-1), len(f))
+
+		#remove large values, as they are probably cosmic rays. be conservative in ccd 1 and 3 because of real emission lines
+		try:
+			sigma=1./snr
+		except:
+			sigma=0.1
+		
+		if ccd==4 or ccd==2:
+			f[f>1+2*sigma]=1+2*sigma
+		if ccd==3:
+			f[(f>1+2*sigma)&((l<6562-40)|(l>6562+40))]=1+2*sigma
+			f[(f>1+6*sigma)&(l>6562-40)&(l<6562+40)]=1+6*sigma
+		if ccd==1:
+			f[(f>1+2*sigma)&((l<4861-40)|(l>4861+40))]=1+2*sigma
+			f[(f>1+6*sigma)&(l>4861-40)&(l<4861+40)]=1+6*sigma
+
 		# ignore first 10 and last 10 pixels, just in case there are problems with normalisation. In CCD 4 ignore more because of telurics.
 		if ccd==4:
 			f=f[1500:-10]
@@ -4127,6 +4159,20 @@ def analyze_rv(args):
 			f=f[10:-10]
 			l=l[10:-10]
 		spec=np.array(zip(l,f), dtype=[('l', 'f8'), ('f', 'f8')])
+
+		if make_plot:
+			if ccd==1:
+				ax1.plot(spec['l'], spec['f'], 'k-')
+				ax1.set_xlim(spec['l'][10], spec['l'][-10])
+			if ccd==2:
+				ax2.plot(spec['l'], spec['f'], 'k-')
+				ax2.set_xlim(spec['l'][10], spec['l'][-10])
+			if ccd==3:
+				ax3.plot(spec['l'], spec['f'], 'k-')
+				ax3.set_xlim(spec['l'][10], spec['l'][-10])
+			if ccd==4:
+				ax4.plot(spec['l'], spec['f'], 'k-')
+				ax4.set_xlim(spec['l'][10], spec['l'][-10])
 
 		# Cross correlate
 		# Following S. Zucker, MNRAS, Volume 342, Issue 4, July 2003
@@ -4174,6 +4220,16 @@ def analyze_rv(args):
 		# only use CCF of the template with best correlation
 		ccfs.append(max_ccf)
 		best_template.append(best_template_tmp)
+
+		if make_plot:
+			if ccd==1:
+				ax1.plot(templates[ccd-1][best_template_tmp][4]['l'],templates[ccd-1][best_template_tmp][4]['f'], 'r-')
+			if ccd==2:
+				ax2.plot(templates[ccd-1][best_template_tmp][4]['l'],templates[ccd-1][best_template_tmp][4]['f'], 'r-')
+			if ccd==3:
+				ax3.plot(templates[ccd-1][best_template_tmp][4]['l'],templates[ccd-1][best_template_tmp][4]['f'], 'r-')
+			if ccd==4:
+				ax4.plot(templates[ccd-1][best_template_tmp][4]['l'],templates[ccd-1][best_template_tmp][4]['f'], 'r-')
 
 		#fig=figure(0)
 		#ax=fig.add_subplot(211)
@@ -4240,7 +4296,7 @@ def analyze_rv(args):
 		# fit individual CCDs
 		for ccd in [1,2,3,4]:
 			peak_max=ccfs[ccd-1][peak_prime]  # height of peak
-			if np.median(ccfs[ccd-1]) == 0:
+			if np.median(ccfs[ccd-1]) == 0 or peak_max-np.median(ccfs[ccd-1])<=0.01:
 				# skip ccds for which the correlation was not computed, set RV values to not evaluated
 				rv_ind_ar.append('None')
 				sigma_ind_ar.append('None')
@@ -4276,8 +4332,6 @@ def analyze_rv(args):
 		sigma_ind_ar=['None', 'None', 'None', 'None']
 		flag_ind_ar=[0, 0, 0, 0]
 
-	#print rv_com, sigma_com, flag_com
-	#print rv_ind_ar, sigma_ind_ar, flag_ind_ar
 
 	for ccd in [1,2,3,4]:
 		# open fits file and write rvs into header
@@ -4295,22 +4349,14 @@ def analyze_rv(args):
 			hdulist[extension].header['RVCOM_OK']=flag_com
 		hdulist.close()
 
-	"""
-	print rv_com, sigma_com
-	print rv_ind_ar, sigma_ind_ar
-	fig=figure(0)
-	ax=fig.add_subplot(111)
-	ax.plot(rvs, ccfs[0], 'b-')
-	ax.plot(rvs, ccfs[1], 'g-')
-	ax.plot(rvs, ccfs[2], 'r-')
-	ax.plot(rvs, ccfs[3], 'k-')
-	ax.plot(rvs, ccf_global, 'y')
-	#ax.plot(rvs, ccf_sgn)
-	if len(peaks_ok)>0:
-		ax.plot(rvs[peak_prime-int(dist):peak_prime+int(dist)], fit, 'm-')
-	#if rv_com!='None': ax.set_xlim(rv_com-100,rv_com+100)
-	show()
-	"""
+	if make_plot:
+		ax5.plot(rvs, ccfs[0], 'b-', lw=1)
+		ax5.plot(rvs, ccfs[1], 'g-', lw=1)
+		ax5.plot(rvs, ccfs[2], 'r-', lw=1)
+		ax5.plot(rvs, ccfs[3], 'k-', lw=1)
+		ax5.plot(rvs, ccf_global, 'k-', lw=3, alpha=0.5)
+		fig.suptitle('rv_1='+str(rv_ind_ar[0])[:6]+'$\\pm$'+str(sigma_ind_ar[0])[:6]+'  rv_2='+str(rv_ind_ar[1])[:6]+'$\\pm$'+str(sigma_ind_ar[1])[:6]+'  rv_3='+str(rv_ind_ar[2])[:6]+'$\\pm$'+str(sigma_ind_ar[2])[:6]+'  rv_4='+str(rv_ind_ar[3])[:6]+'$\\pm$'+str(sigma_ind_ar[3])[:6]+'  rv_c='+str(rv_com)[:6]+'$\\pm$'+str(sigma_com)[:6]+'  flags='+str(flag_ind_ar[0])+' '+str(flag_ind_ar[1])+' '+str(flag_ind_ar[2])+' '+str(flag_ind_ar[3])+' '+str(flag_com))
+		show()
 
 
 def analyze(date, ncpu=1):
