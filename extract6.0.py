@@ -3384,7 +3384,7 @@ def create_final_spectra_proc(args):
 					if len(object_name)>0 and object_name.split('_')[0]=='tmass':
 						hdul[extension].header['2MASS_ID']=(object_name.split('_')[1], '2MASS id (if exists)')
 					#if object name is galahic_xxxxxxxx, check table
-					elif len(object_name)>0 and object_name.split('_')[0]=='galahic'::
+					elif len(object_name)>0 and object_name.split('_')[0]=='galahic':
 						hdul[extension].header['2MASS_ID']=(tmass_dict[ap], '2MASS id (if exists)')
 					#if nothing else works, use cross-match
 					else:
