@@ -36,6 +36,8 @@ import argparse
 from parameters_nn import get_parameters_nn
 from dustmaps.planck import PlanckQuery
 
+use('TkAgg')
+
 # possible NDFCLASS values in human readable form
 ndfclass_types={'MFFFF':'fibre flat', 'MFARC':'arc', 'MFOBJECT':'object', 'BIAS':'bias'}
 
@@ -3123,10 +3125,11 @@ def create_final_spectra_proc(args):
 			n+=1
 			f_xmatch.write('%s,%s,%s\n' % (n,i,j))
 		f_xmatch.close()
-		xmatch_table_tmass = XMatch.query(cat1=open(cob+'/xmatch.txt'), cat2='vizier:II/246/out', max_distance=3*u.arcsec, colRA1='myra', colDec1='mydec')['aperture', '2MASS']
+		xmatch_table_tmass = XMatch.query(cat1=open(cob+'/xmatch.txt'), cat2='vizier:II/246/out', max_distance=2*u.arcsec, colRA1='myra', colDec1='mydec')['aperture', '2MASS']
 		xmatch_table_tmass = np.array(xmatch_table_tmass)
-		xmatch_table_gaia = XMatch.query(cat1=open(cob+'/xmatch.txt'), cat2='vizier:I/350/gaiaedr3', max_distance=2*u.arcsec, colRA1='myra', colDec1='mydec', cache=False)['aperture', 'source_id', 'ra', 'dec', 'angDist', 'phot_g_mean_mag']
+		xmatch_table_gaia = XMatch.query(cat1=open(cob+'/xmatch.txt'), cat2='vizier:I/350/gaiaedr3', max_distance=1*u.arcsec, colRA1='myra', colDec1='mydec', cache=False)['aperture', 'source_id', 'ra', 'dec', 'angDist', 'phot_g_mean_mag']
 		xmatch_table_gaia = np.array(xmatch_table_gaia)
+		time.sleep(10)
 
 		tmass_dict={}
 		gaia_dict={}
@@ -3136,7 +3139,7 @@ def create_final_spectra_proc(args):
 		tmass_dict=defaultdict(lambda:'None', tmass_dict)
 
 		for i in xmatch_table_gaia:
-			if i[5]<17.5 and i[0] not in gaia_dict: gaia_dict[i[0]]=[i[1],i[2],i[3]]
+			if i[5]<17.0 and i[0] not in gaia_dict: gaia_dict[i[0]]=[i[1],i[2],i[3]]
 		gaia_dict=defaultdict(lambda:['None', 'None', 'None'], gaia_dict)
 
 		#read saved b_values
@@ -3377,9 +3380,25 @@ def create_final_spectra_proc(args):
 					else:
 						hdul[extension].header['GALAH_ID']=('None', 'GALAH id number (if exists)')
 					#add 2MASS id
-					hdul[extension].header['2MASS_ID']=(tmass_dict[ap], '2MASS id (if exists)')
+					#if 2MASS id is in the object name, use that
+					if len(object_name)>0 and object_name.split('_')[0]=='tmass':
+						hdul[extension].header['2MASS_ID']=(object_name.split('_')[1], '2MASS id (if exists)')
+					#if object name is galahic_xxxxxxxx, check table
+					elif len(object_name)>0 and object_name.split('_')[0]=='galahic'::
+						hdul[extension].header['2MASS_ID']=(tmass_dict[ap], '2MASS id (if exists)')
+					#if nothing else works, use cross-match
+					else:
+						hdul[extension].header['2MASS_ID']=(tmass_dict[ap], '2MASS id (if exists)')
 					#add gaia id
-					hdul[extension].header['GAIA_ID']=(gaia_dict[ap][0], 'Gaia EDR3 source_id (if exists)')
+					#if gaia edr3 source_id is part of the name, use it
+					if len(object_name)>0 and object_name.split('_')[0]=='gaiaedr3':
+						hdul[extension].header['GAIA_ID']=(object_name.split('_')[1], 'Gaia EDR3 source_id (if exists)')
+					#if gaia_dr2 source_id is in te object name, use that and the dr2-edr3 xmatch to get edr3 source_id
+					elif len(object_name)>0 and object_name.split('_')[0]=='gaiadr2':
+						hdul[extension].header['GAIA_ID']=(gaia_dict[ap][0], 'Gaia EDR3 source_id (if exists)')
+					#use xmatch by coordinates otherwise
+					else:
+						hdul[extension].header['GAIA_ID']=(gaia_dict[ap][0], 'Gaia EDR3 source_id (if exists)')
 					#add object name (first column in fibre table)
 					hdul[extension].header['OBJ_NAME']=(object_name, 'Object name from the .fld file')
 					#add average snr and average resolution
@@ -3688,6 +3707,7 @@ def create_final_spectra(date, ncpu=1, plot_diagnostics=False):
 
 	To do:
 		Check if headers are in accordance with Datacentral requirements
+		Replace xmatch for 2MASS and EDR3 with values from the input catalogue
 
 	"""
 
