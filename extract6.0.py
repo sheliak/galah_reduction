@@ -2890,12 +2890,14 @@ def remove_telurics(date):
 		tot_var+=np.sum(abs(div-div_roll4))*0.1
 		return tot_var
 
+
 	iraf.noao(_doprint=0,Stdout="/dev/null")
 	iraf.onedspec(_doprint=0,Stdout="/dev/null")
 	iraf.dataio(_doprint=0,Stdout="/dev/null")
 
 	# create a dictionary of fitted parameters
 	trans_params={}
+	fitted_params={}
 
 	extract_log.info('Removing telluric absorption.')
 
@@ -2942,17 +2944,31 @@ def remove_telurics(date):
 			failed_wav=np.load('%s/failed_apertures.npy' % cob)
 
 			for file in files:
+				#use only apertures that traced properly and have high enough signal and have good wavelength solution
 				aps=[]
+				hdul=fits.open(file, mode='update')
+				snr=np.sqrt(np.median(hdul[0].data, axis=1))
+				airmass=1./np.cos(hdul[0].header['ZDSTART']/180.0*np.pi)
+				hdul.close()
+				wav_dict=np.load(cob+'/wav_fit.npy')
 				for ap in fibre_table_dict:
-					if fibre_table_dict[ap][8]=='P' and ap not in failed_wav: 
+					if fibre_table_dict[ap][8]=='P' and ap not in failed_wav and snr[ap-1]>15 and float(wav_dict[ap-1][1])<0.05:
 						aps.append(str(ap))
+
+				#if there aren't enough useful apertures, lower the criteria
+				if len(aps)<50:
+					aps=[]
+					for ap in fibre_table_dict:
+						if fibre_table_dict[ap][8]=='P' and ap not in failed_wav and float(wav_dict[ap-1][1])<0.1:
+							aps.append(str(ap))
+
 				aps=','.join(aps)
 				# write them into a file, because a list is too long for iraf
 				with open('%s/aps' % cob, 'w') as f:
 					f.write(aps)
 				# combine spectra from valid apertures, so we only do one tellurics fit per image
 				exposure_number=int(file[-12:-8])
-				iraf.scombine(input=file, output='/'.join(file.split('/')[:-1])+'/combined_'+file.split('/')[-1], combine='median', apertures='@%s/aps' % cob, group='all', Stdout="/dev/null")
+				iraf.scombine(input=file, output='/'.join(file.split('/')[:-1])+'/combined_'+file.split('/')[-1], combine='average', apertures='@%s/aps' % cob, group='all', reject='minmax', nlow=10, nhigh=10, Stdout="/dev/null")
 				os.remove('%s/aps' % cob)
 				iraf.wspectext(input='/'.join(file.split('/')[:-1])+'/combined_'+file.split('/')[-1], output='/'.join(file.split('/')[:-1])+'/combined_'+file.split('/')[-1][:-5]+'.txt', header='no', Stdout="/dev/null")
 				data=np.loadtxt('/'.join(file.split('/')[:-1])+'/combined_'+file.split('/')[-1][:-5]+'.txt')[10:-10] # first and last 10 pixels are truncated, because there are problems with the median due to different wavelength sollutions
@@ -2984,33 +3000,37 @@ def remove_telurics(date):
 
 					minner = Minimizer(total_variation, params, fcn_args=(data,trans_h2o,trans_o2))
 					result = minner.minimize(method='lbfgsb')
-					print file, report_fit(result)
+					#print file, report_fit(result)
 					res=[result.params['scale_h2o'].value, result.params['scale_o2'].value, result.params['vr'].value, result.params['res'].value, result.params['b'].value]
 				else:
 					# if this is the first time fitting this exposure, start from arbitrary initial conditions
 					params = Parameters()
-					params.add('scale_h2o', value=0.9, min=0.01, max=2.0)
-					# O2 can only be estimated on certain ccds 
+					params.add('scale_h2o', value=1.2, min=0.4, max=4.9)
+					# O2 can only be estimated on two ccds 
 					if ccd == 4 or ccd == 2: 
-						params.add('scale_o2', value=0.1, min=0.01, max=2.0, vary=True)
+						params.add('scale_o2', value=0.088*airmass, min=0.088*airmass-0.016, max=0.088*airmass+0.016, vary=True)
 					else:
-						params.add('scale_o2', value=0.1, min=0.01, max=2.0, vary=False)
-					params.add('vr', value=0.0, min=-0.05, max=0.05)
+						params.add('scale_o2', value=0.088*airmass, min=0.03, max=1.0, vary=False)
+					
 					if ccd==4: 
 						params.add('res', value=98.0, min=85, max=110)
 						params.add('b', value=2.01, vary=False)
+						params.add('vr', value=-0.01, min=-0.04, max=0.02)
 					if ccd==3: 
 						params.add('res', value=82.0, min=75, max=95)
 						params.add('b', value=2.08, vary=False)
+						params.add('vr', value=-0.01, min=-0.04, max=0.02)
 					if ccd==2: 
 						params.add('res', value=75.0, min=65, max=90)
 						params.add('b', value=2.15, vary=False)
+						params.add('vr', value=0.0, min=-0.05, max=0.05)
 					if ccd==1: 
 						params.add('res', value=65.0, min=55, max=90)
 						params.add('b', value=2.4, vary=False)
+						params.add('vr', value=0.0, min=-0.05, max=0.05)
 					minner = Minimizer(total_variation, params, fcn_args=(data,trans_h2o,trans_o2))
 					result = minner.minimize(method='lbfgsb')
-					print file, report_fit(result)
+					#print file, report_fit(result)
 					res=[result.params['scale_h2o'].value, result.params['scale_o2'].value, result.params['vr'].value, result.params['res'].value, result.params['b'].value]
 					trans_params[exposure_number]=res
 				os.remove('/'.join(file.split('/')[:-1])+'/combined_'+file.split('/')[-1])
@@ -3056,18 +3076,41 @@ def remove_telurics(date):
 				os.remove('/'.join(file.split('/')[:-1])+'/notel_'+file.split('/')[-1])
 				iraf.flprcache()
 
+				if ccd==4:
+					fitted_params[exposure_number]=[airmass, res[0], res[1], None, res[2], None]
+				if ccd==3 and exposure_number in fitted_params.keys():
+					fitted_params[exposure_number][3]=res[0]
+					fitted_params[exposure_number][5]=res[2]
 
-				#if ccd<5:
-				#	fig=figure('test')
-				#	ax=fig.add_subplot(111)
-				#	ax.plot(data[:,0], data[:,1]/np.percentile(data[:,1],95), 'k-', label='Input spectrum')
-				#	trans_interp=np.interp(data[:,0],trans_hitran[:,0]+res[2], trans_hitran_final)
-				#	ax.plot(data[:,0], trans_interp,'r-', label='Model')
-				#	ax.plot(data[:,0],data[:,1]/np.percentile(data[:,1],95)/trans_interp, 'g-', label='Corrected spectrum')
-				#	ax.set_xlabel('Wavelength / A')
-				#	ax.set_ylabel('flux')
-				#	ax.legend()
-				#	show()
+				#write h2o and o2 into header
+				hdul=fits.open(file, mode='update')
+				if ccd==4 or ccd==2:
+					hdul[0].header['TEL_H2O']=(res[0], 'H2O density (scale factor for HITRAN spectrum)')
+					hdul[0].header['TEL_O2']=(res[1], 'O2 density (scale factor for HITRAN spectrum)')
+				if ccd==1 or ccd==3:
+					hdul[0].header['TEL_H2O']=(res[0], 'H2O density (scale factor for HITRAN spectrum)')
+					hdul[0].header['TEL_O2']=('None', 'There are no O2 absorptions in this region')
+				hdul.close()
+
+				"""
+				if ccd==4:
+					fig=figure('test')
+					ax=fig.add_subplot(111)
+					ax.plot(data[:,0], data[:,1]/np.percentile(data[:,1],95), 'k-', label='Input spectrum')
+					trans_interp=np.interp(data[:,0],trans_hitran[:,0]+res[2], trans_hitran_final)
+					ax.plot(data[:,0], trans_interp,'r-', label='Model')
+					ax.plot(data[:,0],data[:,1]/np.percentile(data[:,1],95)/trans_interp, 'g-', label='Corrected spectrum')
+					ax.set_xlabel('Wavelength / A')
+					ax.set_ylabel('flux')
+					ax.legend()
+					ax.set_title(file.split('/')[-1]+'  '+str(airmass)[:4]+'  '+str(res[0])[:6]+'  '+str(res[1])[:6])
+					show()
+				"""
+	tel_res=open('tel_%s.csv' % (date), 'w')
+	tel_res.write('#run_id\tairmass\tH2O_CCD4\tO2_CCD4\tH2O_CCD3\tRV_CCD4\tRV_CCD3\n')
+	for i in fitted_params.keys():
+		tel_res.write(str(i)+'\t'+'\t'.join(np.array(fitted_params[i], dtype=str))+'\n')
+	tel_res.close()
 
 def create_final_spectra_proc(args):
 	"""
@@ -3463,6 +3506,13 @@ def create_final_spectra_proc(args):
 					hdul[extension].header['EPOCH_E']=(tm_e.decimalyear, 'Epoch, decimal years C.E. at end of exposure')
 					#convert start and end zd and ha to average ha and zd
 					hdul[extension].header['MEAN_ZD']=((hdul[0].header['ZDEND']+hdul[0].header['ZDSTART'])/2., 'Mean zenith distance')
+					hdul[extension].header['AIRMASS']=(1./np.cos((hdul[0].header['ZDEND']+hdul[0].header['ZDSTART'])/2.*np.pi/180.0), 'Mean airmass')
+					if os.path.exists('/'.join(file.split('/')[:-1])+'/telurics_'+file.split('/')[-1]):
+						hdul[extension].header['TEL_H2O']=(hdul[0].header['TEL_H2O'], 'H2O density (scale factor for HITRAN spectrum)')
+						hdul[extension].header['TEL_O2']=(hdul[0].header['TEL_O2'], 'O2 density (scale factor for HITRAN spectrum)')
+					else:
+						hdul[extension].header['TEL_H2O']=('None', 'H2O density (scale factor for HITRAN spectrum)')
+						hdul[extension].header['TEL_O2']=('None', 'O2 density (scale factor for HITRAN spectrum)')
 					hdul[extension].header['MEAN_HA']=((hdul[0].header['HAEND']+hdul[0].header['HASTART'])/2., 'Mean hour angle')
 					#wavelength solution
 					try: wav_rms=float(wav_dict[ap-1][1])
@@ -3664,13 +3714,32 @@ def create_final_spectra_proc(args):
 					hdul[extension].header['BARYEFF']=baryeff/len(filenames)
 				except:
 					hdul[extension].header['BARYEFF']=('None', 'Barycentric velocity correction was not done.')
-				#correct HA, ZD
+				#correct HA, ZD, and atmospheric molecules
 				ha=[]
 				zd=[]
+				h2o=[]
+				o2=[]
 				for file in filenames:
 					ha.append(float(headers_dict[file]['MEAN_HA']))
 					zd.append(float(headers_dict[file]['MEAN_ZD']))
+					h2o.append(headers_dict[file]['TEL_H2O'])
+					o2.append(headers_dict[file]['TEL_O2'])
+				#replace None values with np.nan
+				h2o=[np.nan if i=='None' else i for i in h2o]
+				o2=[np.nan if i=='None' else i for i in o2]
 				hdul[extension].header['MEAN_HA']=(np.average(ha), 'Mean hour angle')
+				hdul[extension].header['AIRMASS']=(1./np.cos(np.average(zd)*np.pi/180.0), 'Mean airmass')
+				if all([np.isnan(i) for i in h2o]):
+						hdul[extension].header['TEL_H2O']=('None', 'H2O density (scale factor for HITRAN spectrum)')
+				else:
+					hdul[extension].header['TEL_H2O']=(np.nanmean(h2o), 'H2O density (scale factor for HITRAN spectrum)')
+				if ccd==2 or ccd==4:
+					if all([np.isnan(i) for i in o2]):
+						hdul[extension].header['TEL_O2']=('None', 'O2 density (scale factor for HITRAN spectrum)')
+					else:
+						hdul[extension].header['TEL_O2']=(np.nanmean(o2), 'O2 density (scale factor for HITRAN spectrum)')
+				if ccd==1 or ccd==3:
+					hdul[extension].header['TEL_O2']=('None', 'There are no O2 absorptions in this region')
 				hdul[extension].header['MEAN_ZD']=(np.average(zd), 'Mean zenith distance')
 				#combine wavelength solution
 				wav_flag=[]
@@ -3801,6 +3870,7 @@ def create_database(date):
 	cols.append(fits.Column(name='mean_ra', format='E', unit='deg'))
 	cols.append(fits.Column(name='mean_dec', format='E', unit='deg'))
 	cols.append(fits.Column(name='mean_zd', format='E', unit='deg'))
+	cols.append(fits.Column(name='mean_airmass', format='E'))
 	cols.append(fits.Column(name='mean_ha', format='E', unit='deg'))
 	cols.append(fits.Column(name='cfg_file', format='A48', null=None))
 	cols.append(fits.Column(name='cfg_field_name', format='A56', null=None))
@@ -3811,6 +3881,8 @@ def create_database(date):
 	cols.append(fits.Column(name='snr', format='4E', null=None))
 	cols.append(fits.Column(name='snr_AA', format='4E', null=None))
 	cols.append(fits.Column(name='fibre_throughput', format='4E', null=None))
+	cols.append(fits.Column(name='telluric_h2o', format='4E', null=None))
+	cols.append(fits.Column(name='telluric_o2', format='4E', null=None))
 	cols.append(fits.Column(name='res', format='4E', null=None, unit='A'))
 	cols.append(fits.Column(name='b_par', format='4E', null=None))
 	cols.append(fits.Column(name='v_bary_eff', format='E', unit='km/s'))
@@ -3892,6 +3964,7 @@ def create_database(date):
 		mean_ra=header1['MEANRA']
 		mean_dec=header1['MEANDEC']
 		mean_zd=header1['MEAN_ZD']
+		mean_airmass=header1['AIRMASS']
 		mean_ha=header1['MEAN_HA']
 		mjd=header1['UTMJD']
 		utdate=header1['UTDATE']
@@ -3937,6 +4010,10 @@ def create_database(date):
 		snr_aa=[None if i=='None' else i for i in snr_aa]
 		fibre_throughput = [header_ccd['FIB_THR'] if header_ccd is not None else None for header_ccd in headers]
 		fibre_throughput=[None if i=='None' else i for i in fibre_throughput]
+		tel_h2o = [header_ccd['TEL_H2O'] if header_ccd is not None else None for header_ccd in headers]
+		tel_h2o=[None if i=='None' else i for i in tel_h2o]
+		tel_o2 = [header_ccd['TEL_O2'] if header_ccd is not None else None for header_ccd in headers]
+		tel_o2=[None if i=='None' else i for i in tel_o2]
 		res = [header_ccd['RES'] if header_ccd is not None else None for header_ccd in headers]
 		res=[None if i=='None' else i for i in res]
 		b = [header_ccd['B'] if header_ccd is not None else None for header_ccd in headers]
@@ -3990,7 +4067,7 @@ def create_database(date):
 			if header4['RV_OK']==0: flag+=32768
 
 		#add parameters into the table
-		table.add_row([sobject, ra, dec, ra_icrs, dec_icrs, mjd, utdate, epoch, mjd_s, utdate_s, epoch_s, mjd_e, utdate_e, epoch_e, aperture, pivot, fibre, fibre_x, fibre_y, fibre_theta, plate, aperture_position, mean_ra, mean_dec, mean_zd, mean_ha, cfg_file, cfg_field_name, obj_name, galah_id, tmass_id, gaia_id, snr, snr_aa, fibre_throughput, res, b, v_bary_eff, exposed, mag, ebv, wav_rms, wav_n_lines, n_combined, rv, e_rv, rv_com, e_rv_com, teff, logg, feh, alpha, vmic, vbroad, obs_comment, pipeline_version, flag])
+		table.add_row([sobject, ra, dec, ra_icrs, dec_icrs, mjd, utdate, epoch, mjd_s, utdate_s, epoch_s, mjd_e, utdate_e, epoch_e, aperture, pivot, fibre, fibre_x, fibre_y, fibre_theta, plate, aperture_position, mean_ra, mean_dec, mean_zd, mean_airmass, mean_ha, cfg_file, cfg_field_name, obj_name, galah_id, tmass_id, gaia_id, snr, snr_aa, fibre_throughput, tel_h2o, tel_o2, res, b, v_bary_eff, exposed, mag, ebv, wav_rms, wav_n_lines, n_combined, rv, e_rv, rv_com, e_rv_com, teff, logg, feh, alpha, vmic, vbroad, obs_comment, pipeline_version, flag])
 
 	#write table to hdu
 	hdu=fits.BinTableHDU(table)
@@ -4026,41 +4103,44 @@ def create_database(date):
 	header['TTYPE23']=(header['TTYPE23'], 'RA of telescope position')
 	header['TTYPE24']=(header['TTYPE24'], 'dec of telescope position')
 	header['TTYPE25']=(header['TTYPE25'], 'zenith distance of telescope position')
-	header['TTYPE26']=(header['TTYPE26'], 'hour angle of telescope position')
-	header['TTYPE27']=(header['TTYPE27'], 'name of the fibre configuration file')
-	header['TTYPE28']=(header['TTYPE28'], 'name of the field in cfg_file')
-	header['TTYPE29']=(header['TTYPE29'], 'object name')
-	header['TTYPE30']=(header['TTYPE30'], 'galahic id')
-	header['TTYPE31']=(header['TTYPE31'], '2MASS id')
-	header['TTYPE32']=(header['TTYPE32'], 'Gaia EDR3 source id')
-	header['TTYPE33']=(header['TTYPE33'], 'mean snr in 4 CCDs')
-	header['TTYPE34']=(header['TTYPE34'], 'mean snr per Angstrom in 4 CCDs')
-	header['TTYPE35']=(header['TTYPE35'], 'fibre throughput in 4 CCDs')
-	header['TTYPE36']=(header['TTYPE36'], 'mean resolution (FWHM) in 4 CCDs')
-	header['TTYPE37']=(header['TTYPE37'], 'LSF B parameter in 4 CCDs')
-	header['TTYPE38']=(header['TTYPE38'], 'mean barycentric velocity (already corrected)')
-	header['TTYPE39']=(header['TTYPE39'], 'total exposure time')
-	header['TTYPE40']=(header['TTYPE40'], 'magnitude as given in cfg_file')
-	header['TTYPE41']=(header['TTYPE41'], 'terminal E(B-V) from Planck maps')
-	header['TTYPE42']=(header['TTYPE42'], 'RMS of wavlength calibr. in 4 CCDs')
-	header['TTYPE43']=(header['TTYPE43'], 'number of lines found/used for wav. cal.')
-	header['TTYPE44']=(header['TTYPE44'], 'number of spectra combined (see image header for list of combined spectra)')
-	header['TTYPE44']=(header['TTYPE44'], 'radial velocity in 4 CCDs')
-	header['TTYPE45']=(header['TTYPE45'], 'rv uncertainty in 4 CCDs')
-	header['TTYPE46']=(header['TTYPE46'], 'rv combined from all arms')
-	header['TTYPE47']=(header['TTYPE47'], 'combined rv uncertainty')
-	header['TTYPE48']=(header['TTYPE48'], 'effective tmperature in K')
-	header['TTYPE49']=(header['TTYPE49'], 'log of surface gravitational acceleration in log(cm / s^2)')
-	header['TTYPE50']=(header['TTYPE50'], 'iron abundance ([Fe/H])')
-	header['TTYPE51']=(header['TTYPE51'], 'alpha abundance ([alpha/Fe])')
-	header['TTYPE52']=(header['TTYPE52'], 'microturbulence in km/s')
-	header['TTYPE53']=(header['TTYPE53'], 'broadening velocity in km/s')
-	header['TTYPE54']=(header['TTYPE54'], 'comments by observer')
-	header['TTYPE55']=(header['TTYPE55'], 'pipeline evrsion')
-	header['TTYPE56']=(header['TTYPE56'], 'reduction flags given as a binary mask')
+	header['TTYPE26']=(header['TTYPE26'], 'mean airmass')
+	header['TTYPE27']=(header['TTYPE27'], 'hour angle of telescope position')
+	header['TTYPE28']=(header['TTYPE28'], 'name of the fibre configuration file')
+	header['TTYPE29']=(header['TTYPE29'], 'name of the field in cfg_file')
+	header['TTYPE30']=(header['TTYPE30'], 'object name')
+	header['TTYPE31']=(header['TTYPE31'], 'galahic id')
+	header['TTYPE32']=(header['TTYPE32'], '2MASS id')
+	header['TTYPE33']=(header['TTYPE33'], 'Gaia EDR3 source id')
+	header['TTYPE34']=(header['TTYPE34'], 'mean snr in 4 CCDs')
+	header['TTYPE35']=(header['TTYPE35'], 'mean snr per Angstrom in 4 CCDs')
+	header['TTYPE36']=(header['TTYPE36'], 'fibre throughput in 4 CCDs')
+	header['TTYPE37']=(header['TTYPE37'], 'density of telluric H2O in 4 CCDs')
+	header['TTYPE38']=(header['TTYPE38'], 'density of telluric O2 in 4 CCDs')
+	header['TTYPE39']=(header['TTYPE39'], 'mean resolution (FWHM) in 4 CCDs')
+	header['TTYPE40']=(header['TTYPE40'], 'LSF B parameter in 4 CCDs')
+	header['TTYPE41']=(header['TTYPE41'], 'mean barycentric velocity (already corrected)')
+	header['TTYPE42']=(header['TTYPE42'], 'total exposure time')
+	header['TTYPE43']=(header['TTYPE43'], 'magnitude as given in cfg_file')
+	header['TTYPE44']=(header['TTYPE44'], 'terminal E(B-V) from Planck maps')
+	header['TTYPE45']=(header['TTYPE45'], 'RMS of wavlength calibr. in 4 CCDs')
+	header['TTYPE46']=(header['TTYPE46'], 'number of lines found/used for wav. cal.')
+	header['TTYPE47']=(header['TTYPE47'], 'number of spectra combined (see image header for list of combined spectra)')
+	header['TTYPE48']=(header['TTYPE48'], 'radial velocity in 4 CCDs')
+	header['TTYPE49']=(header['TTYPE49'], 'rv uncertainty in 4 CCDs')
+	header['TTYPE50']=(header['TTYPE50'], 'rv combined from all arms')
+	header['TTYPE51']=(header['TTYPE51'], 'combined rv uncertainty')
+	header['TTYPE52']=(header['TTYPE52'], 'effective tmperature in K')
+	header['TTYPE53']=(header['TTYPE53'], 'log of surface gravitational acceleration in log(cm / s^2)')
+	header['TTYPE54']=(header['TTYPE54'], 'iron abundance ([Fe/H])')
+	header['TTYPE55']=(header['TTYPE55'], 'alpha abundance ([alpha/Fe])')
+	header['TTYPE56']=(header['TTYPE56'], 'microturbulence in km/s')
+	header['TTYPE57']=(header['TTYPE57'], 'broadening velocity in km/s')
+	header['TTYPE58']=(header['TTYPE58'], 'comments by observer')
+	header['TTYPE59']=(header['TTYPE59'], 'pipeline evrsion')
+	header['TTYPE60']=(header['TTYPE60'], 'reduction flags given as a binary mask')
 
 	#fix bug in astropy (formating of string arrays. Last 7 is dropped when data is inserted)
-	header['TFORM43']='28A7'#this is wav_n_lines column
+	header['TFORM46']='28A7'#this is wav_n_lines column
 	hdul.close()
 
 	#set table name

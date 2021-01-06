@@ -25,6 +25,7 @@ aperture_position	Centre of the aperture in an image at column x=2000. If spectr
 mean_ra	Right ascension of the telescope pointing in decimal degrees.
 mean_dec	Declination of the telescope pointing in decimal degrees.
 mean_zd	Zenith distance of the telescope pointing in decimal degrees.
+mean_airmass	Airmass calculated as sec(mean_zd).
 mean_ha	Hour angle of the telescope pointing in decimal degrees.
 cfg_file	Name of the file used to configure the observed field (a .fld file).
 cfg_field_name	Name of the field as given in the cfg_file.
@@ -35,6 +36,8 @@ gaia_id	Gaia EDR3 source ID. This is obtained from a simple cross-match using (r
 snr	Mean signal to noise ratio per pixel. Is an array with four numbers for blue, green, red and IR ccds.
 snr_AA	Mean signal to noise ratio per Angstrom. Is an array with four numbers for blue, green, red and IR ccds.
 fibre_throughput	Fibre throughput measured relative to the most transparent fibre in each COB. Most transparent fibre has throughput=1.
+telluric_h2o	Density of absorptions of water vapor in the atmosphere. This is a scalling factor with which the HITRAN spectrum is multiplied during telluric absorption removal. Value for blue CCD is assumed to be the same as for IR CCD, as telluric absorptions in blue are miniscule and not possible to fit.
+telluric_o2	Density of absorptions of molecular oxygen in the atmosphere. This is a scalling factor with which the HITRAN spectrum is multiplied during telluric absorption removal. Values for red and blue CCDs are 'NULL', because there are no oxygen absorption lines there.
 res	Mean resolution given as FWHM of the LSF in Angstroms.  Is an array with four numbers for blue, green, red and IR ccds.
 b_par	B parameter used to define the LSF. Is an array with four numbers for blue, green, red and IR ccds. B parameter is a constant for each spectrum in each ccd.
 v_bary_eff	Effective barycentric velocity correction in km/s. This correction is already applied to all spectra. It is calculated for time mjd.
