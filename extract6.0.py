@@ -11,10 +11,11 @@ import os
 import shutil
 stderr = sys.stderr
 sys.stderr = open(os.devnull, 'w')
-from pyraf import iraf
-sys.stderr = stderr
 from matplotlib import *
 from pylab import *
+use('Agg')
+from pyraf import iraf
+sys.stderr = stderr
 import matplotlib.transforms as transforms
 from matplotlib.ticker import MultipleLocator, AutoMinorLocator
 import matplotlib.gridspec as gridspec
@@ -35,8 +36,7 @@ from scipy.optimize import curve_fit
 import argparse
 from parameters_nn import get_parameters_nn
 from dustmaps.planck import PlanckQuery
-
-use('TkAgg')
+import pickle
 
 # possible NDFCLASS values in human readable form
 ndfclass_types={'MFFFF':'fibre flat', 'MFARC':'arc', 'MFOBJECT':'object', 'BIAS':'bias'}
@@ -855,8 +855,6 @@ def find_apertures(date, start_folder):
 			f=open(cob+"/apmasterflat", "r")
 			g=open(cob+"/apmasterflat_cor", "w")
 			start=False
-
-			#iraf.delete('tmp$idiraf*')
 
 			for line in f:
 				l=line.strip().split()
@@ -2978,21 +2976,21 @@ def remove_telurics(date):
 					# initial conditions depend on which ccd we are fitting
 					if ccd==3:
 						params = Parameters()
-						params.add('scale_h2o', value=trans_params[exposure_number][0], min=trans_params[exposure_number][0]*0.7, max=trans_params[exposure_number][0]*1.3)
+						params.add('scale_h2o', value=0.81*trans_params[exposure_number][0], min=0.81*trans_params[exposure_number][0]-0.35, max=0.81*trans_params[exposure_number][0]+0.35)
 						params.add('scale_o2', value=0.1, min=0.01, max=2.0, vary=False) # there is no O2 in red ccd
 						params.add('vr', value=0.0, min=-0.05, max=0.05)
 						params.add('res', value=82.0, min=75.0, max=95.0)
 						params.add('b', value=2.08, vary=False)
 					if ccd==2:
 						params = Parameters()
-						params.add('scale_h2o', value=trans_params[exposure_number][0], min=trans_params[exposure_number][0]*0.7, max=trans_params[exposure_number][0]*1.3)
-						params.add('scale_o2', value=trans_params[exposure_number][1], min=trans_params[exposure_number][1]*0.7, max=trans_params[exposure_number][1]*1.3)
+						params.add('scale_h2o', value=0.81*trans_params[exposure_number][0], min=0.81*trans_params[exposure_number][0]-0.35, max=0.81*trans_params[exposure_number][0]+0.35)
+						params.add('scale_o2', value=trans_params[exposure_number][1], min=trans_params[exposure_number][1]-0.015, max=trans_params[exposure_number][1]+0.015)
 						params.add('vr', value=0.0, min=-0.05, max=0.05)
 						params.add('res', value=75.0, min=65.0, max=90.0)
 						params.add('b', value=2.15, vary=False)
 					if ccd==1:
 						params = Parameters()
-						params.add('scale_h2o', value=trans_params[exposure_number][0], vary=False) # use already measured values, because tellurics in blue are too weak to fit
+						params.add('scale_h2o', value=0.81*trans_params[exposure_number][0], vary=False) # use already measured values, because tellurics in blue are too weak to fit
 						params.add('scale_o2', value=0.1, min=0.01, max=2.0, vary=False) # there is no O2 in blue ccd
 						params.add('vr', value=0.0, min=-0.05, max=0.05)
 						params.add('res', value=65.0, min=55.0, max=90.0)
@@ -3005,12 +3003,12 @@ def remove_telurics(date):
 				else:
 					# if this is the first time fitting this exposure, start from arbitrary initial conditions
 					params = Parameters()
-					params.add('scale_h2o', value=1.2, min=0.4, max=4.9)
+					params.add('scale_h2o', value=1.2, min=0.35, max=5.0)
 					# O2 can only be estimated on two ccds 
 					if ccd == 4 or ccd == 2: 
-						params.add('scale_o2', value=0.088*airmass, min=0.088*airmass-0.016, max=0.088*airmass+0.016, vary=True)
+						params.add('scale_o2', value=0.089*airmass, min=0.089*airmass-0.01, max=0.089*airmass+0.01, vary=True)
 					else:
-						params.add('scale_o2', value=0.088*airmass, min=0.03, max=1.0, vary=False)
+						params.add('scale_o2', value=0.089*airmass, min=0.03, max=1.0, vary=False)
 					
 					if ccd==4: 
 						params.add('res', value=98.0, min=85, max=110)
@@ -3076,11 +3074,14 @@ def remove_telurics(date):
 				os.remove('/'.join(file.split('/')[:-1])+'/notel_'+file.split('/')[-1])
 				iraf.flprcache()
 
-				if ccd==4:
-					fitted_params[exposure_number]=[airmass, res[0], res[1], None, res[2], None]
-				if ccd==3 and exposure_number in fitted_params.keys():
-					fitted_params[exposure_number][3]=res[0]
-					fitted_params[exposure_number][5]=res[2]
+				#if ccd==4:
+				#	fitted_params[exposure_number]=[airmass, res[0], res[1], None, res[2], None, None, None]
+				#if ccd==3 and exposure_number in fitted_params.keys():
+				#	fitted_params[exposure_number][3]=res[0]
+				#	fitted_params[exposure_number][5]=res[2]
+				#if ccd==2: 
+				#	fitted_params[exposure_number][6]=res[0]
+				#	fitted_params[exposure_number][7]=res[1]
 
 				#write h2o and o2 into header
 				hdul=fits.open(file, mode='update')
@@ -3106,17 +3107,17 @@ def remove_telurics(date):
 					ax.set_title(file.split('/')[-1]+'  '+str(airmass)[:4]+'  '+str(res[0])[:6]+'  '+str(res[1])[:6])
 					show()
 				"""
-	tel_res=open('tel_%s.csv' % (date), 'w')
-	tel_res.write('#run_id\tairmass\tH2O_CCD4\tO2_CCD4\tH2O_CCD3\tRV_CCD4\tRV_CCD3\n')
-	for i in fitted_params.keys():
-		tel_res.write(str(i)+'\t'+'\t'.join(np.array(fitted_params[i], dtype=str))+'\n')
-	tel_res.close()
+	#tel_res=open('tel_%s.csv' % (date), 'w')
+	#tel_res.write('#run_id\tairmass\tH2O_CCD4\tO2_CCD4\tH2O_CCD3\tRV_CCD4\tRV_CCD3\tH2O_CCD2\tO2_CCD2\n')
+	#for i in fitted_params.keys():
+	#	tel_res.write(str(i)+'\t'+'\t'.join(np.array(fitted_params[i], dtype=str))+'\n')
+	#tel_res.close()
 
 def create_final_spectra_proc(args):
 	"""
 	Multiprocessing wrapper for create_final_spectra
 	"""
-	ccd, cob, files, plot_diag = args
+	ccd, cob, files, plot_diag,dict_dr2_edr3 = args
 	date=cob.split('/')[1]
 
 	planck = PlanckQuery()
@@ -3342,6 +3343,8 @@ def create_final_spectra_proc(args):
 				x=fibre_table_dict[ap][3]
 				y=fibre_table_dict[ap][4]
 				theta=fibre_table_dict[ap][7]
+				pmra=float(fibre_table_dict[ap][15])#value in the table is not multiplied by cos(dec)
+				pmdec=float(fibre_table_dict[ap][16])
 				mag=fibre_table_dict[ap][10]
 				ebv=fibre_table_dict[ap][18]
 				#check aperture flags
@@ -3427,6 +3430,7 @@ def create_final_spectra_proc(args):
 					if len(object_name)>0 and object_name.split('_')[0]=='tmass':
 						hdul[extension].header['2MASS_ID']=(object_name.split('_')[1], '2MASS id (if exists)')
 					#if object name is galahic_xxxxxxxx, check table
+					#TODO
 					elif len(object_name)>0 and object_name.split('_')[0]=='galahic':
 						hdul[extension].header['2MASS_ID']=(tmass_dict[ap], '2MASS id (if exists)')
 					#if nothing else works, use cross-match
@@ -3436,12 +3440,20 @@ def create_final_spectra_proc(args):
 					#if gaia edr3 source_id is part of the name, use it
 					if len(object_name)>0 and object_name.split('_')[0]=='gaiaedr3':
 						hdul[extension].header['GAIA_ID']=(object_name.split('_')[1], 'Gaia EDR3 source_id (if exists)')
+						gaia_id=object_name.split('_')[1]
 					#if gaia_dr2 source_id is in te object name, use that and the dr2-edr3 xmatch to get edr3 source_id
+					#if there is no entry in the dict, both source_ids re the same.
 					elif len(object_name)>0 and object_name.split('_')[0]=='gaiadr2':
-						hdul[extension].header['GAIA_ID']=(gaia_dict[ap][0], 'Gaia EDR3 source_id (if exists)')
+						try:
+							hdul[extension].header['GAIA_ID']=(dict_dr2_edr3[object_name.split('_')[1]], 'Gaia EDR3 source_id (if exists)')
+							gaia_id=dict_dr2_edr3[object_name.split('_')[1]]
+						except KeyError:
+							hdul[extension].header['GAIA_ID']=(object_name.split('_')[1], 'Gaia EDR3 source_id (if exists)')
+							gaia_id=object_name.split('_')[1]
 					#use xmatch by coordinates otherwise
 					else:
 						hdul[extension].header['GAIA_ID']=(gaia_dict[ap][0], 'Gaia EDR3 source_id (if exists)')
+						gaia_id=gaia_dict[ap][0]
 					#add object name (first column in fibre table)
 					hdul[extension].header['OBJ_NAME']=(object_name, 'Object name from the .fld file')
 					#add average snr and average resolution
@@ -3453,8 +3465,14 @@ def create_final_spectra_proc(args):
 					#add ra and dec of object
 					hdul[extension].header['RA_OBS']=(ra, 'RA of object in degrees')
 					hdul[extension].header['DEC_OBS']=(dec, 'dec of object in degrees')
-					hdul[extension].header['RA_ICRS']=(gaia_dict[ap][1], 'RA of object in degrees in ICRS')
-					hdul[extension].header['DEC_ICRS']=(gaia_dict[ap][2], 'dec of object in degrees in ICRS')
+					#add ICRS coordinates
+					if gaia_id=='None':
+						#if there is no gaia id, there are no icrs coordinates known and we have to calculate them.
+						hdul[extension].header['RA_ICRS']=(gaia_dict[ap][1]+pmra*16.0, 'RA of object in degrees in ICRS')#correct position for 16 years from J2000.0 to Gaia's J2016.0
+						hdul[extension].header['DEC_ICRS']=(gaia_dict[ap][2]+pmdec*16.0, 'dec of object in degrees in ICRS')
+					else:
+						hdul[extension].header['RA_ICRS']=(gaia_dict[ap][1], 'RA of object in degrees in ICRS')
+						hdul[extension].header['DEC_ICRS']=(gaia_dict[ap][2], 'dec of object in degrees in ICRS')
 					#fibre and pivot numbers
 					hdul[extension].header['APERTURE']=(ap, 'Aperture number (1-392, in image)')
 					hdul[extension].header['PIVOT']=(int(pivot), 'Pivot number (1-400, in 2dF)')
@@ -3806,6 +3824,10 @@ def create_final_spectra(date, ncpu=1, plot_diagnostics=False):
 	iraf.noao(_doprint=0,Stdout="/dev/null")
 	iraf.onedspec(_doprint=0,Stdout="/dev/null")
 	iraf.flprcache()
+
+	#load xmatched catalogues
+	with open('aux/dict_dr2_edr3.pickle', 'rb') as handle:
+		dict_dr2_edr3=pickle.load(handle)
 	
 	args=[]
 
@@ -3815,7 +3837,7 @@ def create_final_spectra(date, ncpu=1, plot_diagnostics=False):
 			files=glob.glob("%s/[01-31]*.ms.fits" % cob)
 			# use only COBS with availible spectral data, some ccds could be missing
 			if len(files) > 0:
-				args.append([ccd,cob,files, plot_diagnostics])
+				args.append([ccd,cob,files, plot_diagnostics, dict_dr2_edr3])
 
 	if ncpu>1:
 		pool = Pool(processes=ncpu)
