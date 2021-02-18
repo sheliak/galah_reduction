@@ -524,6 +524,10 @@ def remove_bias(date):
 						hdu_c.flush()						
 		
 		shutil.rmtree("reductions/%s/ccd%s/biases" % (date,ccd))
+		# sometimes the biases folder is not deleted properly. Lets fix this
+		if os.path.exists("reductions/%s/ccd%s/biases" % (date,ccd)):
+			time.sleep(5)
+			shutil.rmtree("reductions/%s/ccd%s/biases" % (date,ccd))
 
 def fix_gain(date):
 	"""
@@ -1532,7 +1536,7 @@ def extract_spectra(date, start_folder):
 			iraf.flprcache()
 
 
-def wav_calibration(date, start_folder):
+def wav_calibration(date, start_folder, plot_diagnostics=False):
 	"""
 	Calculate wavelength calibration and apply it to spectra.
 
@@ -1814,97 +1818,99 @@ def wav_calibration(date, start_folder):
 			# save diagnostics plots
 			coefficients=np.array(coefficients)
 
-			fig=plt.figure(0, figsize=(16,7.5))
-			subplots_adjust(left=0.06, right=0.99, top=0.95, bottom=0.07, wspace=0.0, hspace=0.0)
-			ax=fig.add_subplot(411)
-			ax.set_title('COB = '+cob.split('/')[-1]+', CCD = '+str(ccd))
-			y_points=np.concatenate((coefficients_default[:392][:,0],coefficients[:,0]))
-			y_points=y_points[(y_points<np.percentile(y_points,90))&(y_points>np.percentile(y_points,10))]
-			y_lower=np.average(y_points)-3.2*np.std(y_points)
-			y_upper=np.average(y_points)+3.2*np.std(y_points)
-			ax.set_ylim(y_lower, y_upper)
-			ax.set_ylabel('$C_1$')
-			for n,i in enumerate(coefficients_default[:392][:,0]):
-				if i<y_lower:
-					ax.scatter(n+1,y_lower,c='g', alpha=0.5,lw=0.0,s=15,marker=7)
-				elif i>y_upper:
-					ax.scatter(n+1,y_upper,c='g', alpha=0.5,lw=0.0,s=15,marker=6)
-				else:
-					ax.scatter(n+1,i,c='g', alpha=0.5,lw=0.0,s=10, marker='o')
-			for n,i in enumerate(coefficients[:,0]):
-				if i<y_lower:
-					ax.scatter(n+1,y_lower,c='r', alpha=0.5,lw=0.0,s=15,marker=7)
-				elif i>y_upper:
-					ax.scatter(n+1,y_upper,c='r', alpha=0.5,lw=0.0,s=15,marker=6)
-				else:
-					ax.scatter(n+1,i,c='r', alpha=0.5,lw=0.0,s=10, marker='o')
-			ax=fig.add_subplot(412, sharex=ax)
-			y_points=np.concatenate((coefficients_default[:392][:,1],coefficients[:,1]))
-			y_points=y_points[(y_points<np.percentile(y_points,90))&(y_points>np.percentile(y_points,10))]
-			y_lower=np.average(y_points)-4.0*np.std(y_points)
-			y_upper=np.average(y_points)+4.0*np.std(y_points)
-			ax.set_ylim(y_lower, y_upper)
-			ax.set_ylabel('$C_2$')
-			for n,i in enumerate(coefficients_default[:392][:,1]):
-				if i<y_lower:
-					ax.scatter(n+1,y_lower,c='g', alpha=0.5,lw=0.0,s=15,marker=7)
-				elif i>y_upper:
-					ax.scatter(n+1,y_upper,c='g', alpha=0.5,lw=0.0,s=15,marker=6)
-				else:
-					ax.scatter(n+1,i,c='g', alpha=0.5,lw=0.0,s=10, marker='o')
-			for n,i in enumerate(coefficients[:,1]):
-				if i<y_lower:
-					ax.scatter(n+1,y_lower,c='r', alpha=0.5,lw=0.0,s=15,marker=7)
-				elif i>y_upper:
-					ax.scatter(n+1,y_upper,c='r', alpha=0.5,lw=0.0,s=15,marker=6)
-				else:
-					ax.scatter(n+1,i,c='r', alpha=0.5,lw=0.0,s=10, marker='o')
-			ax=fig.add_subplot(413, sharex=ax)
-			y_points=np.concatenate((coefficients_default[:392][:,2],coefficients[:,2]))
-			y_points=y_points[(y_points<np.percentile(y_points,90))&(y_points>np.percentile(y_points,10))]
-			y_lower=np.average(y_points)-4.5*np.std(y_points)
-			y_upper=np.average(y_points)+4.5*np.std(y_points)
-			ax.set_ylim(y_lower, y_upper)
-			ax.set_ylabel('$C_3$')
-			for n,i in enumerate(coefficients_default[:392][:,2]):
-				if i<y_lower:
-					ax.scatter(n+1,y_lower,c='g', alpha=0.5,lw=0.0,s=15,marker=7)
-				elif i>y_upper:
-					ax.scatter(n+1,y_upper,c='g', alpha=0.5,lw=0.0,s=15,marker=6)
-				else:
-					ax.scatter(n+1,i,c='g', alpha=0.5,lw=0.0,s=10, marker='o')
-			for n,i in enumerate(coefficients[:,2]):
-				if i<y_lower:
-					ax.scatter(n+1,y_lower,c='r', alpha=0.5,lw=0.0,s=15,marker=7)
-				elif i>y_upper:
-					ax.scatter(n+1,y_upper,c='r', alpha=0.5,lw=0.0,s=15,marker=6)
-				else:
-					ax.scatter(n+1,i,c='r', alpha=0.5,lw=0.0,s=10, marker='o')
-			ax=fig.add_subplot(414, sharex=ax)
-			y_points=np.concatenate((coefficients_default[:392][:,3],coefficients[:,3]))
-			y_points=y_points[(y_points<np.percentile(y_points,90))&(y_points>np.percentile(y_points,10))]
-			y_lower=np.average(y_points)-5.0*np.std(y_points)
-			y_upper=np.average(y_points)+5.0*np.std(y_points)
-			ax.set_ylim(y_lower, y_upper)
-			ax.set_ylabel('$C_4$')
-			for n,i in enumerate(coefficients_default[:392][:,3]):
-				if i<y_lower:
-					ax.scatter(n+1,y_lower,c='g', alpha=0.5,lw=0.0,s=15,marker=7)
-				elif i>y_upper:
-					ax.scatter(n+1,y_upper,c='g', alpha=0.5,lw=0.0,s=15,marker=6)
-				else:
-					ax.scatter(n+1,i,c='g', alpha=0.5,lw=0.0,s=10, marker='o')
-			for n,i in enumerate(coefficients[:,3]):
-				if i<y_lower:
-					ax.scatter(n+1,y_lower,c='r', alpha=0.5,lw=0.0,s=15,marker=7)
-				elif i>y_upper:
-					ax.scatter(n+1,y_upper,c='r', alpha=0.5,lw=0.0,s=15,marker=6)
-				else:
-					ax.scatter(n+1,i,c='r', alpha=0.5,lw=0.0,s=10, marker='o')
-			ax.set_xlim(0,394)
-			ax.set_xlabel('Aperture')
-			fig.savefig('wav_'+cob.split('/')[-1]+'00xxx'+str(ccd)+'.png', dpi=300, format='png')
-			fig.clf()
+			if plot_diagnostics:
+
+				fig=plt.figure(0, figsize=(16,7.5))
+				subplots_adjust(left=0.06, right=0.99, top=0.95, bottom=0.07, wspace=0.0, hspace=0.0)
+				ax=fig.add_subplot(411)
+				ax.set_title('COB = '+cob.split('/')[-1]+', CCD = '+str(ccd))
+				y_points=np.concatenate((coefficients_default[:392][:,0],coefficients[:,0]))
+				y_points=y_points[(y_points<np.percentile(y_points,90))&(y_points>np.percentile(y_points,10))]
+				y_lower=np.average(y_points)-3.2*np.std(y_points)
+				y_upper=np.average(y_points)+3.2*np.std(y_points)
+				ax.set_ylim(y_lower, y_upper)
+				ax.set_ylabel('$C_1$')
+				for n,i in enumerate(coefficients_default[:392][:,0]):
+					if i<y_lower:
+						ax.scatter(n+1,y_lower,c='g', alpha=0.5,lw=0.0,s=15,marker=7)
+					elif i>y_upper:
+						ax.scatter(n+1,y_upper,c='g', alpha=0.5,lw=0.0,s=15,marker=6)
+					else:
+						ax.scatter(n+1,i,c='g', alpha=0.5,lw=0.0,s=10, marker='o')
+				for n,i in enumerate(coefficients[:,0]):
+					if i<y_lower:
+						ax.scatter(n+1,y_lower,c='r', alpha=0.5,lw=0.0,s=15,marker=7)
+					elif i>y_upper:
+						ax.scatter(n+1,y_upper,c='r', alpha=0.5,lw=0.0,s=15,marker=6)
+					else:
+						ax.scatter(n+1,i,c='r', alpha=0.5,lw=0.0,s=10, marker='o')
+				ax=fig.add_subplot(412, sharex=ax)
+				y_points=np.concatenate((coefficients_default[:392][:,1],coefficients[:,1]))
+				y_points=y_points[(y_points<np.percentile(y_points,90))&(y_points>np.percentile(y_points,10))]
+				y_lower=np.average(y_points)-4.0*np.std(y_points)
+				y_upper=np.average(y_points)+4.0*np.std(y_points)
+				ax.set_ylim(y_lower, y_upper)
+				ax.set_ylabel('$C_2$')
+				for n,i in enumerate(coefficients_default[:392][:,1]):
+					if i<y_lower:
+						ax.scatter(n+1,y_lower,c='g', alpha=0.5,lw=0.0,s=15,marker=7)
+					elif i>y_upper:
+						ax.scatter(n+1,y_upper,c='g', alpha=0.5,lw=0.0,s=15,marker=6)
+					else:
+						ax.scatter(n+1,i,c='g', alpha=0.5,lw=0.0,s=10, marker='o')
+				for n,i in enumerate(coefficients[:,1]):
+					if i<y_lower:
+						ax.scatter(n+1,y_lower,c='r', alpha=0.5,lw=0.0,s=15,marker=7)
+					elif i>y_upper:
+						ax.scatter(n+1,y_upper,c='r', alpha=0.5,lw=0.0,s=15,marker=6)
+					else:
+						ax.scatter(n+1,i,c='r', alpha=0.5,lw=0.0,s=10, marker='o')
+				ax=fig.add_subplot(413, sharex=ax)
+				y_points=np.concatenate((coefficients_default[:392][:,2],coefficients[:,2]))
+				y_points=y_points[(y_points<np.percentile(y_points,90))&(y_points>np.percentile(y_points,10))]
+				y_lower=np.average(y_points)-4.5*np.std(y_points)
+				y_upper=np.average(y_points)+4.5*np.std(y_points)
+				ax.set_ylim(y_lower, y_upper)
+				ax.set_ylabel('$C_3$')
+				for n,i in enumerate(coefficients_default[:392][:,2]):
+					if i<y_lower:
+						ax.scatter(n+1,y_lower,c='g', alpha=0.5,lw=0.0,s=15,marker=7)
+					elif i>y_upper:
+						ax.scatter(n+1,y_upper,c='g', alpha=0.5,lw=0.0,s=15,marker=6)
+					else:
+						ax.scatter(n+1,i,c='g', alpha=0.5,lw=0.0,s=10, marker='o')
+				for n,i in enumerate(coefficients[:,2]):
+					if i<y_lower:
+						ax.scatter(n+1,y_lower,c='r', alpha=0.5,lw=0.0,s=15,marker=7)
+					elif i>y_upper:
+						ax.scatter(n+1,y_upper,c='r', alpha=0.5,lw=0.0,s=15,marker=6)
+					else:
+						ax.scatter(n+1,i,c='r', alpha=0.5,lw=0.0,s=10, marker='o')
+				ax=fig.add_subplot(414, sharex=ax)
+				y_points=np.concatenate((coefficients_default[:392][:,3],coefficients[:,3]))
+				y_points=y_points[(y_points<np.percentile(y_points,90))&(y_points>np.percentile(y_points,10))]
+				y_lower=np.average(y_points)-5.0*np.std(y_points)
+				y_upper=np.average(y_points)+5.0*np.std(y_points)
+				ax.set_ylim(y_lower, y_upper)
+				ax.set_ylabel('$C_4$')
+				for n,i in enumerate(coefficients_default[:392][:,3]):
+					if i<y_lower:
+						ax.scatter(n+1,y_lower,c='g', alpha=0.5,lw=0.0,s=15,marker=7)
+					elif i>y_upper:
+						ax.scatter(n+1,y_upper,c='g', alpha=0.5,lw=0.0,s=15,marker=6)
+					else:
+						ax.scatter(n+1,i,c='g', alpha=0.5,lw=0.0,s=10, marker='o')
+				for n,i in enumerate(coefficients[:,3]):
+					if i<y_lower:
+						ax.scatter(n+1,y_lower,c='r', alpha=0.5,lw=0.0,s=15,marker=7)
+					elif i>y_upper:
+						ax.scatter(n+1,y_upper,c='r', alpha=0.5,lw=0.0,s=15,marker=6)
+					else:
+						ax.scatter(n+1,i,c='r', alpha=0.5,lw=0.0,s=10, marker='o')
+				ax.set_xlim(0,394)
+				ax.set_xlabel('Aperture')
+				fig.savefig('wav_'+cob.split('/')[-1]+'00xxx'+str(ccd)+'.png', dpi=300, format='png')
+				fig.clf()
 
 			os.chdir('../../../..')
 			iraf.flprcache()
@@ -3468,8 +3474,8 @@ def create_final_spectra_proc(args):
 					#add ICRS coordinates
 					if gaia_id=='None':
 						#if there is no gaia id, there are no icrs coordinates known and we have to calculate them.
-						hdul[extension].header['RA_ICRS']=(gaia_dict[ap][1]+pmra*16.0, 'RA of object in degrees in ICRS')#correct position for 16 years from J2000.0 to Gaia's J2016.0
-						hdul[extension].header['DEC_ICRS']=(gaia_dict[ap][2]+pmdec*16.0, 'dec of object in degrees in ICRS')
+						hdul[extension].header['RA_ICRS']=(ra+pmra*16.0, 'RA of object in degrees in ICRS')#correct position for 16 years from J2000.0 to Gaia's J2016.0
+						hdul[extension].header['DEC_ICRS']=(dec+pmdec*16.0, 'dec of object in degrees in ICRS')
 					else:
 						hdul[extension].header['RA_ICRS']=(gaia_dict[ap][1], 'RA of object in degrees in ICRS')
 						hdul[extension].header['DEC_ICRS']=(gaia_dict[ap][2], 'dec of object in degrees in ICRS')
@@ -3826,8 +3832,12 @@ def create_final_spectra(date, ncpu=1, plot_diagnostics=False):
 	iraf.flprcache()
 
 	#load xmatched catalogues
-	with open('aux/dict_dr2_edr3.pickle', 'rb') as handle:
-		dict_dr2_edr3=pickle.load(handle)
+	#this is a big file, so if you don't have it, empty dict will be passed
+	if os.path.exists('aux/dict_dr2_edr3.pickle'):
+		with open('aux/dict_dr2_edr3.pickle', 'rb') as handle:
+			dict_dr2_edr3=pickle.load(handle)
+	else:
+		dict_dr2_edr3={}
 	
 	args=[]
 
@@ -3928,7 +3938,7 @@ def create_database(date):
 	cols.append(fits.Column(name='pipeline_version', format='A5'))
 	cols.append(fits.Column(name='reduction_flags', format='J'))
 	hdu=fits.BinTableHDU.from_columns(cols)
-	table=Table.read(hdu)	
+	table=Table.read(hdu)
 
 	# list of all files
 	files=glob.glob("reductions/results/%s/spectra/com/*.fits" % (date))
@@ -4648,7 +4658,7 @@ if __name__ == "__main__":
 		if args.extract:
 			extract_spectra(date, start_folder)
 		if args.wav:
-			wav_calibration(date, start_folder)
+			wav_calibration(date, start_folder, plot_diagnostics=args.plot_diagnostics)
 		if args.sky:
 			remove_sky(date, method=args.sky_method, thr_method=args.sky_thru, ncpu=int(args.n_cpu))
 			if args.plot_spectra:
