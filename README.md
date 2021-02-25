@@ -234,7 +234,7 @@ dr6.0_spectra.hdf5
 |   |   |-- CDELT1
 |   |   |-- ...
 |-- ...
-'''
+```
 
 # Known errors and issues
  - **Not enough space in image header**: Find login.cl file and raise the `min_lenuserarea` parameter (also uncomment it, if commented before).
