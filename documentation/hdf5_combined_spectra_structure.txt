@@ -1,0 +1,56 @@
+Structure of the spectral HDF5 database 
+
+The database can be acquired from the file named dr6.0_spectra.hdf5.
+
+Infividual spectra of different night are compied into a single DHF5 file that has the following structure:
+
+|-- sobject_id (15 digit unique spectrum identifier)
+|   |-- ccd1
+|   |   |-- fluxed (array of floats - named copy of extensions in original file)
+|   |   |-- normalized
+|   |   |-- relative_error
+|   |   |-- sky
+|   |   |-- teluric
+|   |   |-- scattered
+|   |   |-- cross_talk
+|   |   |-- resolution_profile
+|   |   |-- CRVAL1 (copy of entries in fits header for the extension 0)
+|   |   |-- CDELT1
+|   |   |-- ...
+|   |-- ccd2
+|   |   |-- fluxed
+|   |   |-- normalized
+|   |   |-- relative_error
+|   |   |-- sky
+|   |   |-- teluric
+|   |   |-- scattered
+|   |   |-- cross_talk
+|   |   |-- resolution_profile
+|   |   |-- CRVAL1
+|   |   |-- CDELT1
+|   |   |-- ...
+|   |-- ccd3
+|   |   |-- fluxed
+|   |   |-- normalized
+|   |   |-- relative_error
+|   |   |-- sky
+|   |   |-- teluric
+|   |   |-- scattered
+|   |   |-- cross_talk
+|   |   |-- resolution_profile
+|   |   |-- CRVAL1
+|   |   |-- CDELT1
+|   |   |-- ...
+|   |-- ccd4
+|   |   |-- fluxed (array of floats - named copy of extensions in original file)
+|   |   |-- normalized
+|   |   |-- relative_error
+|   |   |-- sky
+|   |   |-- teluric
+|   |   |-- scattered
+|   |   |-- cross_talk
+|   |   |-- resolution_profile
+|   |   |-- CRVAL1
+|   |   |-- CDELT1
+|   |   |-- ...
+|-- ...
