@@ -179,7 +179,7 @@ After one night is reduced, the reduction database is created for that night onl
 
 **2. HDF5 SPECTRAL DATABASE (optional)**
 
-If you prefer to have all spectra combined into a single hdf5 file, use the procedure `create_hdf5_spectra.py` that is located in the `utils` folder. It will read the database of individual night and save all its combined spectra into the `dr6.0_spectra.hdf5` file (or create it if it doesn't exist yet). The input arguments are the same as for creating the merged database. This procedure may take a long time if the number of spectra/nights is large.
+If you prefer to have all spectra combined into a single hdf5 file, use the procedure `create_hdf5_spectra.py` located in the `utils` folder. It will read the individual night database and save all its combined spectra into the `dr6.0_spectra.hdf5` file (or create it if it does not exist yet). The input arguments are the same as for creating the merged database. This procedure may take a long time if the number of spectra/nights is large.
 
 Created HDF5 has the following structure:
 ```

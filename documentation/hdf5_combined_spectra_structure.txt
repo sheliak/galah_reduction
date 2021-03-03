@@ -2,7 +2,7 @@ Structure of the spectral HDF5 database
 
 The database can be acquired from the file named dr6.0_spectra.hdf5.
 
-Infividual spectra of different night are compied into a single DHF5 file that has the following structure:
+Individual spectra of the different night are compiled into a single DHF5 file that has the following structure:
 
 |-- sobject_id (15 digit unique spectrum identifier)
 |   |-- ccd1
