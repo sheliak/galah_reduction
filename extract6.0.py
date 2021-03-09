@@ -694,7 +694,12 @@ def shift_ref(date, plate, ccd, cob, flat):
 
 	"""
 
-	if int(date)>=140601:
+	if int(date)>=190223:
+		if plate=='Plate 0':
+			ap_ref={1: 'aux/masterflat_blue0.fits', 2: 'aux/masterflat_green0.fits', 3: 'aux/masterflat_red30.fits', 4: 'aux/masterflat_ir30.fits'}
+		if plate=='Plate 1':
+			ap_ref={1: 'aux/masterflat_blue.fits', 2: 'aux/masterflat_green.fits', 3: 'aux/masterflat_red31.fits', 4: 'aux/masterflat_ir.fits'}
+	elif int(date)>=140601:
 		if plate=='Plate 0':
 			ap_ref={1: 'aux/masterflat_blue0.fits', 2: 'aux/masterflat_green0.fits', 3: 'aux/masterflat_red20.fits', 4: 'aux/masterflat_ir20.fits'}
 		if plate=='Plate 1':
@@ -3474,8 +3479,8 @@ def create_final_spectra_proc(args):
 					#add ICRS coordinates
 					if gaia_id=='None':
 						#if there is no gaia id, there are no icrs coordinates known and we have to calculate them.
-						hdul[extension].header['RA_ICRS']=(ra+pmra*16.0, 'RA of object in degrees in ICRS')#correct position for 16 years from J2000.0 to Gaia's J2016.0
-						hdul[extension].header['DEC_ICRS']=(dec+pmdec*16.0, 'dec of object in degrees in ICRS')
+						hdul[extension].header['RA_ICRS']=(ra+pmra*16.0/3600.0, 'RA of object in degrees in ICRS')#correct position for 16 years from J2000.0 to Gaia's J2016.0
+						hdul[extension].header['DEC_ICRS']=(dec+pmdec*16.0/3600.0, 'dec of object in degrees in ICRS')
 					else:
 						hdul[extension].header['RA_ICRS']=(gaia_dict[ap][1], 'RA of object in degrees in ICRS')
 						hdul[extension].header['DEC_ICRS']=(gaia_dict[ap][2], 'dec of object in degrees in ICRS')

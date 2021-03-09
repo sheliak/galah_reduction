@@ -55,7 +55,12 @@ else:
 
 os.chdir(path)
 
+dates=np.sort(dates)
+
+logging.info('Databases will be combined for dates %s.' % ",".join(dates))
+
 for date in dates:
+	logging.info('Adding database for date %s.' % date)
 
 	if os.path.isfile('dr6.0.fits'):
 		# check if global database exists and open it if it does
@@ -93,15 +98,15 @@ for date in dates:
 		hdul.flush()
 		hdul.close()
 
-		# convert table to ascii. add _1, _2, _3, _4 to fields in arrays (always representing four arms)
-		csv_db=open('dr6.0.csv', 'a')
-		hdul=fits.open('%s/db/%s.fits' % (date,date))
-		hdu=hdul[1]
+		if date==dates[-1]:# if this is the last database to process create csv and hdf databases too
+			# convert table to ascii. add _1, _2, _3, _4 to fields in arrays (always representing four arms)
+			csv_db=open('dr6.0.csv', 'a')
+			hdul=fits.open('dr6.0.fits')
+			hdu=hdul[1]
 
-		data=np.array(hdu.data)
-		#add data
-		for i in data:
-			if i[0] not in sobjects:
+			data=np.array(hdu.data)
+			#add data
+			for i in data:
 				str_to_write=[]
 				for j in i:
 					if j.shape==(4,):
@@ -111,15 +116,15 @@ for date in dates:
 						str_to_write.append(str(j))
 				csv_db.write(','.join(str_to_write))
 				csv_db.write('\n')
-		csv_db.close()
-		hdul.close()
+			csv_db.close()
+			hdul.close()
 
-		# convert table to hdf5. astropy write function has append option, but it doesn't work for hdf5, aparently
-		hdul=fits.open('dr6.0.fits', mode='update')
-		hdu=hdul[1]
-		t=Table(hdu.data)
-		hdul.close()
-		t.write('dr6.0.hdf5', format='hdf5', path='data', overwrite=True)
+			# convert table to hdf5. astropy write function has append option, but it doesn't work for hdf5, aparently
+			hdul=fits.open('dr6.0.fits', mode='update')
+			hdu=hdul[1]
+			t=Table(hdu.data)
+			hdul.close()
+			t.write('dr6.0.hdf5', format='hdf5', path='data', overwrite=True)
 
 		#save results
 		os.remove('.dblock')
@@ -137,38 +142,39 @@ for date in dates:
 		lock_created=True
 		shutil.copyfile('%s/db/%s.fits' % (date,date), 'dr6.0.fits')
 
-		# convert table to ascii. add _1, _2, _3, _4 to fields in arrays (always representing four arms)
-		csv_db=open('dr6.0.csv', 'w')
-		hdul=fits.open('%s/db/%s.fits' % (date,date))
-		hdu=hdul[1]
-		t=Table(hdu.data)
-		data=np.array(hdu.data)
-		#print line with column names
-		str_to_write=[]
-		for n,colname in enumerate(t.colnames):
-			if data[0][n].shape==(4,):
-				for i in range(1,5):
-					str_to_write.append(colname+'_'+str(i))
-			else:
-				str_to_write.append(colname)
-
-		csv_db.write(','.join(str_to_write))
-		csv_db.write('\n')
-		#add data
-		for i in data:
+		if date==dates[-1]:# if this is the last database to process create csv and hdf databases too
+			# convert table to ascii. add _1, _2, _3, _4 to fields in arrays (always representing four arms)
+			csv_db=open('dr6.0.csv', 'w')
+			hdul=fits.open('%s/db/%s.fits' % (date,date))
+			hdu=hdul[1]
+			t=Table(hdu.data)
+			data=np.array(hdu.data)
+			#print line with column names
 			str_to_write=[]
-			for j in i:
-				if j.shape==(4,):
-					for k in j:
-						str_to_write.append(str(k))
+			for n,colname in enumerate(t.colnames):
+				if data[0][n].shape==(4,):
+					for i in range(1,5):
+						str_to_write.append(colname+'_'+str(i))
 				else:
-					str_to_write.append(str(j))
+					str_to_write.append(colname)
+
 			csv_db.write(','.join(str_to_write))
 			csv_db.write('\n')
-		csv_db.close()
-		hdul.close()
+			#add data
+			for i in data:
+				str_to_write=[]
+				for j in i:
+					if j.shape==(4,):
+						for k in j:
+							str_to_write.append(str(k))
+					else:
+						str_to_write.append(str(j))
+				csv_db.write(','.join(str_to_write))
+				csv_db.write('\n')
+			csv_db.close()
+			hdul.close()
 
-		# convert table to hdf5
-		t.write('dr6.0.hdf5', format='hdf5', path='data')
+			# convert table to hdf5
+			t.write('dr6.0.hdf5', format='hdf5', path='data')
 
 		os.remove('.dblock')

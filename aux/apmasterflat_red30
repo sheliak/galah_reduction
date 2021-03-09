@@ -1,0 +1,12176 @@
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 1 2000. 33.66456
+	image	masterflat_red30
+	aperture	1
+	beam	1
+	center	2000. 33.66456
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.1213712
+		0.3532165
+		-0.1603867
+		0.2682263
+		0.08972764
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 2 2000. 41.6092
+	image	masterflat_red30
+	aperture	2
+	beam	2
+	center	2000. 41.6092
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.1050429
+		0.3149222
+		-0.05540808
+		0.2454215
+		0.1497221
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 3 2000. 49.9808
+	image	masterflat_red30
+	aperture	3
+	beam	3
+	center	2000. 49.9808
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.12969
+		0.3490973
+		-0.1114892
+		0.2618091
+		0.1518008
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 4 2000. 58.20714
+	image	masterflat_red30
+	aperture	4
+	beam	4
+	center	2000. 58.20714
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.1523802
+		0.3248308
+		-0.1820442
+		0.2634989
+		0.1947316
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 5 2000. 66.16925
+	image	masterflat_red30
+	aperture	5
+	beam	5
+	center	2000. 66.16925
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.180785
+		0.3187549
+		-0.1669154
+		0.23486
+		0.1617313
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 6 2000. 74.43857
+	image	masterflat_red30
+	aperture	6
+	beam	6
+	center	2000. 74.43857
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.09783754
+		0.4125089
+		-0.08219097
+		0.2742033
+		0.155511
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 7 2000. 82.48611
+	image	masterflat_red30
+	aperture	7
+	beam	7
+	center	2000. 82.48611
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.07797324
+		0.4636377
+		0.0382538
+		0.4026842
+		0.2557532
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 8 2000. 90.56841
+	image	masterflat_red30
+	aperture	8
+	beam	8
+	center	2000. 90.56841
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.02493008
+		0.6285273
+		0.3209432
+		0.6032953
+		0.3864753
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 9 2000. 98.30083
+	image	masterflat_red30
+	aperture	9
+	beam	9
+	center	2000. 98.30083
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		3510.
+		0.02493008
+		0.6285273
+		0.3209432
+		0.6032953
+		0.3864753
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 10 2000. 106.4552
+	image	masterflat_red30
+	aperture	10
+	beam	10
+	center	2000. 106.4552
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		3520.
+		0.02493008
+		0.6285273
+		0.3209432
+		0.6032953
+		0.3864753
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 11 2000. 128.8453
+	image	masterflat_red30
+	aperture	11
+	beam	11
+	center	2000. 128.8453
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.09570918
+		0.3622732
+		-0.1103834
+		0.2703805
+		0.1088995
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 12 2000. 136.7387
+	image	masterflat_red30
+	aperture	12
+	beam	12
+	center	2000. 136.7387
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.06323931
+		0.3563269
+		-0.05170958
+		0.194321
+		0.1293621
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 13 2000. 145.2296
+	image	masterflat_red30
+	aperture	13
+	beam	13
+	center	2000. 145.2296
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.1175143
+		0.3498525
+		-0.1482959
+		0.1626566
+		0.08785301
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 14 2000. 153.5057
+	image	masterflat_red30
+	aperture	14
+	beam	14
+	center	2000. 153.5057
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.08634689
+		0.3902847
+		-0.1470252
+		0.167247
+		0.0591838
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 15 2000. 161.6577
+	image	masterflat_red30
+	aperture	15
+	beam	15
+	center	2000. 161.6577
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.08271973
+		0.369323
+		-0.1459637
+		0.1690157
+		0.07496446
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 16 2000. 170.0462
+	image	masterflat_red30
+	aperture	16
+	beam	16
+	center	2000. 170.0462
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.1190727
+		0.3423923
+		-0.1494882
+		0.1373441
+		0.07976057
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 17 2000. 178.1788
+	image	masterflat_red30
+	aperture	17
+	beam	17
+	center	2000. 178.1788
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.05876858
+		0.4014716
+		-0.08972925
+		0.1818395
+		0.09951783
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 18 2000. 186.4686
+	image	masterflat_red30
+	aperture	18
+	beam	18
+	center	2000. 186.4686
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.03987116
+		0.4546933
+		-0.02222477
+		0.226674
+		0.1253329
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 19 2000. 194.7552
+	image	masterflat_red30
+	aperture	19
+	beam	19
+	center	2000. 194.7552
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.01622511
+		0.4810214
+		0.0695646
+		0.2721421
+		0.1681492
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 20 2000. 202.9367
+	image	masterflat_red30
+	aperture	20
+	beam	20
+	center	2000. 202.9367
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.008011689
+		0.5081295
+		0.1644683
+		0.2514615
+		0.1657384
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 21 2000. 223.0623
+	image	masterflat_red30
+	aperture	21
+	beam	21
+	center	2000. 223.0623
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.1703561
+		0.28282
+		-0.3339095
+		0.08616671
+		0.01601152
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 22 2000. 231.4215
+	image	masterflat_red30
+	aperture	22
+	beam	22
+	center	2000. 231.4215
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.1601284
+		0.3141274
+		-0.3280165
+		0.0433342
+		-0.01043402
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 23 2000. 239.8498
+	image	masterflat_red30
+	aperture	23
+	beam	23
+	center	2000. 239.8498
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.1746271
+		0.2965958
+		-0.3517495
+		0.0435024
+		-0.005120737
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 24 2000. 248.1494
+	image	masterflat_red30
+	aperture	24
+	beam	24
+	center	2000. 248.1494
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.1581954
+		0.3011428
+		-0.3574406
+		0.02895602
+		-0.01076713
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 25 2000. 256.5947
+	image	masterflat_red30
+	aperture	25
+	beam	25
+	center	2000. 256.5947
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.1620549
+		0.3073176
+		-0.3569936
+		0.04553215
+		-0.01949718
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 26 2000. 265.019
+	image	masterflat_red30
+	aperture	26
+	beam	26
+	center	2000. 265.019
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.1617278
+		0.2931075
+		-0.3508242
+		0.03081388
+		-0.006831609
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 27 2000. 273.2385
+	image	masterflat_red30
+	aperture	27
+	beam	27
+	center	2000. 273.2385
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.1396821
+		0.3268416
+		-0.3443479
+		0.05676327
+		0.001402891
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 28 2000. 281.7503
+	image	masterflat_red30
+	aperture	28
+	beam	28
+	center	2000. 281.7503
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.1527574
+		0.3012376
+		-0.3085187
+		0.05349682
+		-0.008303321
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 29 2000. 290.0249
+	image	masterflat_red30
+	aperture	29
+	beam	29
+	center	2000. 290.0249
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.1143219
+		0.3231222
+		-0.2454719
+		0.07160941
+		0.01275612
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 30 2000. 298.3452
+	image	masterflat_red30
+	aperture	30
+	beam	30
+	center	2000. 298.3452
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.1105778
+		0.3694241
+		-0.2019978
+		0.1221662
+		0.04237671
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 31 2000. 321.0081
+	image	masterflat_red30
+	aperture	31
+	beam	31
+	center	2000. 321.0081
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.1397502
+		0.2743265
+		-0.2902203
+		0.08979303
+		0.02517231
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 32 2000. 329.5127
+	image	masterflat_red30
+	aperture	32
+	beam	32
+	center	2000. 329.5127
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.1593216
+		0.3059684
+		-0.2845283
+		0.06865264
+		-9.375962E-4
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 33 2000. 338.1584
+	image	masterflat_red30
+	aperture	33
+	beam	33
+	center	2000. 338.1584
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.1500339
+		0.3063541
+		-0.310168
+		0.05752434
+		0.004408261
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 34 2000. 346.5685
+	image	masterflat_red30
+	aperture	34
+	beam	34
+	center	2000. 346.5685
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.1621704
+		0.3076724
+		-0.2956967
+		0.04431194
+		-0.01425758
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 35 2000. 355.1338
+	image	masterflat_red30
+	aperture	35
+	beam	35
+	center	2000. 355.1338
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.1546345
+		0.3144055
+		-0.3069104
+		0.05832137
+		0.005734196
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 36 2000. 363.5968
+	image	masterflat_red30
+	aperture	36
+	beam	36
+	center	2000. 363.5968
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.1347941
+		0.3159139
+		-0.2860406
+		0.05919782
+		-0.00973313
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 37 2000. 372.1082
+	image	masterflat_red30
+	aperture	37
+	beam	37
+	center	2000. 372.1082
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.1246967
+		0.3154024
+		-0.2720519
+		0.0679122
+		0.01252177
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 38 2000. 380.5059
+	image	masterflat_red30
+	aperture	38
+	beam	38
+	center	2000. 380.5059
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.09662483
+		0.3332433
+		-0.2325753
+		0.08563656
+		0.01163534
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 39 2000. 389.0078
+	image	masterflat_red30
+	aperture	39
+	beam	39
+	center	2000. 389.0078
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.1049119
+		0.3369014
+		-0.1806976
+		0.09886899
+		0.044578
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 40 2000. 397.5779
+	image	masterflat_red30
+	aperture	40
+	beam	40
+	center	2000. 397.5779
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.0826626
+		0.3937652
+		-0.09491226
+		0.1445533
+		0.05030851
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 41 2000. 427.0461
+	image	masterflat_red30
+	aperture	41
+	beam	41
+	center	2000. 427.0461
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.1094742
+		0.3027577
+		-0.1719379
+		0.09343982
+		0.0270163
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 42 2000. 435.5101
+	image	masterflat_red30
+	aperture	42
+	beam	42
+	center	2000. 435.5101
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.07462298
+		0.3168958
+		-0.1809139
+		0.09537448
+		0.02783797
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 43 2000. 444.0742
+	image	masterflat_red30
+	aperture	43
+	beam	43
+	center	2000. 444.0742
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.08551016
+		0.300728
+		-0.1919306
+		0.08062385
+		0.04013094
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 44 2000. 452.6541
+	image	masterflat_red30
+	aperture	44
+	beam	44
+	center	2000. 452.6541
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.09536697
+		0.3333277
+		-0.154778
+		0.07355921
+		0.02189399
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 45 2000. 461.1982
+	image	masterflat_red30
+	aperture	45
+	beam	45
+	center	2000. 461.1982
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.09941578
+		0.3336438
+		-0.1537782
+		0.09068426
+		0.03305589
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 46 2000. 469.8263
+	image	masterflat_red30
+	aperture	46
+	beam	46
+	center	2000. 469.8263
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.08283436
+		0.3356082
+		-0.1358776
+		0.103172
+		0.04084893
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 47 2000. 478.2525
+	image	masterflat_red30
+	aperture	47
+	beam	47
+	center	2000. 478.2525
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.01636481
+		0.4083778
+		-0.02169593
+		0.1180632
+		0.03363393
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 48 2000. 486.848
+	image	masterflat_red30
+	aperture	48
+	beam	48
+	center	2000. 486.848
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.03899869
+		0.3486076
+		-0.04483696
+		0.1255701
+		0.06420127
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 49 2000. 495.2981
+	image	masterflat_red30
+	aperture	49
+	beam	49
+	center	2000. 495.2981
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.01432009
+		0.3646312
+		0.01639593
+		0.1255376
+		0.07943467
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 50 2000. 516.5622
+	image	masterflat_red30
+	aperture	50
+	beam	50
+	center	2000. 516.5622
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.09392785
+		0.3149561
+		-0.2040792
+		0.06996599
+		0.009799968
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 51 2000. 525.3527
+	image	masterflat_red30
+	aperture	51
+	beam	51
+	center	2000. 525.3527
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.08778947
+		0.3275887
+		-0.2180427
+		0.06595065
+		0.006111081
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 52 2000. 534.0851
+	image	masterflat_red30
+	aperture	52
+	beam	52
+	center	2000. 534.0851
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.1114773
+		0.3247261
+		-0.2221332
+		0.05584372
+		0.01736762
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 53 2000. 542.708
+	image	masterflat_red30
+	aperture	53
+	beam	53
+	center	2000. 542.708
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.1033876
+		0.3410833
+		-0.2222661
+		0.04650935
+		-0.003362786
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 54 2000. 551.3691
+	image	masterflat_red30
+	aperture	54
+	beam	54
+	center	2000. 551.3691
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.108176
+		0.340442
+		-0.2290812
+		0.05461604
+		0.002537658
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 55 2000. 560.1037
+	image	masterflat_red30
+	aperture	55
+	beam	55
+	center	2000. 560.1037
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.1182914
+		0.3579251
+		-0.2191887
+		0.0528939
+		0.0101373
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 56 2000. 568.8088
+	image	masterflat_red30
+	aperture	56
+	beam	56
+	center	2000. 568.8088
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.09590077
+		0.3536136
+		-0.1846877
+		0.04837862
+		2.117467E-4
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 57 2000. 577.387
+	image	masterflat_red30
+	aperture	57
+	beam	57
+	center	2000. 577.387
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.08683641
+		0.3451524
+		-0.1955879
+		0.06389896
+		0.01596822
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 58 2000. 586.1166
+	image	masterflat_red30
+	aperture	58
+	beam	58
+	center	2000. 586.1166
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.06146165
+		0.3652809
+		-0.1295212
+		0.08275638
+		0.0345258
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 59 2000. 594.7795
+	image	masterflat_red30
+	aperture	59
+	beam	59
+	center	2000. 594.7795
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.03737964
+		0.3730296
+		-0.07813686
+		0.1049228
+		0.04908935
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 60 2000. 616.692
+	image	masterflat_red30
+	aperture	60
+	beam	60
+	center	2000. 616.692
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.1159388
+		0.3568844
+		-0.2009991
+		0.03690149
+		-4.344226E-4
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 61 2000. 625.7159
+	image	masterflat_red30
+	aperture	61
+	beam	61
+	center	2000. 625.7159
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.1135926
+		0.3624201
+		-0.2265769
+		0.03637989
+		8.786722E-4
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 62 2000. 634.4457
+	image	masterflat_red30
+	aperture	62
+	beam	62
+	center	2000. 634.4457
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.08068033
+		0.3748324
+		-0.2001313
+		0.02951875
+		-0.009291923
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 63 2000. 643.2191
+	image	masterflat_red30
+	aperture	63
+	beam	63
+	center	2000. 643.2191
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.1004627
+		0.3681671
+		-0.2492215
+		0.02979861
+		-0.003933807
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 64 2000. 651.8983
+	image	masterflat_red30
+	aperture	64
+	beam	64
+	center	2000. 651.8983
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.105052
+		0.3741577
+		-0.2415495
+		0.02476642
+		0.004372917
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 65 2000. 660.527
+	image	masterflat_red30
+	aperture	65
+	beam	65
+	center	2000. 660.527
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.1008444
+		0.3763663
+		-0.2353064
+		0.02813303
+		-4.562176E-4
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 66 2000. 669.2955
+	image	masterflat_red30
+	aperture	66
+	beam	66
+	center	2000. 669.2955
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.09219553
+		0.3794802
+		-0.1956726
+		0.04008683
+		0.003897951
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 67 2000. 677.9503
+	image	masterflat_red30
+	aperture	67
+	beam	67
+	center	2000. 677.9503
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.1003096
+		0.3434886
+		-0.1976439
+		0.04098077
+		0.0182081
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 68 2000. 686.7121
+	image	masterflat_red30
+	aperture	68
+	beam	68
+	center	2000. 686.7121
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.09809025
+		0.3764773
+		-0.1590375
+		0.0418922
+		0.02129779
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 69 2000. 695.4447
+	image	masterflat_red30
+	aperture	69
+	beam	69
+	center	2000. 695.4447
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.04087992
+		0.4077667
+		-0.08913817
+		0.07688314
+		0.03579348
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 70 2000. 716.8417
+	image	masterflat_red30
+	aperture	70
+	beam	70
+	center	2000. 716.8417
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.04820609
+		0.3726426
+		-0.09296098
+		0.04500853
+		0.02376752
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 71 2000. 725.5914
+	image	masterflat_red30
+	aperture	71
+	beam	71
+	center	2000. 725.5914
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.06536938
+		0.3773887
+		-0.1292345
+		0.04197827
+		0.01275372
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 72 2000. 734.6014
+	image	masterflat_red30
+	aperture	72
+	beam	72
+	center	2000. 734.6014
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.07002717
+		0.3892983
+		-0.1344026
+		0.03596029
+		0.01020527
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 73 2000. 743.4128
+	image	masterflat_red30
+	aperture	73
+	beam	73
+	center	2000. 743.4128
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.08361412
+		0.3952082
+		-0.1371948
+		0.04709373
+		0.01473899
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 74 2000. 752.3002
+	image	masterflat_red30
+	aperture	74
+	beam	74
+	center	2000. 752.3002
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.06007203
+		0.40169
+		-0.145826
+		0.0419029
+		0.01263789
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 75 2000. 761.3541
+	image	masterflat_red30
+	aperture	75
+	beam	75
+	center	2000. 761.3541
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.02425028
+		0.4463067
+		-0.0490147
+		0.07087444
+		0.0170998
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 76 2000. 769.969
+	image	masterflat_red30
+	aperture	76
+	beam	76
+	center	2000. 769.969
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.05879893
+		0.3650185
+		-0.08846597
+		0.07157657
+		0.04217447
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 77 2000. 778.6027
+	image	masterflat_red30
+	aperture	77
+	beam	77
+	center	2000. 778.6027
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.07713175
+		0.3543158
+		-0.1679736
+		0.01433189
+		0.01691444
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 78 2000. 787.4393
+	image	masterflat_red30
+	aperture	78
+	beam	78
+	center	2000. 787.4393
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.03607638
+		0.4151032
+		-0.05083438
+		0.06186798
+		0.04264269
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 79 2000. 796.3629
+	image	masterflat_red30
+	aperture	79
+	beam	79
+	center	2000. 796.3629
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.01590615
+		0.4356858
+		0.02288873
+		0.07477209
+		0.05116073
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 80 2000. 817.8906
+	image	masterflat_red30
+	aperture	80
+	beam	80
+	center	2000. 817.8906
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.03355736
+		0.4036437
+		-0.05409171
+		0.03711572
+		0.02572571
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 81 2000. 826.8319
+	image	masterflat_red30
+	aperture	81
+	beam	81
+	center	2000. 826.8319
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.03266215
+		0.4096994
+		-0.07245789
+		0.04097649
+		0.02399597
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 82 2000. 835.8905
+	image	masterflat_red30
+	aperture	82
+	beam	82
+	center	2000. 835.8905
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.05493522
+		0.423317
+		-0.09164284
+		0.03949641
+		0.02128565
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 83 2000. 844.7852
+	image	masterflat_red30
+	aperture	83
+	beam	83
+	center	2000. 844.7852
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.04988111
+		0.4266209
+		-0.09612024
+		0.03998848
+		0.02085679
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 84 2000. 853.6313
+	image	masterflat_red30
+	aperture	84
+	beam	84
+	center	2000. 853.6313
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.03497985
+		0.4343676
+		-0.09477261
+		0.03563977
+		0.0118065
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 85 2000. 862.5073
+	image	masterflat_red30
+	aperture	85
+	beam	85
+	center	2000. 862.5073
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.04519425
+		0.4301793
+		-0.09002526
+		0.04047583
+		0.01534456
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 86 2000. 871.4755
+	image	masterflat_red30
+	aperture	86
+	beam	86
+	center	2000. 871.4755
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.05445657
+		0.4374816
+		-0.07730492
+		0.03668329
+		0.01513242
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 87 2000. 880.3467
+	image	masterflat_red30
+	aperture	87
+	beam	87
+	center	2000. 880.3467
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.03079132
+		0.4435262
+		-0.05146192
+		0.04055562
+		0.01989483
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 88 2000. 889.1362
+	image	masterflat_red30
+	aperture	88
+	beam	88
+	center	2000. 889.1362
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-4.041182E-4
+		0.4404601
+		-0.02123962
+		0.0503934
+		0.03424644
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 89 2000. 898.0067
+	image	masterflat_red30
+	aperture	89
+	beam	89
+	center	2000. 898.0067
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.003447374
+		0.4322472
+		0.04505648
+		0.05130045
+		0.04817789
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 90 2000. 929.1262
+	image	masterflat_red30
+	aperture	90
+	beam	90
+	center	2000. 929.1262
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.0552718
+		0.4629227
+		-0.119768
+		0.03185373
+		0.01435487
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 91 2000. 938.2631
+	image	masterflat_red30
+	aperture	91
+	beam	91
+	center	2000. 938.2631
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.03640787
+		0.4784573
+		-0.1141779
+		0.03052328
+		-0.003491405
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 92 2000. 947.2916
+	image	masterflat_red30
+	aperture	92
+	beam	92
+	center	2000. 947.2916
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.05163927
+		0.4856808
+		-0.1335342
+		0.03293852
+		-0.003321946
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 93 2000. 956.2513
+	image	masterflat_red30
+	aperture	93
+	beam	93
+	center	2000. 956.2513
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.04539206
+		0.4817009
+		-0.1315199
+		0.03350723
+		-0.002938801
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 94 2000. 965.353
+	image	masterflat_red30
+	aperture	94
+	beam	94
+	center	2000. 965.353
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.05339944
+		0.4830366
+		-0.1155158
+		0.03628903
+		-0.005357334
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 95 2000. 974.1999
+	image	masterflat_red30
+	aperture	95
+	beam	95
+	center	2000. 974.1999
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.04450104
+		0.4680348
+		-0.1246315
+		0.03434021
+		0.003512961
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 96 2000. 980.4879
+	image	masterflat_red30
+	aperture	96
+	beam	96
+	center	2000. 980.4879
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4090.
+		-0.04450104
+		0.4680348
+		-0.1246315
+		0.03434021
+		0.003512961
+		0.0
+		0.0
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 97 2000. 992.2995
+	image	masterflat_red30
+	aperture	97
+	beam	97
+	center	2000. 992.2995
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.01945904
+		0.4967999
+		-0.06810291
+		0.03639079
+		0.008243768
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 98 2000. 1001.079
+	image	masterflat_red30
+	aperture	98
+	beam	98
+	center	2000. 1001.079
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.001936403
+		0.4774235
+		-0.03041518
+		0.04251821
+		0.02328438
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 99 2000. 1023.635
+	image	masterflat_red30
+	aperture	99
+	beam	99
+	center	2000. 1023.635
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.01410792
+		0.509572
+		-0.07262509
+		0.01611402
+		0.004889904
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 100 2000. 1032.733
+	image	masterflat_red30
+	aperture	100
+	beam	100
+	center	2000. 1032.733
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.02451769
+		0.5379533
+		-0.07115664
+		0.008068074
+		0.001731239
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 101 2000. 1041.868
+	image	masterflat_red30
+	aperture	101
+	beam	101
+	center	2000. 1041.868
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.04201087
+		0.5219455
+		-0.1071217
+		0.01676374
+		0.008021376
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 102 2000. 1050.922
+	image	masterflat_red30
+	aperture	102
+	beam	102
+	center	2000. 1050.922
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.04249283
+		0.5309054
+		-0.1176177
+		0.02052256
+		0.008222112
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 103 2000. 1059.924
+	image	masterflat_red30
+	aperture	103
+	beam	103
+	center	2000. 1059.924
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.04970482
+		0.5379134
+		-0.1095149
+		0.02124088
+		0.007088259
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 104 2000. 1069.019
+	image	masterflat_red30
+	aperture	104
+	beam	104
+	center	2000. 1069.019
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.0344243
+		0.542774
+		-0.08635878
+		0.03463214
+		0.005001381
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 105 2000. 1078.008
+	image	masterflat_red30
+	aperture	105
+	beam	105
+	center	2000. 1078.008
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.02897071
+		0.5142121
+		-0.1128575
+		0.02887123
+		0.00956638
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 106 2000. 1086.823
+	image	masterflat_red30
+	aperture	106
+	beam	106
+	center	2000. 1086.823
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.01949044
+		0.5221414
+		-0.08906508
+		0.02060703
+		0.01364535
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 107 2000. 1095.963
+	image	masterflat_red30
+	aperture	107
+	beam	107
+	center	2000. 1095.963
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.02285299
+		0.535835
+		-0.04285579
+		0.03283153
+		0.01895431
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 108 2000. 1102.317
+	image	masterflat_red30
+	aperture	108
+	beam	108
+	center	2000. 1102.317
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4090.
+		-0.02285299
+		0.535835
+		-0.04285579
+		0.03283153
+		0.01895431
+		0.0
+		0.0
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 109 2000. 1126.239
+	image	masterflat_red30
+	aperture	109
+	beam	109
+	center	2000. 1126.239
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.006841295
+		0.5489803
+		-0.03363644
+		0.0292553
+		0.01061737
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 110 2000. 1135.371
+	image	masterflat_red30
+	aperture	110
+	beam	110
+	center	2000. 1135.371
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.01185312
+		0.5599826
+		-0.04961715
+		0.02663896
+		-0.00148512
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 111 2000. 1144.585
+	image	masterflat_red30
+	aperture	111
+	beam	111
+	center	2000. 1144.585
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.02237157
+		0.5774949
+		-0.06695073
+		0.01621973
+		0.003270826
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 112 2000. 1153.636
+	image	masterflat_red30
+	aperture	112
+	beam	112
+	center	2000. 1153.636
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.01654793
+		0.5812414
+		-0.06671128
+		0.01921777
+		0.003776199
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 113 2000. 1162.723
+	image	masterflat_red30
+	aperture	113
+	beam	113
+	center	2000. 1162.723
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.02823192
+		0.5865337
+		-0.07006016
+		0.01816927
+		0.005482887
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 114 2000. 1171.757
+	image	masterflat_red30
+	aperture	114
+	beam	114
+	center	2000. 1171.757
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.007522788
+		0.6090977
+		-0.03780621
+		0.02399491
+		0.006222941
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 115 2000. 1178.57
+	image	masterflat_red30
+	aperture	115
+	beam	115
+	center	2000. 1178.57
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4090.
+		-0.007522788
+		0.6090977
+		-0.03780621
+		0.02399491
+		0.006222941
+		0.0
+		0.0
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 116 2000. 1189.697
+	image	masterflat_red30
+	aperture	116
+	beam	116
+	center	2000. 1189.697
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-9.091465E-4
+		0.5960444
+		-0.03497371
+		0.0243434
+		0.01542553
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 117 2000. 1198.781
+	image	masterflat_red30
+	aperture	117
+	beam	117
+	center	2000. 1198.781
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.0201512
+		0.601652
+		-0.001557946
+		0.03086002
+		0.0170028
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 118 2000. 1207.84
+	image	masterflat_red30
+	aperture	118
+	beam	118
+	center	2000. 1207.84
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.03990577
+		0.611506
+		0.05536643
+		0.04584805
+		0.02968708
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 119 2000. 1229.786
+	image	masterflat_red30
+	aperture	119
+	beam	119
+	center	2000. 1229.786
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.02293969
+		0.633328
+		-0.002111982
+		0.01018722
+		0.006845821
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 120 2000. 1238.943
+	image	masterflat_red30
+	aperture	120
+	beam	120
+	center	2000. 1238.943
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.02206893
+		0.6533222
+		4.299278E-4
+		0.0211967
+		0.002434116
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 121 2000. 1248.217
+	image	masterflat_red30
+	aperture	121
+	beam	121
+	center	2000. 1248.217
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.004645659
+		0.6373516
+		-0.03374736
+		0.03069211
+		-0.004387263
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 122 2000. 1257.257
+	image	masterflat_red30
+	aperture	122
+	beam	122
+	center	2000. 1257.257
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.02915126
+		0.6539029
+		-0.0198897
+		0.01987025
+		-0.01386762
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 123 2000. 1266.417
+	image	masterflat_red30
+	aperture	123
+	beam	123
+	center	2000. 1266.417
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		-0.003086154
+		0.6489697
+		-0.04861278
+		0.017698
+		-0.00905771
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 124 2000. 1275.595
+	image	masterflat_red30
+	aperture	124
+	beam	124
+	center	2000. 1275.595
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.006051263
+		0.6580382
+		-0.04215319
+		0.01364551
+		-0.002760614
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 125 2000. 1284.572
+	image	masterflat_red30
+	aperture	125
+	beam	125
+	center	2000. 1284.572
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.03844861
+		0.6895416
+		0.0103602
+		0.00710344
+		-0.001882878
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 126 2000. 1293.71
+	image	masterflat_red30
+	aperture	126
+	beam	126
+	center	2000. 1293.71
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		5.494649E-4
+		0.6556009
+		-0.02790198
+		0.02374289
+		0.00712227
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 127 2000. 1302.935
+	image	masterflat_red30
+	aperture	127
+	beam	127
+	center	2000. 1302.935
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.005074927
+		0.649277
+		-0.01805472
+		0.02692374
+		0.01479222
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 128 2000. 1311.918
+	image	masterflat_red30
+	aperture	128
+	beam	128
+	center	2000. 1311.918
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.008005459
+		0.6524658
+		0.009097414
+		0.02933216
+		0.0191486
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 129 2000. 1334.973
+	image	masterflat_red30
+	aperture	129
+	beam	129
+	center	2000. 1334.973
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.03209875
+		0.6448836
+		0.03782292
+		0.01590474
+		0.02335804
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 130 2000. 1344.195
+	image	masterflat_red30
+	aperture	130
+	beam	130
+	center	2000. 1344.195
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.03846743
+		0.6711532
+		0.04360668
+		0.02866998
+		0.01061952
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 131 2000. 1353.426
+	image	masterflat_red30
+	aperture	131
+	beam	131
+	center	2000. 1353.426
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.023063
+		0.665274
+		0.004237918
+		0.01721131
+		0.007579494
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 132 2000. 1362.513
+	image	masterflat_red30
+	aperture	132
+	beam	132
+	center	2000. 1362.513
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.03316719
+		0.6926432
+		0.03501546
+		0.01894676
+		0.004941164
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 133 2000. 1371.806
+	image	masterflat_red30
+	aperture	133
+	beam	133
+	center	2000. 1371.806
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.02789439
+		0.6976717
+		0.02718801
+		0.02060792
+		0.01653019
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 134 2000. 1380.978
+	image	masterflat_red30
+	aperture	134
+	beam	134
+	center	2000. 1380.978
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.02595001
+		0.689492
+		0.02653723
+		0.02830044
+		0.01525494
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 135 2000. 1390.132
+	image	masterflat_red30
+	aperture	135
+	beam	135
+	center	2000. 1390.132
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.03035054
+		0.6968779
+		0.04147939
+		0.03491228
+		0.01289525
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 136 2000. 1399.078
+	image	masterflat_red30
+	aperture	136
+	beam	136
+	center	2000. 1399.078
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.06347586
+		0.7215343
+		0.1164037
+		0.03627469
+		0.01788653
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 137 2000. 1408.313
+	image	masterflat_red30
+	aperture	137
+	beam	137
+	center	2000. 1408.313
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.0698844
+		0.704271
+		0.08357387
+		0.03326973
+		0.02294121
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 138 2000. 1417.447
+	image	masterflat_red30
+	aperture	138
+	beam	138
+	center	2000. 1417.447
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.05264029
+		0.6927825
+		0.09422047
+		0.03512121
+		0.03290487
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 139 2000. 1448.543
+	image	masterflat_red30
+	aperture	139
+	beam	139
+	center	2000. 1448.543
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.08704369
+		0.733398
+		0.1085456
+		0.02486508
+		0.01953888
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 140 2000. 1455.162
+	image	masterflat_red30
+	aperture	140
+	beam	140
+	center	2000. 1455.162
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4090.
+		0.08704369
+		0.733398
+		0.1085456
+		0.02486508
+		0.01953888
+		0.0
+		0.0
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 141 2000. 1467.102
+	image	masterflat_red30
+	aperture	141
+	beam	141
+	center	2000. 1467.102
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.04043235
+		0.7249868
+		0.06097126
+		0.03057547
+		0.02245931
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 142 2000. 1476.219
+	image	masterflat_red30
+	aperture	142
+	beam	142
+	center	2000. 1476.219
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.02975216
+		0.7268624
+		0.06541887
+		0.03050596
+		0.01678122
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 143 2000. 1485.342
+	image	masterflat_red30
+	aperture	143
+	beam	143
+	center	2000. 1485.342
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.0422744
+		0.7298576
+		0.06281193
+		0.03186702
+		0.02246463
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 144 2000. 1494.527
+	image	masterflat_red30
+	aperture	144
+	beam	144
+	center	2000. 1494.527
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.02967229
+		0.7287912
+		0.07051332
+		0.02771268
+		0.02271209
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 145 2000. 1503.729
+	image	masterflat_red30
+	aperture	145
+	beam	145
+	center	2000. 1503.729
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.051689
+		0.7457393
+		0.1067822
+		0.03570562
+		0.0374091
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 146 2000. 1512.961
+	image	masterflat_red30
+	aperture	146
+	beam	146
+	center	2000. 1512.961
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.06482867
+		0.7452502
+		0.123208
+		0.0327641
+		0.0349472
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 147 2000. 1522.111
+	image	masterflat_red30
+	aperture	147
+	beam	147
+	center	2000. 1522.111
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1021827
+		0.7725565
+		0.1971563
+		0.04413338
+		0.04284053
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 148 2000. 1544.858
+	image	masterflat_red30
+	aperture	148
+	beam	148
+	center	2000. 1544.858
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.0367124
+		0.7652713
+		0.04833231
+		0.01733355
+		0.01715047
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 149 2000. 1554.284
+	image	masterflat_red30
+	aperture	149
+	beam	149
+	center	2000. 1554.284
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.05008203
+		0.768968
+		0.03736379
+		0.03077249
+		0.00229197
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 150 2000. 1563.578
+	image	masterflat_red30
+	aperture	150
+	beam	150
+	center	2000. 1563.578
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.04864445
+		0.7903492
+		0.04010709
+		0.01605888
+		-2.329156E-4
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 151 2000. 1572.815
+	image	masterflat_red30
+	aperture	151
+	beam	151
+	center	2000. 1572.815
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.02311492
+		0.7883078
+		7.148319E-4
+		0.01920378
+		0.01088209
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 152 2000. 1581.933
+	image	masterflat_red30
+	aperture	152
+	beam	152
+	center	2000. 1581.933
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.02716961
+		0.7932298
+		0.009416069
+		0.023271
+		0.007471565
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 153 2000. 1591.293
+	image	masterflat_red30
+	aperture	153
+	beam	153
+	center	2000. 1591.293
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.04663627
+		0.8038506
+		0.02313247
+		0.02515971
+		-0.005059593
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 154 2000. 1600.306
+	image	masterflat_red30
+	aperture	154
+	beam	154
+	center	2000. 1600.306
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.04563145
+		0.8076019
+		0.03560453
+		0.02916563
+		-0.0023345
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 155 2000. 1609.611
+	image	masterflat_red30
+	aperture	155
+	beam	155
+	center	2000. 1609.611
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.02985865
+		0.8197734
+		0.04454838
+		0.02158193
+		0.007530658
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 156 2000. 1618.78
+	image	masterflat_red30
+	aperture	156
+	beam	156
+	center	2000. 1618.78
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.03654274
+		0.8157974
+		0.05686997
+		0.02565753
+		0.0168
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 157 2000. 1628.048
+	image	masterflat_red30
+	aperture	157
+	beam	157
+	center	2000. 1628.048
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.0419013
+		0.8259265
+		0.1000409
+		0.02961336
+		0.01843571
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 158 2000. 1649.67
+	image	masterflat_red30
+	aperture	158
+	beam	158
+	center	2000. 1649.67
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.06687165
+		0.8474568
+		0.1002039
+		0.0203874
+		0.01704946
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 159 2000. 1658.969
+	image	masterflat_red30
+	aperture	159
+	beam	159
+	center	2000. 1658.969
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.06768464
+		0.8514143
+		0.07487104
+		0.02637843
+		0.01234691
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 160 2000. 1668.259
+	image	masterflat_red30
+	aperture	160
+	beam	160
+	center	2000. 1668.259
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.05800552
+		0.8583803
+		0.0696203
+		0.02575527
+		-0.003897904
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 161 2000. 1677.494
+	image	masterflat_red30
+	aperture	161
+	beam	161
+	center	2000. 1677.494
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.0548407
+		0.8668494
+		0.05983105
+		0.01772763
+		4.160055E-4
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 162 2000. 1686.942
+	image	masterflat_red30
+	aperture	162
+	beam	162
+	center	2000. 1686.942
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.03992615
+		0.8730912
+		0.06243246
+		0.02828368
+		0.01128166
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 163 2000. 1695.949
+	image	masterflat_red30
+	aperture	163
+	beam	163
+	center	2000. 1695.949
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.03312171
+		0.8705232
+		0.05272541
+		0.02739138
+		0.01673131
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 164 2000. 1705.119
+	image	masterflat_red30
+	aperture	164
+	beam	164
+	center	2000. 1705.119
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.04560399
+		0.8716405
+		0.05679388
+		0.03256645
+		0.006869955
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 165 2000. 1714.355
+	image	masterflat_red30
+	aperture	165
+	beam	165
+	center	2000. 1714.355
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.06263068
+		0.8796495
+		0.07686252
+		0.02964129
+		0.004508657
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 166 2000. 1723.575
+	image	masterflat_red30
+	aperture	166
+	beam	166
+	center	2000. 1723.575
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.07511071
+		0.8880266
+		0.09654446
+		0.02726679
+		0.01328205
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 167 2000. 1732.812
+	image	masterflat_red30
+	aperture	167
+	beam	167
+	center	2000. 1732.812
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.07402734
+		0.8889985
+		0.1107471
+		0.02662234
+		0.02098395
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 168 2000. 1755.392
+	image	masterflat_red30
+	aperture	168
+	beam	168
+	center	2000. 1755.392
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.06056452
+		0.8637199
+		0.09810352
+		0.01890627
+		0.0117165
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 169 2000. 1764.831
+	image	masterflat_red30
+	aperture	169
+	beam	169
+	center	2000. 1764.831
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.06498499
+		0.8889226
+		0.1030671
+		0.01688273
+		0.02190782
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 170 2000. 1774.102
+	image	masterflat_red30
+	aperture	170
+	beam	170
+	center	2000. 1774.102
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.0667377
+		0.8820114
+		0.0732533
+		0.02594616
+		0.0168226
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 171 2000. 1783.517
+	image	masterflat_red30
+	aperture	171
+	beam	171
+	center	2000. 1783.517
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.08152575
+		0.8986424
+		0.08893128
+		0.01872564
+		0.006854322
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 172 2000. 1792.926
+	image	masterflat_red30
+	aperture	172
+	beam	172
+	center	2000. 1792.926
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.05428283
+		0.9055885
+		0.07756764
+		0.02124614
+		0.01572279
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 173 2000. 1802.014
+	image	masterflat_red30
+	aperture	173
+	beam	173
+	center	2000. 1802.014
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.06103601
+		0.917231
+		0.0892747
+		0.02444821
+		0.01308485
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 174 2000. 1811.29
+	image	masterflat_red30
+	aperture	174
+	beam	174
+	center	2000. 1811.29
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.05655127
+		0.9095875
+		0.08747391
+		0.02532714
+		0.009436266
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 175 2000. 1820.609
+	image	masterflat_red30
+	aperture	175
+	beam	175
+	center	2000. 1820.609
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.07943844
+		0.9230282
+		0.1063083
+		0.02433281
+		0.01301302
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 176 2000. 1829.878
+	image	masterflat_red30
+	aperture	176
+	beam	176
+	center	2000. 1829.878
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.06221034
+		0.9174343
+		0.1132229
+		0.02163883
+		0.01685251
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 177 2000. 1839.17
+	image	masterflat_red30
+	aperture	177
+	beam	177
+	center	2000. 1839.17
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.07404611
+		0.931855
+		0.1332311
+		0.02744844
+		0.02586375
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 178 2000. 1861.51
+	image	masterflat_red30
+	aperture	178
+	beam	178
+	center	2000. 1861.51
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.08476207
+		0.9529436
+		0.113027
+		0.01665672
+		0.007319341
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 179 2000. 1870.968
+	image	masterflat_red30
+	aperture	179
+	beam	179
+	center	2000. 1870.968
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.06104058
+		0.9462016
+		0.07718816
+		0.02875782
+		0.00823191
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 180 2000. 1880.261
+	image	masterflat_red30
+	aperture	180
+	beam	180
+	center	2000. 1880.261
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.07827991
+		0.9618213
+		0.08713943
+		0.02431769
+		-0.01041946
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 181 2000. 1889.607
+	image	masterflat_red30
+	aperture	181
+	beam	181
+	center	2000. 1889.607
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.05701972
+		0.9635229
+		0.08191824
+		0.01993696
+		0.003409309
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 182 2000. 1898.855
+	image	masterflat_red30
+	aperture	182
+	beam	182
+	center	2000. 1898.855
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.05374711
+		0.9701506
+		0.07841229
+		0.02929641
+		0.008948637
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 183 2000. 1908.16
+	image	masterflat_red30
+	aperture	183
+	beam	183
+	center	2000. 1908.16
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.08732817
+		0.9712255
+		0.08314027
+		0.0302661
+		-0.009529365
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 184 2000. 1917.548
+	image	masterflat_red30
+	aperture	184
+	beam	184
+	center	2000. 1917.548
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.06259279
+		0.9768509
+		0.08040743
+		0.02207737
+		0.004327559
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 185 2000. 1923.885
+	image	masterflat_red30
+	aperture	185
+	beam	185
+	center	2000. 1923.885
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4090.
+		0.06259279
+		0.9768509
+		0.08040743
+		0.02207737
+		0.004327559
+		0.0
+		0.0
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 186 2000. 1936.03
+	image	masterflat_red30
+	aperture	186
+	beam	186
+	center	2000. 1936.03
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.07175846
+		0.9895875
+		0.1121485
+		0.03308048
+		0.01327599
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 187 2000. 1945.437
+	image	masterflat_red30
+	aperture	187
+	beam	187
+	center	2000. 1945.437
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.07926016
+		0.9886396
+		0.1240189
+		0.03355954
+		0.01243719
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 188 2000. 1976.165
+	image	masterflat_red30
+	aperture	188
+	beam	188
+	center	2000. 1976.165
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.115606
+		1.031599
+		0.1202822
+		0.02205563
+		-0.01347337
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 189 2000. 1985.618
+	image	masterflat_red30
+	aperture	189
+	beam	189
+	center	2000. 1985.618
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.07922776
+		1.035363
+		0.1157985
+		0.01414448
+		0.008745495
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 190 2000. 1994.911
+	image	masterflat_red30
+	aperture	190
+	beam	190
+	center	2000. 1994.911
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.08426841
+		1.046405
+		0.1183349
+		0.02773416
+		-0.004515073
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 191 2000. 2004.309
+	image	masterflat_red30
+	aperture	191
+	beam	191
+	center	2000. 2004.309
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1055405
+		1.049594
+		0.11423
+		0.0146936
+		-0.01241139
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 192 2000. 2013.602
+	image	masterflat_red30
+	aperture	192
+	beam	192
+	center	2000. 2013.602
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.07941547
+		1.04869
+		0.1061086
+		0.0139973
+		0.008307873
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 193 2000. 2022.951
+	image	masterflat_red30
+	aperture	193
+	beam	193
+	center	2000. 2022.951
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.0741778
+		1.056181
+		0.1170666
+		0.02821281
+		-0.003964279
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 194 2000. 2032.329
+	image	masterflat_red30
+	aperture	194
+	beam	194
+	center	2000. 2032.329
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.08270488
+		1.057224
+		0.1137555
+		0.02317829
+		-0.008977604
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 195 2000. 2041.497
+	image	masterflat_red30
+	aperture	195
+	beam	195
+	center	2000. 2041.497
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.08525421
+		1.054348
+		0.1098307
+		0.02271147
+		0.002599306
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 196 2000. 2050.881
+	image	masterflat_red30
+	aperture	196
+	beam	196
+	center	2000. 2050.881
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.07602402
+		1.064181
+		0.1347629
+		0.02919823
+		0.01807199
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 197 2000. 2073.094
+	image	masterflat_red30
+	aperture	197
+	beam	197
+	center	2000. 2073.094
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.09633315
+		1.065815
+		0.1590659
+		0.03130415
+		0.008094667
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 198 2000. 2082.556
+	image	masterflat_red30
+	aperture	198
+	beam	198
+	center	2000. 2082.556
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.08951779
+		1.062709
+		0.1312289
+		0.02070591
+		0.006357366
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 199 2000. 2091.792
+	image	masterflat_red30
+	aperture	199
+	beam	199
+	center	2000. 2091.792
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.07578204
+		1.072241
+		0.1309042
+		0.02604281
+		0.01346289
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 200 2000. 2101.247
+	image	masterflat_red30
+	aperture	200
+	beam	200
+	center	2000. 2101.247
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.09676972
+		1.08088
+		0.1308473
+		0.02608486
+		-0.009219025
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 201 2000. 2110.479
+	image	masterflat_red30
+	aperture	201
+	beam	201
+	center	2000. 2110.479
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1135278
+		1.089778
+		0.1410176
+		0.01858267
+		-2.420083E-4
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 202 2000. 2119.86
+	image	masterflat_red30
+	aperture	202
+	beam	202
+	center	2000. 2119.86
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.09573807
+		1.091273
+		0.1298621
+		0.02985184
+		0.01434976
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 203 2000. 2129.033
+	image	masterflat_red30
+	aperture	203
+	beam	203
+	center	2000. 2129.033
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1048401
+		1.096575
+		0.1385972
+		0.03508327
+		0.005587068
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 204 2000. 2138.335
+	image	masterflat_red30
+	aperture	204
+	beam	204
+	center	2000. 2138.335
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1068524
+		1.109962
+		0.1563324
+		0.0280842
+		-0.001673152
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 205 2000. 2147.702
+	image	masterflat_red30
+	aperture	205
+	beam	205
+	center	2000. 2147.702
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.09101366
+		1.109105
+		0.1607033
+		0.02827371
+		0.01604405
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 206 2000. 2157.117
+	image	masterflat_red30
+	aperture	206
+	beam	206
+	center	2000. 2157.117
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1116282
+		1.113234
+		0.1706005
+		0.03546805
+		0.01649015
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 207 2000. 2179.212
+	image	masterflat_red30
+	aperture	207
+	beam	207
+	center	2000. 2179.212
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1034651
+		1.116213
+		0.1514195
+		0.0278188
+		9.816287E-4
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 208 2000. 2188.719
+	image	masterflat_red30
+	aperture	208
+	beam	208
+	center	2000. 2188.719
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1178024
+		1.146575
+		0.1862694
+		0.02261075
+		0.01623307
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 209 2000. 2198.041
+	image	masterflat_red30
+	aperture	209
+	beam	209
+	center	2000. 2198.041
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1018815
+		1.138294
+		0.1484871
+		0.03127023
+		0.00144253
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 210 2000. 2207.286
+	image	masterflat_red30
+	aperture	210
+	beam	210
+	center	2000. 2207.286
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.115745
+		1.145867
+		0.1570166
+		0.02370812
+		-0.01165255
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 211 2000. 2216.616
+	image	masterflat_red30
+	aperture	211
+	beam	211
+	center	2000. 2216.616
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1006955
+		1.145204
+		0.1494292
+		0.01864093
+		0.01066084
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 212 2000. 2225.841
+	image	masterflat_red30
+	aperture	212
+	beam	212
+	center	2000. 2225.841
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.103582
+		1.157505
+		0.158515
+		0.02807572
+		0.0145403
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 213 2000. 2235.075
+	image	masterflat_red30
+	aperture	213
+	beam	213
+	center	2000. 2235.075
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1088726
+		1.160965
+		0.1492455
+		0.03438373
+		0.002488099
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 214 2000. 2244.513
+	image	masterflat_red30
+	aperture	214
+	beam	214
+	center	2000. 2244.513
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.09634345
+		1.152726
+		0.1499264
+		0.02601215
+		0.003804247
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 215 2000. 2253.725
+	image	masterflat_red30
+	aperture	215
+	beam	215
+	center	2000. 2253.725
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.08878973
+		1.167299
+		0.1654254
+		0.03024455
+		0.01697295
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 216 2000. 2263.001
+	image	masterflat_red30
+	aperture	216
+	beam	216
+	center	2000. 2263.001
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1114437
+		1.173188
+		0.1747501
+		0.03334996
+		0.01835078
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 217 2000. 2284.995
+	image	masterflat_red30
+	aperture	217
+	beam	217
+	center	2000. 2284.995
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1172039
+		1.160432
+		0.1786614
+		0.02743352
+		0.02310374
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 218 2000. 2294.389
+	image	masterflat_red30
+	aperture	218
+	beam	218
+	center	2000. 2294.389
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1108841
+		1.174689
+		0.1815319
+		0.02336152
+		0.007374159
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 219 2000. 2303.594
+	image	masterflat_red30
+	aperture	219
+	beam	219
+	center	2000. 2303.594
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1124754
+		1.17956
+		0.1734427
+		0.02099946
+		0.01328106
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 220 2000. 2312.977
+	image	masterflat_red30
+	aperture	220
+	beam	220
+	center	2000. 2312.977
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1135501
+		1.182465
+		0.1731823
+		0.03031847
+		0.01499476
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 221 2000. 2322.199
+	image	masterflat_red30
+	aperture	221
+	beam	221
+	center	2000. 2322.199
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1263044
+		1.188969
+		0.1653674
+		0.02658306
+		0.003336759
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 222 2000. 2331.556
+	image	masterflat_red30
+	aperture	222
+	beam	222
+	center	2000. 2331.556
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1048132
+		1.198054
+		0.1779349
+		0.02154844
+		0.01103086
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 223 2000. 2340.761
+	image	masterflat_red30
+	aperture	223
+	beam	223
+	center	2000. 2340.761
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1092611
+		1.22319
+		0.2151783
+		0.02174617
+		0.01798087
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 224 2000. 2350.004
+	image	masterflat_red30
+	aperture	224
+	beam	224
+	center	2000. 2350.004
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1200453
+		1.201646
+		0.1757119
+		0.02950127
+		0.01750227
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 225 2000. 2359.263
+	image	masterflat_red30
+	aperture	225
+	beam	225
+	center	2000. 2359.263
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1233105
+		1.208439
+		0.1868336
+		0.03001006
+		0.01363066
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 226 2000. 2368.645
+	image	masterflat_red30
+	aperture	226
+	beam	226
+	center	2000. 2368.645
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1214556
+		1.213187
+		0.1993219
+		0.03264463
+		0.0203847
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 227 2000. 2392.301
+	image	masterflat_red30
+	aperture	227
+	beam	227
+	center	2000. 2392.301
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1329145
+		1.222779
+		0.1931957
+		0.02556187
+		0.009295781
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 228 2000. 2401.588
+	image	masterflat_red30
+	aperture	228
+	beam	228
+	center	2000. 2401.588
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.0999682
+		1.224885
+		0.1857458
+		0.02251041
+		0.01312074
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 229 2000. 2410.909
+	image	masterflat_red30
+	aperture	229
+	beam	229
+	center	2000. 2410.909
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1154622
+		1.236557
+		0.1909473
+		0.02621406
+		0.01658892
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 230 2000. 2420.152
+	image	masterflat_red30
+	aperture	230
+	beam	230
+	center	2000. 2420.152
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1299841
+		1.242232
+		0.1848747
+		0.0248303
+		0.002722826
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 231 2000. 2429.262
+	image	masterflat_red30
+	aperture	231
+	beam	231
+	center	2000. 2429.262
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1498684
+		1.252635
+		0.1941529
+		0.02521925
+		8.910827E-4
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 232 2000. 2438.58
+	image	masterflat_red30
+	aperture	232
+	beam	232
+	center	2000. 2438.58
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1343241
+		1.252536
+		0.1966217
+		0.02198879
+		0.01185234
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 233 2000. 2447.688
+	image	masterflat_red30
+	aperture	233
+	beam	233
+	center	2000. 2447.688
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1076656
+		1.24554
+		0.1833512
+		0.02196365
+		0.01682919
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 234 2000. 2457.047
+	image	masterflat_red30
+	aperture	234
+	beam	234
+	center	2000. 2457.047
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1207503
+		1.259724
+		0.1889464
+		0.02817524
+		0.01398413
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 235 2000. 2466.221
+	image	masterflat_red30
+	aperture	235
+	beam	235
+	center	2000. 2466.221
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1263452
+		1.268238
+		0.2054452
+		0.03316746
+		0.0152016
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 236 2000. 2475.437
+	image	masterflat_red30
+	aperture	236
+	beam	236
+	center	2000. 2475.437
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1326322
+		1.276797
+		0.2221366
+		0.03277656
+		0.01656318
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 237 2000. 2506.694
+	image	masterflat_red30
+	aperture	237
+	beam	237
+	center	2000. 2506.694
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1266242
+		1.292482
+		0.2316588
+		0.02305167
+		0.01543293
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 238 2000. 2515.893
+	image	masterflat_red30
+	aperture	238
+	beam	238
+	center	2000. 2515.893
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1520445
+		1.296758
+		0.2198074
+		0.02533622
+		0.0190857
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 239 2000. 2525.032
+	image	masterflat_red30
+	aperture	239
+	beam	239
+	center	2000. 2525.032
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1358163
+		1.301259
+		0.2098645
+		0.02860109
+		0.0138379
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 240 2000. 2534.25
+	image	masterflat_red30
+	aperture	240
+	beam	240
+	center	2000. 2534.25
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1455091
+		1.30546
+		0.2113127
+		0.03124191
+		0.007557548
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 241 2000. 2543.436
+	image	masterflat_red30
+	aperture	241
+	beam	241
+	center	2000. 2543.436
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1311951
+		1.309833
+		0.2104996
+		0.02948538
+		0.009274113
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 242 2000. 2552.577
+	image	masterflat_red30
+	aperture	242
+	beam	242
+	center	2000. 2552.577
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1393992
+		1.306281
+		0.2043961
+		0.02738858
+		0.0121161
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 243 2000. 2561.779
+	image	masterflat_red30
+	aperture	243
+	beam	243
+	center	2000. 2561.779
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1164824
+		1.31957
+		0.2195735
+		0.03199038
+		0.01954333
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 244 2000. 2570.871
+	image	masterflat_red30
+	aperture	244
+	beam	244
+	center	2000. 2570.871
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1083004
+		1.330595
+		0.2347138
+		0.03172153
+		0.02348851
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 245 2000. 2580.11
+	image	masterflat_red30
+	aperture	245
+	beam	245
+	center	2000. 2580.11
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1379262
+		1.33667
+		0.2506903
+		0.0359109
+		0.02344343
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 246 2000. 2604.551
+	image	masterflat_red30
+	aperture	246
+	beam	246
+	center	2000. 2604.551
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.126669
+		1.281867
+		0.1857753
+		0.005008298
+		0.01224634
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 247 2000. 2613.81
+	image	masterflat_red30
+	aperture	247
+	beam	247
+	center	2000. 2613.81
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1206757
+		1.307896
+		0.2175615
+		0.01634055
+		0.01616603
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 248 2000. 2623.034
+	image	masterflat_red30
+	aperture	248
+	beam	248
+	center	2000. 2623.034
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1380808
+		1.318696
+		0.2219935
+		0.01889646
+		0.0207907
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 249 2000. 2632.241
+	image	masterflat_red30
+	aperture	249
+	beam	249
+	center	2000. 2632.241
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1529914
+		1.341907
+		0.2457644
+		0.02484815
+		0.02077462
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 250 2000. 2641.463
+	image	masterflat_red30
+	aperture	250
+	beam	250
+	center	2000. 2641.463
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1492944
+		1.34278
+		0.2362194
+		0.02401754
+		0.01804806
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 251 2000. 2650.489
+	image	masterflat_red30
+	aperture	251
+	beam	251
+	center	2000. 2650.489
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1554522
+		1.349504
+		0.23713
+		0.02438039
+		0.01765006
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 252 2000. 2659.676
+	image	masterflat_red30
+	aperture	252
+	beam	252
+	center	2000. 2659.676
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.149376
+		1.360955
+		0.2543561
+		0.02772051
+		0.02045217
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 253 2000. 2668.693
+	image	masterflat_red30
+	aperture	253
+	beam	253
+	center	2000. 2668.693
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1589013
+		1.384375
+		0.2874067
+		0.0336349
+		0.02414392
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 254 2000. 2677.801
+	image	masterflat_red30
+	aperture	254
+	beam	254
+	center	2000. 2677.801
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1678497
+		1.366562
+		0.2608927
+		0.0281514
+		0.02493544
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 255 2000. 2687.03
+	image	masterflat_red30
+	aperture	255
+	beam	255
+	center	2000. 2687.03
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1712118
+		1.36998
+		0.2766482
+		0.02824294
+		0.03039532
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 256 2000. 2709.008
+	image	masterflat_red30
+	aperture	256
+	beam	256
+	center	2000. 2709.008
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1486725
+		1.382306
+		0.2491743
+		0.02214677
+		0.02017002
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 257 2000. 2718.148
+	image	masterflat_red30
+	aperture	257
+	beam	257
+	center	2000. 2718.148
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1654174
+		1.400711
+		0.2588841
+		0.02401422
+		0.01362031
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 258 2000. 2727.37
+	image	masterflat_red30
+	aperture	258
+	beam	258
+	center	2000. 2727.37
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1627062
+		1.40586
+		0.2589501
+		0.02733126
+		0.01053962
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 259 2000. 2736.566
+	image	masterflat_red30
+	aperture	259
+	beam	259
+	center	2000. 2736.566
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1550357
+		1.41168
+		0.2534746
+		0.0238661
+		0.01295466
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 260 2000. 2745.734
+	image	masterflat_red30
+	aperture	260
+	beam	260
+	center	2000. 2745.734
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1508577
+		1.418347
+		0.2647887
+		0.02245007
+		0.01679762
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 261 2000. 2754.94
+	image	masterflat_red30
+	aperture	261
+	beam	261
+	center	2000. 2754.94
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1506643
+		1.423788
+		0.2610163
+		0.02176948
+		0.01822134
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 262 2000. 2764.109
+	image	masterflat_red30
+	aperture	262
+	beam	262
+	center	2000. 2764.109
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1602004
+		1.426029
+		0.2544477
+		0.02714836
+		0.01942678
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 263 2000. 2773.006
+	image	masterflat_red30
+	aperture	263
+	beam	263
+	center	2000. 2773.006
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1630357
+		1.439244
+		0.2748053
+		0.02781658
+		0.02287307
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 264 2000. 2782.278
+	image	masterflat_red30
+	aperture	264
+	beam	264
+	center	2000. 2782.278
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1848417
+		1.442041
+		0.278872
+		0.0327034
+		0.01870739
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 265 2000. 2791.516
+	image	masterflat_red30
+	aperture	265
+	beam	265
+	center	2000. 2791.516
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1700172
+		1.444177
+		0.2821391
+		0.03321103
+		0.02153201
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 266 2000. 2814.661
+	image	masterflat_red30
+	aperture	266
+	beam	266
+	center	2000. 2814.661
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.172785
+		1.441892
+		0.2793435
+		0.02604932
+		0.01951416
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 267 2000. 2823.859
+	image	masterflat_red30
+	aperture	267
+	beam	267
+	center	2000. 2823.859
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1646791
+		1.448472
+		0.2871191
+		0.02594162
+		0.02176361
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 268 2000. 2833.016
+	image	masterflat_red30
+	aperture	268
+	beam	268
+	center	2000. 2833.016
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1681269
+		1.462166
+		0.2938
+		0.02169671
+		0.02028578
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 269 2000. 2842.079
+	image	masterflat_red30
+	aperture	269
+	beam	269
+	center	2000. 2842.079
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.163068
+		1.467544
+		0.2885238
+		0.02444149
+		0.02157296
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 270 2000. 2851.106
+	image	masterflat_red30
+	aperture	270
+	beam	270
+	center	2000. 2851.106
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1788373
+		1.477502
+		0.2949985
+		0.02355373
+		0.01987475
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 271 2000. 2860.192
+	image	masterflat_red30
+	aperture	271
+	beam	271
+	center	2000. 2860.192
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1842096
+		1.484375
+		0.2996289
+		0.02689138
+		0.02060335
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 272 2000. 2869.367
+	image	masterflat_red30
+	aperture	272
+	beam	272
+	center	2000. 2869.367
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1901202
+		1.486211
+		0.2937284
+		0.02921058
+		0.0189945
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 273 2000. 2878.472
+	image	masterflat_red30
+	aperture	273
+	beam	273
+	center	2000. 2878.472
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2067476
+		1.487363
+		0.2984999
+		0.03046298
+		0.02072312
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 274 2000. 2884.59
+	image	masterflat_red30
+	aperture	274
+	beam	274
+	center	2000. 2884.59
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4090.
+		0.2067476
+		1.487363
+		0.2984999
+		0.03046298
+		0.02072312
+		0.0
+		0.0
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 275 2000. 2896.529
+	image	masterflat_red30
+	aperture	275
+	beam	275
+	center	2000. 2896.529
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2122874
+		1.519925
+		0.3460734
+		0.03628099
+		0.02292917
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 276 2000. 2918.8
+	image	masterflat_red30
+	aperture	276
+	beam	276
+	center	2000. 2918.8
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.178695
+		1.488646
+		0.3047631
+		0.02571833
+		0.01958433
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 277 2000. 2927.893
+	image	masterflat_red30
+	aperture	277
+	beam	277
+	center	2000. 2927.893
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1769223
+		1.492519
+		0.3003586
+		0.02021148
+		0.02196397
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 278 2000. 2936.98
+	image	masterflat_red30
+	aperture	278
+	beam	278
+	center	2000. 2936.98
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1964732
+		1.499892
+		0.3030432
+		0.01566331
+		0.02106254
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 279 2000. 2942.771
+	image	masterflat_red30
+	aperture	279
+	beam	279
+	center	2000. 2942.771
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4090.
+		0.1964732
+		1.499892
+		0.3030432
+		0.01566331
+		0.02106254
+		0.0
+		0.0
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 280 2000. 2955.139
+	image	masterflat_red30
+	aperture	280
+	beam	280
+	center	2000. 2955.139
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2026073
+		1.526709
+		0.3150785
+		0.02362793
+		0.0231437
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 281 2000. 2964.134
+	image	masterflat_red30
+	aperture	281
+	beam	281
+	center	2000. 2964.134
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1849341
+		1.516666
+		0.2971084
+		0.02133318
+		0.02243577
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 282 2000. 2973.426
+	image	masterflat_red30
+	aperture	282
+	beam	282
+	center	2000. 2973.426
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1904447
+		1.526867
+		0.3053253
+		0.02647501
+		0.01893651
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 283 2000. 2982.355
+	image	masterflat_red30
+	aperture	283
+	beam	283
+	center	2000. 2982.355
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1812648
+		1.534264
+		0.3177358
+		0.02540196
+		0.02232271
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 284 2000. 2991.367
+	image	masterflat_red30
+	aperture	284
+	beam	284
+	center	2000. 2991.367
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2003064
+		1.534032
+		0.3207287
+		0.02156803
+		0.0232508
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 285 2000. 3000.476
+	image	masterflat_red30
+	aperture	285
+	beam	285
+	center	2000. 3000.476
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.210501
+		1.530724
+		0.31558
+		0.02027761
+		0.0233888
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 286 2000. 3022.574
+	image	masterflat_red30
+	aperture	286
+	beam	286
+	center	2000. 3022.574
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1801576
+		1.542843
+		0.3289732
+		0.01948642
+		0.02172501
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 287 2000. 3031.713
+	image	masterflat_red30
+	aperture	287
+	beam	287
+	center	2000. 3031.713
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2097886
+		1.544393
+		0.3268732
+		0.01583466
+		0.01660962
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 288 2000. 3040.899
+	image	masterflat_red30
+	aperture	288
+	beam	288
+	center	2000. 3040.899
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2038863
+		1.557658
+		0.3361623
+		0.01722601
+		0.0187669
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 289 2000. 3058.97
+	image	masterflat_red30
+	aperture	289
+	beam	289
+	center	2000. 3058.97
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1967756
+		1.573702
+		0.3430912
+		0.01866696
+		0.0215617
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 290 2000. 3068.191
+	image	masterflat_red30
+	aperture	290
+	beam	290
+	center	2000. 3068.191
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1878454
+		1.578554
+		0.3439051
+		0.01821189
+		0.02427777
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 291 2000. 3077.081
+	image	masterflat_red30
+	aperture	291
+	beam	291
+	center	2000. 3077.081
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2030879
+		1.578785
+		0.3445098
+		0.01738516
+		0.0238199
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 292 2000. 3086.204
+	image	masterflat_red30
+	aperture	292
+	beam	292
+	center	2000. 3086.204
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2093675
+		1.582925
+		0.3484784
+		0.0142721
+		0.02436183
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 293 2000. 3095.344
+	image	masterflat_red30
+	aperture	293
+	beam	293
+	center	2000. 3095.344
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1904108
+		1.578192
+		0.3448319
+		0.0126085
+		0.02280639
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 294 2000. 3104.308
+	image	masterflat_red30
+	aperture	294
+	beam	294
+	center	2000. 3104.308
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2084179
+		1.575964
+		0.3452436
+		0.01083448
+		0.02420197
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 295 2000. 3127.557
+	image	masterflat_red30
+	aperture	295
+	beam	295
+	center	2000. 3127.557
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.1973256
+		1.595467
+		0.3398364
+		0.02044067
+		0.03199518
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 296 2000. 3136.415
+	image	masterflat_red30
+	aperture	296
+	beam	296
+	center	2000. 3136.415
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2339658
+		1.622226
+		0.3901169
+		0.02189473
+		0.02639618
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 297 2000. 3145.47
+	image	masterflat_red30
+	aperture	297
+	beam	297
+	center	2000. 3145.47
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2095127
+		1.623489
+		0.3803956
+		0.02267011
+		0.02676876
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 298 2000. 3154.567
+	image	masterflat_red30
+	aperture	298
+	beam	298
+	center	2000. 3154.567
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2182956
+		1.635222
+		0.3843073
+		0.02567316
+		0.02547163
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 299 2000. 3163.497
+	image	masterflat_red30
+	aperture	299
+	beam	299
+	center	2000. 3163.497
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2479428
+		1.643181
+		0.3890423
+		0.02764387
+		0.02678117
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 300 2000. 3172.371
+	image	masterflat_red30
+	aperture	300
+	beam	300
+	center	2000. 3172.371
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2366493
+		1.653362
+		0.4013052
+		0.02817935
+		0.02775812
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 301 2000. 3177.998
+	image	masterflat_red30
+	aperture	301
+	beam	301
+	center	2000. 3177.998
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4090.
+		0.2366493
+		1.653362
+		0.4013052
+		0.02817935
+		0.02775812
+		0.0
+		0.0
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 302 2000. 3190.355
+	image	masterflat_red30
+	aperture	302
+	beam	302
+	center	2000. 3190.355
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2552166
+		1.659055
+		0.4049942
+		0.02866318
+		0.03106012
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 303 2000. 3199.36
+	image	masterflat_red30
+	aperture	303
+	beam	303
+	center	2000. 3199.36
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2391694
+		1.663595
+		0.4119255
+		0.02762491
+		0.03040642
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 304 2000. 3208.363
+	image	masterflat_red30
+	aperture	304
+	beam	304
+	center	2000. 3208.363
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.226207
+		1.666947
+		0.4165809
+		0.02760286
+		0.03306492
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 305 2000. 3231.063
+	image	masterflat_red30
+	aperture	305
+	beam	305
+	center	2000. 3231.063
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2545761
+		1.673689
+		0.4421479
+		0.02086469
+		0.02923037
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 306 2000. 3240.158
+	image	masterflat_red30
+	aperture	306
+	beam	306
+	center	2000. 3240.158
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.237247
+		1.661789
+		0.4207009
+		0.009603686
+		0.02705995
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 307 2000. 3248.928
+	image	masterflat_red30
+	aperture	307
+	beam	307
+	center	2000. 3248.928
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2591024
+		1.667816
+		0.4227417
+		0.01525554
+		0.02440016
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 308 2000. 3257.909
+	image	masterflat_red30
+	aperture	308
+	beam	308
+	center	2000. 3257.909
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2236623
+		1.669775
+		0.4128108
+		0.0150042
+		0.01935085
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 309 2000. 3266.682
+	image	masterflat_red30
+	aperture	309
+	beam	309
+	center	2000. 3266.682
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2433806
+		1.683553
+		0.4199827
+		0.01785153
+		0.02535287
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 310 2000. 3275.535
+	image	masterflat_red30
+	aperture	310
+	beam	310
+	center	2000. 3275.535
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2553418
+		1.687529
+		0.4212104
+		0.02097945
+		0.02586375
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 311 2000. 3284.54
+	image	masterflat_red30
+	aperture	311
+	beam	311
+	center	2000. 3284.54
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2322389
+		1.68243
+		0.4038748
+		0.01189901
+		0.02375135
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 312 2000. 3293.302
+	image	masterflat_red30
+	aperture	312
+	beam	312
+	center	2000. 3293.302
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2307545
+		1.675358
+		0.4044999
+		0.004600014
+		0.02640651
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 313 2000. 3302.182
+	image	masterflat_red30
+	aperture	313
+	beam	313
+	center	2000. 3302.182
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.238296
+		1.678312
+		0.4036979
+		6.962892E-4
+		0.01839728
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 314 2000. 3310.975
+	image	masterflat_red30
+	aperture	314
+	beam	314
+	center	2000. 3310.975
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2481688
+		1.677998
+		0.3942569
+		-0.006462123
+		0.01143146
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 315 2000. 3333.376
+	image	masterflat_red30
+	aperture	315
+	beam	315
+	center	2000. 3333.376
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2454516
+		1.739524
+		0.4674743
+		0.0216022
+		0.03200755
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 316 2000. 3342.39
+	image	masterflat_red30
+	aperture	316
+	beam	316
+	center	2000. 3342.39
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2473026
+		1.705167
+		0.4175463
+		0.006199322
+		0.02459925
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 317 2000. 3351.258
+	image	masterflat_red30
+	aperture	317
+	beam	317
+	center	2000. 3351.258
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.266614
+		1.726114
+		0.4400919
+		0.01068593
+		0.02868317
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 318 2000. 3360.084
+	image	masterflat_red30
+	aperture	318
+	beam	318
+	center	2000. 3360.084
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2554868
+		1.73335
+		0.449322
+		0.01376979
+		0.02960839
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 319 2000. 3368.939
+	image	masterflat_red30
+	aperture	319
+	beam	319
+	center	2000. 3368.939
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2528566
+		1.745251
+		0.4535029
+		0.01734023
+		0.02772387
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 320 2000. 3377.761
+	image	masterflat_red30
+	aperture	320
+	beam	320
+	center	2000. 3377.761
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2510052
+		1.754313
+		0.4584275
+		0.02049574
+		0.02586837
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 321 2000. 3386.593
+	image	masterflat_red30
+	aperture	321
+	beam	321
+	center	2000. 3386.593
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2609051
+		1.754527
+		0.4513828
+		0.02162972
+		0.02289352
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 322 2000. 3395.522
+	image	masterflat_red30
+	aperture	322
+	beam	322
+	center	2000. 3395.522
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2688455
+		1.759979
+		0.4590034
+		0.01923978
+		0.02280155
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 323 2000. 3404.28
+	image	masterflat_red30
+	aperture	323
+	beam	323
+	center	2000. 3404.28
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2841812
+		1.768468
+		0.4706443
+		0.01987049
+		0.02885807
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 324 2000. 3413.176
+	image	masterflat_red30
+	aperture	324
+	beam	324
+	center	2000. 3413.176
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2667688
+		1.767656
+		0.4757237
+		0.01809093
+		0.02819703
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 325 2000. 3430.566
+	image	masterflat_red30
+	aperture	325
+	beam	325
+	center	2000. 3430.566
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4090.
+		0.2879039
+		1.790034
+		0.4763257
+		0.02403981
+		0.02714275
+		0.0
+		0.0
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 326 2000. 3442.624
+	image	masterflat_red30
+	aperture	326
+	beam	326
+	center	2000. 3442.624
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2879039
+		1.790034
+		0.4763257
+		0.02403981
+		0.02714275
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 327 2000. 3451.486
+	image	masterflat_red30
+	aperture	327
+	beam	327
+	center	2000. 3451.486
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2770709
+		1.811185
+		0.4950432
+		0.02442461
+		0.02636809
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 328 2000. 3460.435
+	image	masterflat_red30
+	aperture	328
+	beam	328
+	center	2000. 3460.435
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2793426
+		1.808468
+		0.4867114
+		0.02369917
+		0.02658074
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 329 2000. 3469.056
+	image	masterflat_red30
+	aperture	329
+	beam	329
+	center	2000. 3469.056
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2698083
+		1.814861
+		0.4929858
+		0.02301938
+		0.03081079
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 330 2000. 3477.876
+	image	masterflat_red30
+	aperture	330
+	beam	330
+	center	2000. 3477.876
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2597087
+		1.817229
+		0.4930683
+		0.02296215
+		0.02976566
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 331 2000. 3486.715
+	image	masterflat_red30
+	aperture	331
+	beam	331
+	center	2000. 3486.715
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2816307
+		1.830891
+		0.5022143
+		0.02804889
+		0.02517582
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 332 2000. 3495.358
+	image	masterflat_red30
+	aperture	332
+	beam	332
+	center	2000. 3495.358
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2748709
+		1.829017
+		0.5019832
+		0.02562706
+		0.0289281
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 333 2000. 3504.278
+	image	masterflat_red30
+	aperture	333
+	beam	333
+	center	2000. 3504.278
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2794606
+		1.834056
+		0.5099563
+		0.02329251
+		0.03127567
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 334 2000. 3513.06
+	image	masterflat_red30
+	aperture	334
+	beam	334
+	center	2000. 3513.06
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2657823
+		1.842301
+		0.5203283
+		0.0277086
+		0.02977469
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 335 2000. 3540.834
+	image	masterflat_red30
+	aperture	335
+	beam	335
+	center	2000. 3540.834
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4090.
+		0.2916563
+		1.847606
+		0.5295839
+		0.0277711
+		0.02217506
+		0.0
+		0.0
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 336 2000. 3552.857
+	image	masterflat_red30
+	aperture	336
+	beam	336
+	center	2000. 3552.857
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2916563
+		1.847606
+		0.5295839
+		0.0277711
+		0.02217506
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 337 2000. 3561.74
+	image	masterflat_red30
+	aperture	337
+	beam	337
+	center	2000. 3561.74
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2710056
+		1.848451
+		0.5252857
+		0.02801569
+		0.02271127
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 338 2000. 3570.295
+	image	masterflat_red30
+	aperture	338
+	beam	338
+	center	2000. 3570.295
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.290262
+		1.846696
+		0.5287539
+		0.02090902
+		0.02660121
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 339 2000. 3579.059
+	image	masterflat_red30
+	aperture	339
+	beam	339
+	center	2000. 3579.059
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2859325
+		1.856486
+		0.5342327
+		0.02106553
+		0.02397753
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 340 2000. 3587.778
+	image	masterflat_red30
+	aperture	340
+	beam	340
+	center	2000. 3587.778
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.3010113
+		1.865302
+		0.5352687
+		0.02865965
+		0.0227958
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 341 2000. 3596.568
+	image	masterflat_red30
+	aperture	341
+	beam	341
+	center	2000. 3596.568
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.3067373
+		1.888068
+		0.5516392
+		0.03000906
+		0.02519539
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 342 2000. 3605.221
+	image	masterflat_red30
+	aperture	342
+	beam	342
+	center	2000. 3605.221
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2993582
+		1.890844
+		0.5580101
+		0.02533015
+		0.02663577
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 343 2000. 3614.032
+	image	masterflat_red30
+	aperture	343
+	beam	343
+	center	2000. 3614.032
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.314723
+		1.897751
+		0.5610305
+		0.02701571
+		0.02312926
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 344 2000. 3637.288
+	image	masterflat_red30
+	aperture	344
+	beam	344
+	center	2000. 3637.288
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.3074917
+		1.877612
+		0.5373402
+		0.0145474
+		0.03209973
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 345 2000. 3645.856
+	image	masterflat_red30
+	aperture	345
+	beam	345
+	center	2000. 3645.856
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.3127493
+		1.901998
+		0.5573612
+		0.02097068
+		0.0227723
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 346 2000. 3654.487
+	image	masterflat_red30
+	aperture	346
+	beam	346
+	center	2000. 3654.487
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.3179937
+		1.92522
+		0.5750694
+		0.0272549
+		0.02850174
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 347 2000. 3663.031
+	image	masterflat_red30
+	aperture	347
+	beam	347
+	center	2000. 3663.031
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.326999
+		1.92342
+		0.5807829
+		0.02629029
+		0.02453909
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 348 2000. 3671.55
+	image	masterflat_red30
+	aperture	348
+	beam	348
+	center	2000. 3671.55
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.3225678
+		1.925601
+		0.5668214
+		0.02807885
+		0.02699137
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 349 2000. 3680.162
+	image	masterflat_red30
+	aperture	349
+	beam	349
+	center	2000. 3680.162
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.3212653
+		1.931585
+		0.578749
+		0.023884
+		0.02843904
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 350 2000. 3688.582
+	image	masterflat_red30
+	aperture	350
+	beam	350
+	center	2000. 3688.582
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.3270464
+		1.933972
+		0.5743666
+		0.0284755
+		0.02392995
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 351 2000. 3697.269
+	image	masterflat_red30
+	aperture	351
+	beam	351
+	center	2000. 3697.269
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.3316501
+		1.944075
+		0.5875484
+		0.02628409
+		0.02906163
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 352 2000. 3705.73
+	image	masterflat_red30
+	aperture	352
+	beam	352
+	center	2000. 3705.73
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.3355613
+		1.963246
+		0.5966414
+		0.03360323
+		0.02258806
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 353 2000. 3714.288
+	image	masterflat_red30
+	aperture	353
+	beam	353
+	center	2000. 3714.288
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.3206249
+		1.948324
+		0.5955618
+		0.02288999
+		0.02861123
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 354 2000. 3735.108
+	image	masterflat_red30
+	aperture	354
+	beam	354
+	center	2000. 3735.108
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2844194
+		1.90248
+		0.4687945
+		-0.0274422
+		4.247957E-4
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 355 2000. 3743.593
+	image	masterflat_red30
+	aperture	355
+	beam	355
+	center	2000. 3743.593
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.3004017
+		1.834543
+		0.4738151
+		-0.06584547
+		-0.01259259
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 356 2000. 3752.119
+	image	masterflat_red30
+	aperture	356
+	beam	356
+	center	2000. 3752.119
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2916316
+		1.878122
+		0.536001
+		-0.0358685
+		7.904015E-4
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 357 2000. 3760.766
+	image	masterflat_red30
+	aperture	357
+	beam	357
+	center	2000. 3760.766
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.3026571
+		1.936182
+		0.574389
+		-0.008469723
+		0.01089901
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 358 2000. 3769.216
+	image	masterflat_red30
+	aperture	358
+	beam	358
+	center	2000. 3769.216
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.328794
+		1.949111
+		0.5954483
+		-0.003242656
+		0.01757077
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 359 2000. 3777.665
+	image	masterflat_red30
+	aperture	359
+	beam	359
+	center	2000. 3777.665
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.3367964
+		1.947027
+		0.5797324
+		-0.009513316
+		0.01085874
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 360 2000. 3786.156
+	image	masterflat_red30
+	aperture	360
+	beam	360
+	center	2000. 3786.156
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.2944825
+		1.950344
+		0.5909282
+		-0.00892725
+		0.007179652
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 361 2000. 3794.635
+	image	masterflat_red30
+	aperture	361
+	beam	361
+	center	2000. 3794.635
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.3684888
+		1.984382
+		0.6023595
+		-0.001365478
+		0.01405566
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 362 2000. 3803.214
+	image	masterflat_red30
+	aperture	362
+	beam	362
+	center	2000. 3803.214
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.350872
+		1.994649
+		0.6054482
+		-0.009992877
+		0.008466116
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 363 2000. 3811.76
+	image	masterflat_red30
+	aperture	363
+	beam	363
+	center	2000. 3811.76
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.3432674
+		2.001575
+		0.5864506
+		-0.002051755
+		0.009410026
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 364 2000. 3830.549
+	image	masterflat_red30
+	aperture	364
+	beam	364
+	center	2000. 3830.549
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4090.
+		0.3651844
+		2.019059
+		0.637735
+		0.0163171
+		0.02615125
+		0.0
+		0.0
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 365 2000. 3842.182
+	image	masterflat_red30
+	aperture	365
+	beam	365
+	center	2000. 3842.182
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.3651844
+		2.019059
+		0.637735
+		0.0163171
+		0.02615125
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 366 2000. 3850.624
+	image	masterflat_red30
+	aperture	366
+	beam	366
+	center	2000. 3850.624
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.3708822
+		2.030431
+		0.6518492
+		0.01599142
+		0.02463994
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 367 2000. 3859.019
+	image	masterflat_red30
+	aperture	367
+	beam	367
+	center	2000. 3859.019
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.3690176
+		2.024294
+		0.6622143
+		0.0146143
+		0.02166049
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 368 2000. 3867.451
+	image	masterflat_red30
+	aperture	368
+	beam	368
+	center	2000. 3867.451
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.3617217
+		2.024353
+		0.6485932
+		0.01280549
+		0.02643627
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 369 2000. 3875.838
+	image	masterflat_red30
+	aperture	369
+	beam	369
+	center	2000. 3875.838
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.3719763
+		2.032206
+		0.6582241
+		0.0141868
+		0.01835809
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 370 2000. 3884.317
+	image	masterflat_red30
+	aperture	370
+	beam	370
+	center	2000. 3884.317
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.3778509
+		2.038505
+		0.6639752
+		0.01158804
+		0.02536081
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 371 2000. 3892.653
+	image	masterflat_red30
+	aperture	371
+	beam	371
+	center	2000. 3892.653
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.3792779
+		2.060657
+		0.6649218
+		0.02174962
+		0.0205199
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 372 2000. 3897.845
+	image	masterflat_red30
+	aperture	372
+	beam	372
+	center	2000. 3897.845
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	11
+		2.
+		7.
+		10.
+		4090.
+		0.3792779
+		2.060657
+		0.6649218
+		0.02174962
+		0.0205199
+		0.0
+		0.0
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 373 2000. 3909.454
+	image	masterflat_red30
+	aperture	373
+	beam	373
+	center	2000. 3909.454
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.3379051
+		2.061152
+		0.6476578
+		0.009377533
+		0.02273914
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 374 2000. 3931.693
+	image	masterflat_red30
+	aperture	374
+	beam	374
+	center	2000. 3931.693
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.385107
+		2.062574
+		0.6682857
+		0.02256091
+		0.02384665
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 375 2000. 3940.031
+	image	masterflat_red30
+	aperture	375
+	beam	375
+	center	2000. 3940.031
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.3798161
+		2.074061
+		0.6897024
+		0.02203362
+		0.02072804
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 376 2000. 3948.5
+	image	masterflat_red30
+	aperture	376
+	beam	376
+	center	2000. 3948.5
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.3909203
+		2.091149
+		0.6890317
+		0.02166357
+		0.02262466
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 377 2000. 3956.809
+	image	masterflat_red30
+	aperture	377
+	beam	377
+	center	2000. 3956.809
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.3831207
+		2.091673
+		0.6905917
+		0.02461846
+		0.01900959
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 378 2000. 3965.097
+	image	masterflat_red30
+	aperture	378
+	beam	378
+	center	2000. 3965.097
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.3786586
+		2.095316
+		0.6963285
+		0.0212225
+		0.02209904
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 379 2000. 3973.484
+	image	masterflat_red30
+	aperture	379
+	beam	379
+	center	2000. 3973.484
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.393777
+		2.119552
+		0.7031993
+		0.02768912
+		0.02470433
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 380 2000. 3981.79
+	image	masterflat_red30
+	aperture	380
+	beam	380
+	center	2000. 3981.79
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.3712609
+		2.100905
+		0.693761
+		0.02073299
+		0.02194629
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 381 2000. 3990.083
+	image	masterflat_red30
+	aperture	381
+	beam	381
+	center	2000. 3990.083
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.3887584
+		2.121424
+		0.7123711
+		0.02562973
+		0.02784142
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 382 2000. 3998.419
+	image	masterflat_red30
+	aperture	382
+	beam	382
+	center	2000. 3998.419
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.4077788
+		2.115554
+		0.7022121
+		0.02157359
+		0.02672224
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 383 2000. 4006.701
+	image	masterflat_red30
+	aperture	383
+	beam	383
+	center	2000. 4006.701
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.395994
+		2.12628
+		0.7011458
+		0.02193204
+		0.02541291
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 384 2000. 4037.849
+	image	masterflat_red30
+	aperture	384
+	beam	384
+	center	2000. 4037.849
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.4214925
+		2.149927
+		0.7361696
+		0.02051197
+		0.02176994
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 385 2000. 4046.019
+	image	masterflat_red30
+	aperture	385
+	beam	385
+	center	2000. 4046.019
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.4106275
+		2.130641
+		0.7389719
+		0.02137252
+		0.03042292
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 386 2000. 4054.358
+	image	masterflat_red30
+	aperture	386
+	beam	386
+	center	2000. 4054.358
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.4049853
+		2.14175
+		0.7336494
+		0.02053665
+		0.0302151
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 387 2000. 4062.645
+	image	masterflat_red30
+	aperture	387
+	beam	387
+	center	2000. 4062.645
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.4141412
+		2.133712
+		0.7358282
+		0.01823665
+		0.02646778
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 388 2000. 4070.684
+	image	masterflat_red30
+	aperture	388
+	beam	388
+	center	2000. 4070.684
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.4038975
+		2.13466
+		0.7454459
+		0.02066207
+		0.02873264
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 389 2000. 4078.934
+	image	masterflat_red30
+	aperture	389
+	beam	389
+	center	2000. 4078.934
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.3971835
+		2.144556
+		0.7577047
+		0.01713282
+		0.03818453
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 390 2000. 4087.077
+	image	masterflat_red30
+	aperture	390
+	beam	390
+	center	2000. 4087.077
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.4208301
+		2.13308
+		0.753499
+		0.0155658
+		0.03894453
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 391 2000. 4095.341
+	image	masterflat_red30
+	aperture	391
+	beam	391
+	center	2000. 4095.341
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.4074736
+		2.145813
+		0.7596119
+		0.01445373
+		0.0375994
+
+# Wed 15:35:33 03-Mar-2021
+begin	aperture masterflat_red30 392 2000. 4103.723
+	image	masterflat_red30
+	aperture	392
+	beam	392
+	center	2000. 4103.723
+	low	-1999. -3.
+	high	2146. 3.
+	background
+		xmin -10.
+		xmax 10.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	2
+	curve	9
+		2.
+		5.
+		10.
+		4090.
+		0.421921
+		2.149124
+		0.7615583
+		0.008126088
+		0.03673711
+
