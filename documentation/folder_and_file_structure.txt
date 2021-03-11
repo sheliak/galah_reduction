@@ -43,8 +43,10 @@ reductions
 |   |   |   |-- *.txt
 |   |   |   |-- ...
 |
-|-- dr6.0.fits
 |-- dr6.0.csv
+|-- dr6.0.fits
+|-- dr6.0.hdf5
+|-- dr6.0_spectra.hdf5
 
 File structure
 

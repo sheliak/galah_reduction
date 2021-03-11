@@ -1,0 +1,68 @@
+Structure of the spectral HDF5 database 
+
+The database can be acquired from the file named dr6.0_spectra.hdf5.
+
+Individual spectra of the different night are compiled into a single DHF5 file that has the following structure:
+
+|-- sobject_id (15 digit unique spectrum identifier)
+|   |-- ccd1
+|   |   |-- fluxed (array of floats - named copy of extensions in original file)
+|   |   |-- normalized
+|   |   |-- relative_error
+|   |   |-- sky
+|   |   |-- teluric
+|   |   |-- scattered
+|   |   |-- cross_talk
+|   |   |-- resolution_profile
+|   |   |-- CRVAL1 (copy of entries in fits header for the extension 0)
+|   |   |-- CDELT1
+|   |   |-- ...
+|   |-- ccd2
+|   |   |-- fluxed
+|   |   |-- normalized
+|   |   |-- relative_error
+|   |   |-- sky
+|   |   |-- teluric
+|   |   |-- scattered
+|   |   |-- cross_talk
+|   |   |-- resolution_profile
+|   |   |-- CRVAL1
+|   |   |-- CDELT1
+|   |   |-- ...
+|   |-- ccd3
+|   |   |-- fluxed
+|   |   |-- normalized
+|   |   |-- relative_error
+|   |   |-- sky
+|   |   |-- teluric
+|   |   |-- scattered
+|   |   |-- cross_talk
+|   |   |-- resolution_profile
+|   |   |-- CRVAL1
+|   |   |-- CDELT1
+|   |   |-- ...
+|   |-- ccd4
+|   |   |-- fluxed (array of floats - named copy of extensions in original file)
+|   |   |-- normalized
+|   |   |-- relative_error
+|   |   |-- sky
+|   |   |-- teluric
+|   |   |-- scattered
+|   |   |-- cross_talk
+|   |   |-- resolution_profile
+|   |   |-- CRVAL1
+|   |   |-- CDELT1
+|   |   |-- ...
+|-- ...
+
+Example of how to read an individual spectrum in python:
+
+import numpy as np
+import h5py
+
+galah = h5py.File('dr6.0_spectra.hdf5', 'r')
+spectrum = galah['190207003201266']['ccd1']['normalized'][:]
+wvl = np.arange(spectrum.shape[0]) * galah['190207003201266']['ccd1']['CDELT1'] + galah['190207003201266']['ccd1']['CRVAL1']
+galah.close()
+
+

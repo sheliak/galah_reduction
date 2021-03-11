@@ -98,7 +98,7 @@ reductions
 |   |   |   |-- ddmmm2rrrr.fits
 |   |   |   |-- ...
 |   |   |-- ...
-|   |   
+|   |
 |   |-- ccd3
 |   |   |-- yymmddrrrr (10 digit COB number)
 |   |   |   |-- masterflat.fits
@@ -106,7 +106,7 @@ reductions
 |   |   |   |-- ddmmm3rrrr.fits
 |   |   |   |-- ...
 |   |   |-- ...
-|   |   
+|   |
 |   |-- ccd4
 |   |   |-- yymmddrrrr (10 digit COB number)
 |   |   |   |-- masterflat.fits
@@ -175,11 +175,66 @@ From the reduced spectra, one can produce intermediate spectra, as they would ap
 
 **1. MERGE DATABASES**
 
-After one night is reduced, the reduction database is created for that night only. If you are happy with the results, you can merge it into a global database that includes results for multiple nights. Script `merge_db.py` in `utils` does that for you. It will merge the database for one night into `dr6.0.fits` and `dr6.0.csv` files (or create them, if they don't exist yet) in the `reductions/` directory.
+After one night is reduced, the reduction database is created for that night only. If you are happy with the results, you can merge it into a global database that includes results for multiple nights. Script `merge_db.py` in `utils` does that for you. It will merge the database for one night into `dr6.0.fits`, `dr6.0.csv` and `dr6.0.hfd5` files (or create them, if they don't exist yet) in the `reductions/` directory.
 
 **2. HDF5 SPECTRAL DATABASE (optional)**
 
-If you prefer to have all spectra combined into a single hdf5 file, the procedure `create_hdf5_database.py` that is located in the `utils` folder. It will read the final merged database and save all combined spectra into a `dr6.0_com.hdf5` file. This procedure takes a long time if the number of spectra is large.
+If you prefer to have all spectra combined into a single hdf5 file, use the procedure `create_hdf5_spectra.py` located in the `utils` folder. It will read the individual night database and save all its combined spectra into the `dr6.0_spectra.hdf5` file (or create it if it does not exist yet). The input arguments are the same as for creating the merged database. This procedure may take a long time if the number of spectra/nights is large.
+
+Created HDF5 has the following structure:
+```
+dr6.0_spectra.hdf5
+|-- sobject_id (15 digit unique spectrum identifier)
+|   |-- ccd1
+|   |   |-- fluxed (array of floats - named copy of extensions in original file)
+|   |   |-- normalized
+|   |   |-- relative_error
+|   |   |-- sky
+|   |   |-- teluric
+|   |   |-- scattered
+|   |   |-- cross_talk
+|   |   |-- resolution_profile
+|   |   |-- CRVAL1 (copy of entries in fits header for the extension 0)
+|   |   |-- CDELT1
+|   |   |-- ...
+|   |-- ccd2
+|   |   |-- fluxed
+|   |   |-- normalized
+|   |   |-- relative_error
+|   |   |-- sky
+|   |   |-- teluric
+|   |   |-- scattered
+|   |   |-- cross_talk
+|   |   |-- resolution_profile
+|   |   |-- CRVAL1
+|   |   |-- CDELT1
+|   |   |-- ...
+|   |-- ccd3
+|   |   |-- fluxed
+|   |   |-- normalized
+|   |   |-- relative_error
+|   |   |-- sky
+|   |   |-- teluric
+|   |   |-- scattered
+|   |   |-- cross_talk
+|   |   |-- resolution_profile
+|   |   |-- CRVAL1
+|   |   |-- CDELT1
+|   |   |-- ...
+|   |-- ccd4
+|   |   |-- fluxed (array of floats - named copy of extensions in original file)
+|   |   |-- normalized
+|   |   |-- relative_error
+|   |   |-- sky
+|   |   |-- teluric
+|   |   |-- scattered
+|   |   |-- cross_talk
+|   |   |-- resolution_profile
+|   |   |-- CRVAL1
+|   |   |-- CDELT1
+|   |   |-- ...
+|-- ...
+```
 
 # Known errors and issues
  - **Not enough space in image header**: Find login.cl file and raise the `min_lenuserarea` parameter (also uncomment it, if commented before).
