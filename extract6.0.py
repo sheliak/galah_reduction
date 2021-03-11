@@ -253,6 +253,9 @@ def prepare_dir(dir, str_range='*', list_cobs=True):
 
 	extract_log.info('Checking contents of the given folder.')
 
+	# load whitelisted COBs
+	whitelist_cobs = np.loadtxt('aux/whitelisted_cobs', dtype='S12')
+
 	if dir[-1]=='/': dir=dir[:-1]
 
 	cobs_all=[]
@@ -338,7 +341,7 @@ def prepare_dir(dir, str_range='*', list_cobs=True):
 				new_t_coord = SkyCoord(ra=hdul[0].header['MEANRA'] * u.deg, dec=hdul[0].header['MEANDEC'] * u.deg)
 				hdul.close()
 
-				if f[3]!=current_field or f[4]!=current_plate or current_t_coord.separation(new_t_coord) > 1 * u.deg:
+				if f[3]!=current_field or f[4]!=current_plate or (current_t_coord.separation(new_t_coord) > 1 * u.deg and cob_id not in whitelist_cobs):
 					if _has_cob_all_frames(cob_content, current_cob, ccd):
 						cobs.append([current_cob,cob_content])
 						list_of_cob_ids.append(cob_id)
