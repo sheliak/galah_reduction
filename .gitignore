@@ -5,7 +5,6 @@
 *.pyc
 
 # Datasets
-*.csv
 *.fits
 *.vot
 
@@ -26,3 +25,4 @@ login.cl
 pyraf
 reductions
 uparm
+utils/CNN_train
