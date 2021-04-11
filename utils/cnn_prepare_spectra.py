@@ -98,7 +98,6 @@ if __name__ == "__main__":
             try:
                 # resample read spectrum to the same grid
                 new_spec_flx, idx_use = spectrum_resample(spectrum.f, spectrum.l, target_wvl)
-                print np.float16(new_spec_flx)
             except:
                 # logging.warning('Resampling problem for spectrum {:s}.'.format(spectrum_id))
                 continue

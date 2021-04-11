@@ -1,4 +1,5 @@
 import os
+import sys
 os.environ['KERAS_BACKEND'] = 'tensorflow'
 
 from keras.layers import Input, Dense, Conv1D, MaxPooling1D, Dropout, Flatten, Activation
@@ -145,7 +146,7 @@ save_fits_predictions = True
 abund_positive_offset = 0.
 
 # ann settings
-dropout_learning = True
+dropout_learning = False
 dropout_rate = 0.1
 dropout_learning_c = False
 dropout_rate_c = 0.
@@ -154,15 +155,15 @@ activation_function = None # 'relu'  # dense layers - if set to None defaults to
 activation_function_c = None # 'relu'  # 'relu'  # None  # convolution layers - if set to None defaults to PReLu
 
 # convolution layer 1
-C_f_1 = 3  # number of filters
+C_f_1 = 5  # number of filters
 C_k_1 = 7  # size of convolution kernel
 C_s_1 = 1  # strides value
-P_s_1 = 4  # size of pooling operator
+P_s_1 = 3  # size of pooling operator
 # convolution layer 2
-C_f_2 = 3
+C_f_2 = 5
 C_k_2 = 5
 C_s_2 = 1
-P_s_2 = 4
+P_s_2 = 3
 # convolution layer 3
 C_f_3 = 0
 C_k_3 = 5
@@ -182,8 +183,8 @@ step_wvl = np.array([0.04, 0.05, 0.06, 0.07])
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("reduction", help="Path to the folder with the combined reduction database (dr6.0.fits) from the Iraf_6.0 reduction pipeline.")
-    parser.add_argument("parameters", help="Full path to the fits file with stellar parameters (GALAH+ DR3) that will be used for training the CNN architecture.")
+    parser.add_argument("reduction", help="Full path to the fits file with the combined reduction database (dr6.0.fits or simillar) from the Iraf reduction pipeline.")
+    parser.add_argument("parameters", help="Full path to the fits file with stellar parameters (GALAH+ DR3 or simillar) that will be used for training the CNN architecture.")
     args = parser.parse_args()
 
     log_file = 'cnn_train_network.log'
@@ -191,11 +192,8 @@ if __name__ == "__main__":
         os.remove(log_file)
     logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%Y/%m/%d %H:%M:%S', filename=log_file, level=logging.DEBUG)
 
-    galah_data_dir = args.reduction
-    if galah_data_dir[-1]!='/': galah_data_dir += '/'
-
+    galah_obs_fits = args.reduction
     # read the list of reduced data
-    galah_obs_fits = galah_data_dir + 'dr6.0.fits'
     if os.path.isfile(galah_obs_fits):
         galah_param = Table.read(galah_obs_fits)
         logging.info('Number of availible spectra: {:d}'.format(len(galah_param)))
@@ -230,6 +228,7 @@ if __name__ == "__main__":
 
     # determine parameters to train on
     sme_abundances_list = [col for col in abund_param.colnames if '_fe' in col and len(col.split('_')) == 2 and len(col.split('_')[0]) <= 2]
+    # sme_abundances_list = ['Na_fe', 'Al_fe', 'Si_fe', 'K_fe', 'Ca_fe', 'Ti_fe']
     sme_params = ['teff', 'logg', 'vbroad', 'vmic', 'fe_h', 'alpha_fe']
 
     # select only abundances with some datapoints
@@ -239,8 +238,10 @@ if __name__ == "__main__":
     # Parameters flagging procedure
     # Only flag_sp and flag_fe_h are taken into account. Individual abundance flags are currentlly not considered for selection
     logging.info('Applying various flags to training set')
-    abund_param = abund_param[np.logical_and(abund_param['flag_fe_h'] == 0, abund_param['red_flag'] == 0)]
-    abund_param = abund_param[np.logical_and(abund_param['vbroad'] <= 50, abund_param['flag_sp'] == 0)]
+    abund_param = abund_param[np.logical_and(abund_param['flag_fe_h'] == 0, 
+                                             abund_param['red_flag'] == 0)]
+    abund_param = abund_param[np.logical_and(abund_param['vbroad'] <= 50, 
+                                             abund_param['flag_sp'] == 0)]
     # TODO: SNR cuts if needed
 
     logging.info('SME Abundances: ' + ' '.join(sme_abundances_list))
@@ -262,17 +263,19 @@ if __name__ == "__main__":
     np.savetxt('model_wvl.dat', wvl_data, '%11.5f')
 
     # determine and filter out spectral entries with nan only rows - no spectral data was added to the database
-    print 'spectral_data',spectral_data.shape
-    idx_bad_rows = np.logical_not(np.isfinite(spectral_data).any(axis=1))
-    logging.info('Removing {:d} spectral lines with no spectral information.'.format(np.sum(idx_bad_rows)))
+    # additionaly remove entries that were flagged during reduction precedure
+    idx_bad_rows = np.logical_or(np.logical_not(np.isfinite(spectral_data).any(axis=1)),
+                                 galah_param['reduction_flags'] > 0)
+    logging.info('Removing {:d} spectral lines with no spectral information or reduction flag > 0.'.format(np.sum(idx_bad_rows)))
     spectral_data = spectral_data[np.logical_not(idx_bad_rows), :]
     galah_param = galah_param[np.logical_not(idx_bad_rows)]
+    logging.info(spectral_data.shape)
 
     # somehow handle cols with nan values, delete cols or fill in data
     idx_bad_spectra = np.where(np.logical_not(np.isfinite(spectral_data)))
     n_bad_spectra = len(idx_bad_spectra[0])
     if n_bad_spectra > 0:
-        logging.info('Correcting '+str(n_bad_spectra)+' bad flux values in read spectra.')
+        logging.info('Correcting {:d} bad flux values in read spectra.'.format(n_bad_spectra))
         spectral_data[idx_bad_spectra] = 1.  # remove nan values with theoretical continuum flux value
 
     # normalize data (flux at every wavelength)
@@ -289,12 +292,13 @@ if __name__ == "__main__":
     # ----------------- Determine train set -----------------------
     # -------------------------------------------------------------
     # final set of parameters
-    galah_param_complete = join(galah_param['sobject_id', 'rv'],
+    galah_param_complete = join(galah_param['sobject_id', 'ra', 'dec'],
                                 abund_param[list(np.hstack(('sobject_id', sme_abundances_list, sme_params)))],
                                 keys='sobject_id', join_type='left')
     # replace/fill strange masked (--) values with np.nan
     for c_col in galah_param_complete.colnames[1:]:   # 1: to skis sobject_id column
-        galah_param_complete[c_col] = galah_param_complete[c_col].filled(np.nan)
+        if sys.version_info[0] == 2:
+            galah_param_complete[c_col] = galah_param_complete[c_col].filled(np.nan)
 
     # select only rows with valid parameters and spectra data
     logging.info('Size complete: ' + str(len(galah_param_complete)))
@@ -317,7 +321,7 @@ if __name__ == "__main__":
 
     plot_suffix = ''
 
-    param_joined = join(galah_param['sobject_id', 'rv'],
+    param_joined = join(galah_param['sobject_id', 'ra', 'dec'],
                         abund_param[list(np.hstack(('sobject_id', sme_abundance, additional_train_feat)))][idx_abund_rows],
                         keys='sobject_id', join_type='inner')
 
@@ -430,11 +434,11 @@ if __name__ == "__main__":
     abundance_ann.summary()
 
     metwork_weights_file = 'model_nn_weights_last.h5'
-    metwork_weights_file_best = glob('model_nn_weights_*-*-*.h5')
-    if len(metwork_weights_file_best) == 1:
+    metwork_weights_file_best = 'model_nn.h5'
+    if os.path.isfile(metwork_weights_file_best):
         save_fits = False
         logging.info('Reading NN weighs - CAE')
-        abundance_ann.load_weights(metwork_weights_file_best[0], by_name=True)
+        abundance_ann.load_weights(metwork_weights_file_best, by_name=True)
     else:
         # define early stopping callback
         earlystop = EarlyStopping(monitor='val_loss', patience=200, verbose=1, mode='auto')
@@ -443,12 +447,12 @@ if __name__ == "__main__":
                                      save_weights_only=True, mode='auto', period=1)
         # fit the NN model
         # split into train and validation set
-        vals_split_per = 85.  # percent, randomly generate validation set for every run
+        vals_split_per = 10.  # percent, randomly generate validation set for every run
         idx_val = np.in1d(np.arange(n_train_sme),
                           np.random.choice(np.arange(n_train_sme), int(n_train_sme*vals_split_per/100.), replace=False))
         ann_fit_hist = abundance_ann.fit(spectral_data_train[~idx_val, :], abund_values_train[~idx_val, :],
-                                         epochs=200,
-                                         batch_size=int(np.ceil(n_train_sme*(100-vals_split_per)/100./10)),  # batches must be keept quite large to reduce overfitting
+                                         epochs=250,
+                                         batch_size=int(np.ceil(n_train_sme*(100-vals_split_per)/100./12)),  # batches must be keept quite large to reduce overfitting
                                          shuffle=True,
                                          callbacks=[earlystop, checkpoint],
                                          validation_data=(spectral_data_train[idx_val, :], abund_values_train[idx_val, :]),
@@ -468,49 +472,41 @@ if __name__ == "__main__":
         plt.close()
 
         last_loss = ann_fit_hist.history['loss'][-1]
-        if last_loss > 15:
-            # something went wrong, do not evaluate this case
-            logging.error('Final loss was quite large:', last_loss)
-            save_fits = True
-            save_model_last = False
-        else:
-            save_fits = True
-            save_model_last = False
-
+            
+        save_model_last = False
         if save_model_last:
             logging.info('Saving NN weighs')
             abundance_ann.save_weights(metwork_weights_file, overwrite=True)
 
         # recover weights of the best model and compute predictions
-        h5_weight_files = glob('ann_network_{:03.0f}-*-*.h5'.format(i_best + 1))
+        h5_weight_files = glob('model_nn_weight_{:03.0f}-*-*.h5'.format(i_best + 1))
         if len(h5_weight_files) == 1:
             logging.info('Restoring epoch {:.0f} with the lowest validation loss ({:.3f}).'.format(i_best + 1, ann_fit_hist.history['val_loss'][i_best]))
             abundance_ann.load_weights(h5_weight_files[0], by_name=True)
             # delete all other h5 files that were not used and may occupy a lot of hdd space
-            for h5_file in glob('ann_network_*-*-*.h5'.format(i_run)):
+            for h5_file in glob('model_nn_weights_*-*-*.h5'):
                 if h5_file != h5_weight_files[0]:
                     os.system('rm ' + h5_file)
         else:
             logging.info('The last model will be used to compute predictions.')
-            logging.info('Glob weights search results:', h5_weight_files)
 
         logging.info('Saving model for GALAH pipeline')
-        abundance_ann.save_weights('model_nn_weights.h5'.format(i_run), overwrite=True)
+        abundance_ann.save_weights('model_nn_weights.h5', overwrite=True)
 
         # save model architecture in HDF5 and JSON fomats - the following can be used in further loading of the architecture
-        abundance_ann.save('model_nn.h5'.format(i_run), overwrite=True)
+        abundance_ann.save('model_nn.h5', overwrite=True)
         model_json = abundance_ann.to_json()
-        with open('model_nn.json'.format(i_run), "w") as json_file:
+        with open('model_nn.json', "w") as json_file:
             json.dump(model_json, json_file)
 
     # evaluate on all spectra
     logging.info('Predicting abundance values from spectra')
     abundance_predicted = abundance_ann.predict(spectral_data)
-    if normalize_abund_values:
-        logging.info('Denormalizing output values of features')
-        # 
-        for i_f in range(n_train_feat):
-            abundance_predicted[:, i_f] = (abundance_predicted[:, i_f] - abund_positive_offset) * train_feat_std[i_f] + train_feat_mean[i_f]
+
+    logging.info('Denormalizing output values of features')
+    # 
+    for i_f in range(n_train_feat):
+        abundance_predicted[:, i_f] = (abundance_predicted[:, i_f] - abund_positive_offset) * train_feat_std[i_f] + train_feat_mean[i_f]
 
     # add parameters to the output table
     for s_p in additional_train_feat:
@@ -624,5 +620,5 @@ if __name__ == "__main__":
 
     # also save results (predictions) at the end
     if save_fits_predictions:
-        fits_out = 'galah_abund_ANN_DR3.fits'.format(i_run)
+        fits_out = 'galah_abund_ANN_DR3.fits'
         galah_param_complete.write(fits_out, overwrite=True)   
