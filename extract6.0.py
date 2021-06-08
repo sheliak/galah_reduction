@@ -481,6 +481,7 @@ def prepare_dir(dir, str_range='*', list_cobs=True):
 def remove_bias(date):
 	"""
 	Bias is removed from all images. If there are not enough biases (less than 3) overscan is used.
+	Readout speed is checked, so correct biases are used.
 
 	Parameters:
 		date (str): date string (e.g. 190210)
@@ -495,12 +496,26 @@ def remove_bias(date):
 	extract_log.info('Correcting bias.')
 	for ccd in [1,2,3,4]:
 		files=glob.glob("reductions/%s/ccd%s/biases/*.fits" % (date,ccd))
+
+		normal_speed=[]
+		fast_speed=[]
+
+		# check readout speed
+		for file in files:
+			hdul=fits.open(file)
+			speed=hdul[0].header['SPEED']
+			hdul.close()
+			if speed=='FAST': fast_speed.append(file)
+			elif speed=='NORMAL': normal_speed.append(file)
+			else: extract_log.warning("Bias %s has unrecognised readout speed %s." % (file, speed))
+
+		# remove bias from normal readout files
 		
-		if len(files)>=5:
-			extract_log.info("Found at least 5 biases and making proper bias subtraction for images from CCD %s." % ccd)
+		if len(normal_speed)>=5:
+			extract_log.info("Found at least 5 biases and making proper bias subtraction for images from CCD %s with normal readout speed." % ccd)
 			# create masterbias
 			biases=[]
-			for f in files:
+			for f in normal_speed:
 				hdul=fits.open(f)
 				biases.append(hdul[0].data)
 				hdul.close()
@@ -513,18 +528,68 @@ def remove_bias(date):
 					continue
 				else:
 					with fits.open(f, mode='update') as hdu_c:
-						hdu_c[0].data=hdu_c[0].data-masterbias
-						hdu_c.flush()
+						speed=hdu_c[0].header['SPEED']
+						if speed!='NORMAL': 
+							continue
+						else:
+							hdu_c[0].data=hdu_c[0].data-masterbias
+							hdu_c.flush()
+
 		else: # if there are not enough biases, use overscan
-			extract_log.warning("Found less than 5 biases for CCD %s thus using overscan." % ccd)
+			extract_log.warning("Found less than 5 biases for CCD %s thus using overscan for normal readout speed." % ccd)
 			files=glob.glob("reductions/%s/ccd%s/*/[01-31]*.fits" % (date,ccd))
 			for f in files:
 				if 'biases' in f: 
 					continue
 				else:
 					with fits.open(f, mode='update') as hdu_c:
-						hdu_c[0].data=hdu_c[0].data-np.transpose(np.ones([4146,4112])*np.mean(hdu_c[0].data[:,4096:],axis=1))			
-						hdu_c.flush()						
+						speed=hdu_c[0].header['SPEED']
+						if speed!='NORMAL': 
+							continue
+						else:
+							hdu_c[0].data=hdu_c[0].data-np.transpose(np.ones([4146,4112])*np.mean(hdu_c[0].data[:,4096:],axis=1))			
+							hdu_c.flush()
+
+		# remove bias from fast readout files
+		
+		if len(fast_speed)>=5:
+			extract_log.info("Found at least 5 biases and making proper bias subtraction for images from CCD %s with fast readout speed." % ccd)
+			# create masterbias
+			biases=[]
+			for f in fast_speed:
+				hdul=fits.open(f)
+				biases.append(hdul[0].data)
+				hdul.close()
+			masterbias=np.median(np.array(biases), axis=0)
+
+			# remove bias from images
+			files=glob.glob("reductions/%s/ccd%s/*/[01-31]*.fits" % (date,ccd))
+			for f in files:
+				if 'biases' in f: 
+					continue
+				else:
+					with fits.open(f, mode='update') as hdu_c:
+						speed=hdu_c[0].header['SPEED']
+						if speed!='FAST': 
+							continue
+						else:
+							hdu_c[0].data=hdu_c[0].data-masterbias
+							hdu_c.flush()
+
+		else: # if there are not enough biases, use overscan
+			extract_log.warning("Found less than 5 biases for CCD %s thus using overscan for fast readout speed." % ccd)
+			files=glob.glob("reductions/%s/ccd%s/*/[01-31]*.fits" % (date,ccd))
+			for f in files:
+				if 'biases' in f: 
+					continue
+				else:
+					with fits.open(f, mode='update') as hdu_c:
+						speed=hdu_c[0].header['SPEED']
+						if speed!='FAST': 
+							continue
+						else:
+							hdu_c[0].data=hdu_c[0].data-np.transpose(np.ones([4146,4112])*np.mean(hdu_c[0].data[:,4096:],axis=1))			
+							hdu_c.flush()						
 		
 		shutil.rmtree("reductions/%s/ccd%s/biases" % (date,ccd))
 		# sometimes the biases folder is not deleted properly. Lets fix this
@@ -1942,7 +2007,10 @@ def resolution_profile_proc(arg):
 		params = Parameters()
 		params.add('pos', value=p0[0], min=p0[0]-2.0, max=p0[0]+2.0)
 		params.add('amp', value=p0[1], min=p0[1]*0.7, max=p0[1]*1.3)
-		params.add('fwhm', value=p0[2], min=p0[2]*0.5, max=p0[2]*1.5)
+		if p0[3]:# if high res data
+			params.add('fwhm', value=p0[2], min=p0[2]*0.2, max=p0[2]*1.5)
+		else:
+			params.add('fwhm', value=p0[2], min=p0[2]*0.5, max=p0[2]*1.5)
 		params.add('b', value=2.5, min=2.0, max=3.8, vary=vary_B)
 		minner = Minimizer(peak_profile, params, fcn_args=(x,y))
 		result = minner.minimize()
@@ -1951,9 +2019,6 @@ def resolution_profile_proc(arg):
 
 	iraf.noao(_doprint=0,Stdout="/dev/null")
 	iraf.onedspec(_doprint=0,Stdout="/dev/null")
-
-	# number of lines to be found that give best resolution profile:
-	n_of_lines_dict={1:45, 2:45, 3:45, 4:40}
 
 	cob,ccd=arg
 
@@ -1964,6 +2029,18 @@ def resolution_profile_proc(arg):
 	if not os.path.isfile(arc):
 		extract_log.warning('Masterarc was not found in ccd %d of COB %s, resolution profile will not be computed.' % (ccd, cob))
 		return 0
+
+	hdul=fits.open(arc)
+	is_high_res=hdul[0].header['SLITMASK']=='IN'
+	hdul.close()
+
+	if is_high_res:
+		# number of lines to be found that give best resolution profile FOR THE HIGH_RES SPECTRA:
+		n_of_lines_dict={1:15, 2:15, 3:15, 4:10}
+	else:
+		# number of lines to be found that give best resolution profile:
+		n_of_lines_dict={1:45, 2:45, 3:45, 4:40}
+
 
 	# linearize arc
 	iraf.disptrans(input=arc, output='', linearize='yes', units='angstroms', Stdout="/dev/null")
@@ -1982,7 +2059,10 @@ def resolution_profile_proc(arg):
 		#ax=fig.add_subplot(311)
 		#ax.plot(data[line], 'k-')
 		# find peaks positions
-		peaks,properties=signal.find_peaks(data[line], width=(3.0,8.0), distance=10, height=75.0, prominence=1.0)
+		if is_high_res:
+			peaks,properties=signal.find_peaks(data[line], width=(1.0,5.5), distance=9, height=75.0, prominence=1.0)
+		else:
+			peaks,properties=signal.find_peaks(data[line], width=(3.0,8.0), distance=10, height=75.0, prominence=1.0)
 		widths=properties['widths']
 		heights=properties['peak_heights']
 		# accept only some strongest peaks
@@ -2000,7 +2080,7 @@ def resolution_profile_proc(arg):
 		# fit peaks with a modified gaussian function and calculate mean B parameter for each fibre
 		bs=[]
 		for i,j,k in zip(peaks, widths, heights):
-			res=fit_profile([i,k,j], data[line])
+			res=fit_profile([i,k,j,is_high_res], data[line])
 			#ax2.plot(res[0],res[2], 'ro')
 			#ax.plot(np.arange(len(data[line])), res[1]*np.exp(-(abs(2*(np.arange(len(data[line]))-res[0])/res[2])**res[3])*0.693147), 'r-')
 			#ax3.plot(res[0],res[3], 'ro')
@@ -2015,7 +2095,7 @@ def resolution_profile_proc(arg):
 		# fit peaks again to get their fwhm, given a fixed B
 		widths_fit=[]
 		for i,j,k in zip(peaks, widths, heights):
-			res=fit_profile([i,k,j], data[line], vary_B=False)
+			res=fit_profile([i,k,j,is_high_res], data[line], vary_B=False)
 			widths_fit.append(res[2])
 		widths=np.array(widths_fit)
 		# remember peaks widths and B values
@@ -3157,7 +3237,7 @@ def create_final_spectra_proc(args):
 				pass
 			else: 
 				n+=1
-				fibre_table_dict[n]=np.append(np.array(i), [np.array([fibre+1]), 0.0])
+				fibre_table_dict[n]=np.append(np.array(i), [fibre+1, 0.0])
 		fibre_table_dict=defaultdict(lambda:np.array(['FIBRE NOT IN USE', 0.0, 0.0, 0, 0, 0, 0, 0.0, 'N', 0, 0.0, 0, 'Not in use', '0', 0.0, 0.0, 0.0, fibre+1, 'None']), fibre_table_dict)
 
 		# create extinction array to be added to fibre_table_dict
@@ -3353,9 +3433,9 @@ def create_final_spectra_proc(args):
 				ra=float(fibre_table_dict[ap][1])/np.pi*180.
 				dec=float(fibre_table_dict[ap][2])/np.pi*180.
 				pivot=fibre_table_dict[ap][9]
-				fibre=fibre_table_dict[ap][-1]
+				fibre=int(float(fibre_table_dict[ap][-2]))
 				x=fibre_table_dict[ap][3]
-				y=fibre_table_dict[ap][4]
+				yy=fibre_table_dict[ap][4]
 				theta=fibre_table_dict[ap][7]
 				pmra=float(fibre_table_dict[ap][15])#value in the table is not multiplied by cos(dec)
 				pmdec=float(fibre_table_dict[ap][16])
@@ -3492,7 +3572,7 @@ def create_final_spectra_proc(args):
 					hdul[extension].header['PIVOT']=(int(pivot), 'Pivot number (1-400, in 2dF)')
 					hdul[extension].header['FIBRE']=(int(fibre), 'Fibre number (1-400, in image)')
 					hdul[extension].header['X']=(float(x), 'x position of fibre on plate in um')
-					hdul[extension].header['Y']=(float(y), 'y position of fibre on plate in um')
+					hdul[extension].header['Y']=(float(yy), 'y position of fibre on plate in um')
 					hdul[extension].header['THETA']=(float(theta), 'Bend of fibre in degrees')
 					#position of aperture on image
 					hdul[extension].header['AP_POS']=(aperture_flags_dict[ap][0], 'Position of aperture in image at x=2000')
@@ -4100,6 +4180,7 @@ def create_database(date):
 		if header3['RV_OK']==0: flag+=16384
 		if header1['RVCOM_OK']==0: flag+=65536#this one is the same in all 4 ccds
 		if header1['PAR_OK']==0: flag+=131072#parameters are calculated over all arms, so this flag is the same for all 4 ccds
+		if header1['SLITMASK']=='IN': flag+=262144#flag for high res spectra
 		if has_ccd4:
 			if header4['TRACE_OK']==0: flag+=8
 			if header4['WAV_OK']==0: flag+=128
@@ -4429,6 +4510,7 @@ def analyze_rv(args):
 		sigma_com=np.sqrt(sigma2)
 		if sigma_com>25: flag_com=0
 		else: flag_com=1
+		if np.isnan(sigma_com): sigma_com='None'
 		#report_fit(out)
 		#print 'com', rv_com, sigma_com
 		fit = residual(out.params, rvs[peak_prime-int(dist):peak_prime+int(dist)])

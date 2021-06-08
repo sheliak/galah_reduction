@@ -19,6 +19,7 @@ Bit	Decimal value	Description
 15	+32768	Radial velocity in IR CCD could not be calculated**
 16	+65536	Radial velocity could not be calculated from the combination of all four CCDs**
 17	+131072	Atmospheric parameters could not be calculated
+18	+262144	High-resolution spectra
 
 
 *A trace that didn't fit correctly might still produce useful spectra. Although it usually won't have cross-talk calculated properly.
