@@ -1,0 +1,7 @@
+This is the code used to reduce data in the GALAH survey. You need access to the raw data to use it. 
+It has been written by Janez Kos with contributions from Klemen Cotar and Kevin Luke Beeson at the Faculty of mathematics and physics, University of Ljubljana.
+More information is available in the paper at https://ui.adsabs.harvard.edu/abs/2017MNRAS.464.1259K/abstract
+
+db_description.txt               describes the products saved in the galah_dr6.0.fits database
+flags_description.txt            describes flags in the galah_dr6.0.fits database
+folder_and_file_structure.txt    describes the needed folders tructure to run this code.
